@@ -1,0 +1,14 @@
+{
+  "name": "soundshop-cl",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Interfaz Tailwind CSS para el prototipo Django SoundShop CL.",
+  "scripts": {
+    "build:css": "tailwindcss -i ./static/css/input.css -o ./static/css/tailwind.css --minify",
+    "watch:css": "tailwindcss -i ./static/css/input.css -o ./static/css/tailwind.css --watch"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.13",
+    "tailwindcss": "^4.1.13"
+  }
+}

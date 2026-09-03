@@ -1,0 +1,22 @@
+{% load static soundshop_extras %}
+<article class="product-card group flex h-full flex-col overflow-hidden rounded-3xl border border-white/[0.08] bg-slate-900/55">
+  <a href="{% url 'core:detalle_producto' producto.id %}" class="relative block aspect-square overflow-hidden bg-[#090d19]">
+    <img src="{% static producto.imagen %}" alt="{{ producto.nombre }} de {{ producto.marca }}" class="h-full w-full object-cover" loading="lazy">
+    <span class="absolute left-4 top-4 rounded-full border border-white/10 bg-slate-950/75 px-3 py-1 text-[0.65rem] font-bold uppercase tracking-[0.14em] text-slate-300 backdrop-blur">{{ producto.marca }}</span>
+    {% if producto.destacado %}<span class="absolute right-4 top-4 rounded-full bg-violet-500 px-3 py-1 text-[0.65rem] font-black uppercase tracking-[0.12em] text-white shadow-lg shadow-violet-950/50">Destacado</span>{% endif %}
+  </a>
+  <div class="flex flex-1 flex-col p-5">
+    <p class="text-xs font-bold uppercase tracking-[0.16em] text-violet-300">{{ producto.categoria|nombre_categoria }}</p>
+    <h3 class="mt-2 text-xl font-black tracking-tight text-white"><a class="transition hover:text-violet-300" href="{% url 'core:detalle_producto' producto.id %}">{{ producto.nombre }}</a></h3>
+    <p class="mt-2 line-clamp-2 text-sm leading-6 text-slate-400">{{ producto.descripcion }}</p>
+    <div class="mt-auto flex items-end justify-between gap-3 pt-5">
+      <div>
+        <p class="text-2xl font-black tracking-tight text-white">{{ producto.precio|precio_clp }}</p>
+        {% if producto.puede_comprarse %}<p class="mt-1 text-xs font-semibold text-emerald-400">{{ producto.stock }} unidades disponibles</p>{% else %}<p class="mt-1 text-xs font-semibold text-rose-400">Sin stock</p>{% endif %}
+      </div>
+      <a href="{% url 'core:detalle_producto' producto.id %}" class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-slate-950 transition hover:bg-violet-300" aria-label="Ver {{ producto.nombre }}">
+        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+  </div>
+</article>

@@ -1,0 +1,109 @@
+:root {
+  color-scheme: dark;
+  --sound-violet: #8b5cf6;
+  --sound-blue: #38bdf8;
+  --sound-pink: #ec4899;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background:
+    radial-gradient(circle at 12% -5%, rgba(124, 58, 237, 0.2), transparent 28rem),
+    radial-gradient(circle at 88% 15%, rgba(14, 165, 233, 0.13), transparent 26rem),
+    #050812;
+}
+
+::selection {
+  color: white;
+  background: rgba(139, 92, 246, 0.75);
+}
+
+.site-noise {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.12;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.95' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.16'/%3E%3C/svg%3E");
+}
+
+.glass-panel {
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.86), rgba(9, 13, 27, 0.78));
+  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(18px);
+}
+
+.gradient-text {
+  color: transparent;
+  background: linear-gradient(110deg, #c4b5fd 10%, #7dd3fc 48%, #f0abfc 90%);
+  background-clip: text;
+  -webkit-background-clip: text;
+}
+
+.hero-grid {
+  background-image:
+    linear-gradient(rgba(148, 163, 184, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.045) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: linear-gradient(to bottom, black 20%, transparent 95%);
+}
+
+.product-card {
+  transform: translateY(0);
+  transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(167, 139, 250, 0.38);
+  box-shadow: 0 24px 70px rgba(76, 29, 149, 0.16);
+}
+
+.product-card img,
+.product-stage img {
+  transition: transform 500ms cubic-bezier(.2, .7, .2, 1), filter 300ms ease;
+}
+
+.product-card:hover img {
+  transform: scale(1.045);
+  filter: saturate(1.08);
+}
+
+.sound-wave span {
+  display: inline-block;
+  width: 3px;
+  border-radius: 999px;
+  background: linear-gradient(to top, var(--sound-violet), var(--sound-blue));
+  animation: wave 1.15s ease-in-out infinite;
+}
+
+.sound-wave span:nth-child(2) { animation-delay: -0.45s; }
+.sound-wave span:nth-child(3) { animation-delay: -0.8s; }
+.sound-wave span:nth-child(4) { animation-delay: -0.25s; }
+
+@keyframes wave {
+  0%, 100% { height: 7px; opacity: 0.65; }
+  50% { height: 19px; opacity: 1; }
+}
+
+.message-enter {
+  animation: message-in 260ms ease-out both;
+}
+
+@keyframes message-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
