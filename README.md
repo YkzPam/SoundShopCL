@@ -123,6 +123,7 @@ SoundShopCL/
 - [Mockups y evidencia del prototipo](docs/mockups-prototipo.md)
 - [Auditoría de los diez indicadores](docs/auditoria-rubrica.md)
 - [Registro del apoyo de inteligencia artificial](docs/uso-inteligencia-artificial.md)
+- [Guion breve para la demostración](docs/guion-demostracion.md)
 
 ## Git y publicación en GitHub
 
