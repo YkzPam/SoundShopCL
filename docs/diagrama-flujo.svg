@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1040" viewBox="0 0 1600 1040" role="img" aria-labelledby="title desc">
+  <title id="title">Diagrama de flujo de SoundShop CL</title>
+  <desc id="desc">Recorrido desde el inicio hasta la confirmación simulada del pedido, con decisiones para resultados, identificadores y stock.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#050812"/><stop offset="1" stop-color="#10172a"/></linearGradient>
+    <linearGradient id="primary" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#7c3aed"/><stop offset="1" stop-color="#2563eb"/></linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0891b2"/><stop offset="1" stop-color="#7c3aed"/></linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#000" flood-opacity=".32"/></filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0l10 5-10 5z" fill="#64748b"/></marker>
+    <style>
+      .box{fill:#111827;stroke:#334155;stroke-width:2;filter:url(#shadow)}
+      .decision{fill:#172033;stroke:#8b5cf6;stroke-width:2;filter:url(#shadow)}
+      .line{fill:none;stroke:#64748b;stroke-width:3;marker-end:url(#arrow)}
+      .dash{fill:none;stroke:#475569;stroke-width:2.5;stroke-dasharray:9 8;marker-end:url(#arrow)}
+      .h{font:700 24px 'Segoe UI',sans-serif;fill:#f8fafc;text-anchor:middle}
+      .p{font:400 17px 'Segoe UI',sans-serif;fill:#aebbd0;text-anchor:middle}
+      .small{font:700 15px 'Segoe UI',sans-serif;fill:#c4b5fd;text-anchor:middle}
+      .label{font:700 16px 'Segoe UI',sans-serif;fill:#94a3b8}
+    </style>
+  </defs>
+  <rect width="1600" height="1040" rx="34" fill="url(#bg)"/>
+  <circle cx="1410" cy="90" r="230" fill="#7c3aed" opacity=".08"/><circle cx="90" cy="920" r="250" fill="#0ea5e9" opacity=".06"/>
+  <text x="800" y="56" font-family="Segoe UI,sans-serif" font-size="34" font-weight="800" fill="#fff" text-anchor="middle">Flujo principal · SoundShop CL</text>
+  <text x="800" y="88" font-family="Segoe UI,sans-serif" font-size="16" fill="#8290a7" text-anchor="middle">Sistema de sucursal y vitrina musical · Evaluación 1</text>
+
+  <rect x="650" y="120" width="300" height="86" rx="43" fill="url(#primary)" filter="url(#shadow)"/>
+  <text class="h" x="800" y="157">Inicio</text><text class="p" x="800" y="183" fill="#ddd6fe">Portada y destacados</text>
+  <path class="line" d="M800 206v55"/>
+
+  <rect class="box" x="610" y="262" width="380" height="105" rx="22"/>
+  <text class="h" x="800" y="304">Explorar catálogo</text><text class="p" x="800" y="334">Buscar, filtrar o elegir categoría</text>
+  <path class="line" d="M800 367v51"/>
+
+  <path class="decision" d="M800 418l165 86-165 86-165-86z"/>
+  <text class="h" x="800" y="494">¿Hay resultados?</text><text class="p" x="800" y="520">Datos filtrados desde JSON</text>
+  <path class="dash" d="M635 504H405v80"/>
+  <text class="label" x="500" y="489">No</text>
+  <rect class="box" x="235" y="584" width="340" height="96" rx="22"/>
+  <text class="h" x="405" y="622">Sin coincidencias</text><text class="p" x="405" y="650">Limpiar o cambiar filtros</text>
+  <path class="dash" d="M405 584V315h205"/>
+
+  <path class="line" d="M965 504h180"/>
+  <text class="label" x="1030" y="489">Sí</text>
+  <rect class="box" x="1145" y="452" width="340" height="105" rx="22"/>
+  <text class="h" x="1315" y="494">Seleccionar producto</text><text class="p" x="1315" y="524">URL con identificador entero</text>
+  <path class="line" d="M1315 557v54"/>
+
+  <path class="decision" d="M1315 611l155 78-155 78-155-78z"/>
+  <text class="h" x="1315" y="681">¿ID válido?</text><text class="small" x="1315" y="707">Vista Django</text>
+  <path class="dash" d="M1470 689h82V315H990"/>
+  <text class="label" x="1388" y="785">No: mensaje y retorno</text>
+  <path class="line" d="M1160 689H985"/>
+  <text class="label" x="1050" y="674">Sí</text>
+
+  <rect class="box" x="645" y="637" width="340" height="105" rx="22"/>
+  <text class="h" x="815" y="679">Ficha del producto</text><text class="p" x="815" y="709">Precio, stock y especificaciones</text>
+  <path class="line" d="M815 742v51"/>
+
+  <path class="decision" d="M815 793l145 74-145 74-145-74z"/>
+  <text class="h" x="815" y="858">¿Cantidad válida?</text><text class="small" x="815" y="884">1 ≤ cantidad ≤ stock</text>
+  <path class="dash" d="M670 867H575V690h70"/>
+  <text class="label" x="585" y="851">No</text>
+  <path class="line" d="M960 867h100"/>
+  <text class="label" x="995" y="851">Sí</text>
+
+  <rect x="1060" y="815" width="250" height="104" rx="22" fill="url(#accent)" filter="url(#shadow)"/>
+  <text class="h" x="1185" y="856">Carrito</text><text class="p" x="1185" y="885" fill="#e0f2fe">Actualizar o eliminar</text>
+  <path class="line" d="M1310 867h85"/>
+  <rect class="box" x="1395" y="815" width="170" height="104" rx="22"/>
+  <text class="h" x="1480" y="850">Confirmar</text><text class="p" x="1480" y="878">Pedido</text><text class="small" x="1480" y="901">POST + CSRF</text>
+  <path class="line" d="M1480 919v55H985"/>
+
+  <rect x="650" y="945" width="335" height="72" rx="36" fill="url(#primary)" filter="url(#shadow)"/>
+  <text class="h" x="817" y="977">Pedido simulado</text><text class="p" x="817" y="1001" fill="#ddd6fe">Código, total y fecha</text>
+</svg>
