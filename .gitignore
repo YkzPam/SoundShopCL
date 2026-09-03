@@ -1,0 +1,28 @@
+# Entorno virtual y configuración local
+venv/
+.venv/
+.env
+
+# Python y Django
+__pycache__/
+*.py[cod]
+*.sqlite3
+db.sqlite3
+media/
+staticfiles/
+
+# Herramientas de desarrollo
+.vscode/*.log
+.idea/
+.DS_Store
+Thumbs.db
+
+# Dependencias de Tailwind
+node_modules/
+npm-debug.log*
+
+# Pruebas y cobertura
+.coverage
+htmlcov/
+.pytest_cache/
+
