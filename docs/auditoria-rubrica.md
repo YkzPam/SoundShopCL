@@ -9,7 +9,7 @@
 | 3 | Vistas con ciclos y condiciones coherentes con el flujo | `core/views.py` filtra, calcula, decide estados y prepara colecciones iterables | Cumplido |
 | 4 | Plantillas que muestran variables y operadores del servidor | Plantillas `core`, herencia desde `base.html`, `{% for %}`, `{% if %}`, filtros y `{% url %}` | Cumplido |
 | 5 | Paquetes y librerías externas configuradas | `requirements.txt`, `package.json`, Tailwind CSS compilado y `package-lock.json` | Cumplido |
-| 6 | Módulos Django, estilos y repositorio Git | Formularios, sesiones, mensajes, archivos estáticos, CSRF, Tailwind y carpeta `.git` | Cumplido |
+| 6 | Módulos Django, estilos y repositorio GitHub | Formularios, sesiones, mensajes, archivos estáticos, CSRF, Tailwind y repositorio Git local con ocho commits | Pendiente solo la publicación pública |
 | 7 | Proyecto y aplicación creados y registrados | Proyecto `soundshop`, aplicación `core` en `INSTALLED_APPS` y comandos documentados | Cumplido |
 | 8 | Rutas limpias, modulares, semánticas y nombradas | `soundshop/urls.py` incluye `core.urls`; todas las rutas usan `path()` y `name` | Cumplido |
 | 9 | Vistas reciben `request`, crean contexto y renderizan | Funciones de `core/views.py` y helper `_datos_catalogo` | Cumplido |
@@ -30,3 +30,5 @@ El resultado esperado de Django es `System check identified no issues` y quince 
 ## 4.3 Límites declarados
 
 La tabla mide la primera evaluación y no afirma funciones que el proyecto todavía no posee. No existe autenticación, administración persistente, historial real, pasarela de pago ni seguimiento logístico. Esas capacidades requieren base de datos y corresponden al desarrollo posterior del caso semestral.
+
+El código todavía no posee un remoto de GitHub. La publicación se marcará como cumplida solo después de comprobar una URL pública que contenga la rama `main` y el historial completo; no se considera suficiente que el repositorio exista únicamente en el computador.
