@@ -1,0 +1,131 @@
+{
+  "categorias": [
+    {
+      "slug": "audifonos",
+      "nombre": "Audífonos",
+      "descripcion": "Modelos para escuchar música, mezclar y trabajar con aislamiento preciso.",
+      "icono": "headphones"
+    },
+    {
+      "slug": "tornamesas-vinilos",
+      "nombre": "Tornamesas y vinilos",
+      "descripcion": "Equipos y accesorios para recuperar el ritual de escuchar un disco completo.",
+      "icono": "disc"
+    },
+    {
+      "slug": "estudio-creacion",
+      "nombre": "Estudio y creación",
+      "descripcion": "Micrófonos e interfaces para grabar ideas con una señal clara y estable.",
+      "icono": "waveform"
+    }
+  ],
+  "productos": [
+    {
+      "id": 1,
+      "nombre": "Pulse X ANC",
+      "marca": "SoundLab",
+      "categoria": "audifonos",
+      "descripcion": "Audífonos inalámbricos circumaurales con cancelación activa de ruido y perfil equilibrado para jornadas largas.",
+      "precio": 89990,
+      "stock": 8,
+      "imagen": "img/productos/audifonos-pulse-x.png",
+      "destacado": true,
+      "etiquetas": ["bluetooth", "inalámbrico", "cancelación de ruido", "hi-fi"],
+      "especificaciones": {
+        "Conexión": "Bluetooth 5.3 y cable 3,5 mm",
+        "Autonomía": "Hasta 38 horas",
+        "Peso": "254 g",
+        "Garantía": "12 meses"
+      }
+    },
+    {
+      "id": 2,
+      "nombre": "Studio M40",
+      "marca": "North Audio",
+      "categoria": "audifonos",
+      "descripcion": "Monitores cerrados con cable desmontable, respuesta definida y almohadillas cómodas para edición y práctica musical.",
+      "precio": 59990,
+      "stock": 12,
+      "imagen": "img/productos/audifonos-pulse-x.png",
+      "destacado": false,
+      "etiquetas": ["estudio", "monitoreo", "cableado"],
+      "especificaciones": {
+        "Conexión": "Cable 3,5 mm desmontable",
+        "Respuesta": "15 Hz–24 kHz",
+        "Impedancia": "32 ohm",
+        "Garantía": "12 meses"
+      }
+    },
+    {
+      "id": 3,
+      "nombre": "Orbit One",
+      "marca": "Needle Works",
+      "categoria": "tornamesas-vinilos",
+      "descripcion": "Tornamesa de tracción por correa con preamplificador conmutable, cápsula magnética y cubierta antipolvo.",
+      "precio": 149990,
+      "stock": 5,
+      "imagen": "img/productos/tornamesa-orbit-one.png",
+      "destacado": true,
+      "etiquetas": ["vinilo", "tornamesa", "preamplificador", "33 rpm", "45 rpm"],
+      "especificaciones": {
+        "Velocidades": "33⅓ y 45 RPM",
+        "Tracción": "Correa",
+        "Salida": "RCA con preamplificador",
+        "Garantía": "12 meses"
+      }
+    },
+    {
+      "id": 4,
+      "nombre": "Record Care Kit",
+      "marca": "Needle Works",
+      "categoria": "tornamesas-vinilos",
+      "descripcion": "Set de cuidado con cepillo de fibra, líquido limpiador y paño suave para discos de vinilo.",
+      "precio": 22990,
+      "stock": 0,
+      "imagen": "img/productos/tornamesa-orbit-one.png",
+      "destacado": false,
+      "etiquetas": ["limpieza", "vinilo", "accesorio"],
+      "especificaciones": {
+        "Contenido": "Cepillo, líquido y paño",
+        "Uso": "Limpieza en seco y húmedo",
+        "Compatibilidad": "Discos de 7, 10 y 12 pulgadas"
+      }
+    },
+    {
+      "id": 5,
+      "nombre": "Vela C1",
+      "marca": "Voxline",
+      "categoria": "estudio-creacion",
+      "descripcion": "Micrófono condensador cardioide para voces, instrumentos acústicos, streaming y producción desde casa.",
+      "precio": 79990,
+      "stock": 6,
+      "imagen": "img/productos/microfono-vela-c1.png",
+      "destacado": true,
+      "etiquetas": ["micrófono", "condensador", "podcast", "voz", "xlr"],
+      "especificaciones": {
+        "Patrón": "Cardioide",
+        "Conexión": "XLR",
+        "Alimentación": "Phantom 48 V",
+        "Incluye": "Soporte y filtro antipop"
+      }
+    },
+    {
+      "id": 6,
+      "nombre": "MiniWave 2",
+      "marca": "Voxline",
+      "categoria": "estudio-creacion",
+      "descripcion": "Interfaz de audio USB de dos canales con monitoreo directo y controles independientes para grabación doméstica.",
+      "precio": 119990,
+      "stock": 4,
+      "imagen": "img/productos/microfono-vela-c1.png",
+      "destacado": false,
+      "etiquetas": ["interfaz", "usb-c", "grabación", "audio"],
+      "especificaciones": {
+        "Entradas": "2 combo XLR/TRS",
+        "Resolución": "24 bit / 192 kHz",
+        "Conexión": "USB-C",
+        "Compatibilidad": "Windows y macOS"
+      }
+    }
+  ]
+}
