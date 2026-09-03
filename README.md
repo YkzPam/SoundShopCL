@@ -120,6 +120,7 @@ SoundShopCL/
 - [Modelo de datos, entradas y validaciones](docs/modelo-datos-y-validaciones.md)
 - [Arquitectura y flujo de navegación](docs/arquitectura-y-flujo.md)
 - [Diagrama de flujo](docs/diagrama-flujo.svg)
+- [Mockups y evidencia del prototipo](docs/mockups-prototipo.md)
 - [Auditoría de los diez indicadores](docs/auditoria-rubrica.md)
 - [Registro del apoyo de inteligencia artificial](docs/uso-inteligencia-artificial.md)
 
@@ -145,4 +146,4 @@ No se debe subir la carpeta `venv`, `node_modules`, cookies, claves personales n
 
 `core/models.py` utiliza `dataclasses` para describir las entidades y sus tipos. Los registros se cargan desde `core/data/catalogo.json`, se convierten en objetos Python y se envían a cada plantilla mediante diccionarios de contexto. Esta solución demuestra el flujo completo solicitado sin adelantar la conexión ORM ni el sistema de usuarios de evaluaciones posteriores.
 
-Los nombres, precios y marcas del catálogo son ficticios. Las imágenes fueron creadas específicamente para el prototipo y no contienen logotipos de terceros. El pedido final no es una transacción comercial.
+Los nombres, precios y marcas del catálogo son ficticios. Las seis imágenes fueron creadas específicamente para el prototipo, optimizadas en WebP y no contienen logotipos de terceros. El pedido final no es una transacción comercial.

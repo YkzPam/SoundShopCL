@@ -14,7 +14,7 @@ La inteligencia artificial apoyó la lectura comparada de la pauta y la escala d
 
 ## 5.3 Recursos visuales generados
 
-Se crearon tres imágenes originales para las familias de audífonos, tornamesa y micrófono. La solicitud visual pidió fotografías cuadradas de producto, fondo carbón oscuro, iluminación de estudio violeta, azul y magenta, alta definición y ausencia de texto o logotipos. Las imágenes se guardaron en `static/img/productos` y se usan solo dentro del prototipo.
+Se crearon seis imágenes originales: audífonos inalámbricos, audífonos de estudio, tornamesa, kit de limpieza de vinilos, micrófono e interfaz de audio. La solicitud visual mantuvo un mismo lenguaje para todo el conjunto: fotografía cuadrada de producto, fondo carbón oscuro, iluminación de estudio violeta, azul y magenta, materiales realistas, alta definición y ausencia de texto o logotipos. Las copias del proyecto se optimizaron en formato WebP y se guardaron en `static/img/productos`.
 
 ## 5.4 Verificación humana esperada
 

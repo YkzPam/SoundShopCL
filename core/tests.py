@@ -115,9 +115,12 @@ class ArchivosEstaticosTests(SimpleTestCase):
 
     def test_imagenes_del_catalogo_existen(self):
         for ruta in (
-            "img/productos/audifonos-pulse-x.png",
-            "img/productos/tornamesa-orbit-one.png",
-            "img/productos/microfono-vela-c1.png",
+            "img/productos/audifonos-pulse-x.webp",
+            "img/productos/audifonos-studio-m40.webp",
+            "img/productos/tornamesa-orbit-one.webp",
+            "img/productos/kit-cuidado-vinilo.webp",
+            "img/productos/microfono-vela-c1.webp",
+            "img/productos/interfaz-miniwave-2.webp",
         ):
             with self.subTest(ruta=ruta):
                 self.assertIsNotNone(finders.find(ruta))

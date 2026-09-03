@@ -13,7 +13,7 @@
 | 7 | Proyecto y aplicación creados y registrados | Proyecto `soundshop`, aplicación `core` en `INSTALLED_APPS` y comandos documentados | Cumplido |
 | 8 | Rutas limpias, modulares, semánticas y nombradas | `soundshop/urls.py` incluye `core.urls`; todas las rutas usan `path()` y `name` | Cumplido |
 | 9 | Vistas reciben `request`, crean contexto y renderizan | Funciones de `core/views.py` y helper `_datos_catalogo` | Cumplido |
-| 10 | Validación de sintaxis, rutas y visualización con apoyo de IA | `manage.py check`, quince pruebas, revisión responsive y registro en `docs/uso-inteligencia-artificial.md` | Cumplido |
+| 10 | Validación de sintaxis, rutas y visualización con apoyo de IA | `manage.py check`, quince pruebas, capturas de `docs/mockups-prototipo.md` y registro de IA | Cumplido |
 
 ## 4.2 Comprobaciones reproducibles
 
@@ -25,7 +25,7 @@ git status
 git log --oneline
 ```
 
-El resultado esperado de Django es `System check identified no issues` y quince pruebas aprobadas. El compilador debe producir `static/css/tailwind.css`. La aplicación debe responder con código HTTP 200 en la portada, catálogo, categorías, productos existentes y carrito.
+El resultado esperado de Django es `System check identified no issues` y quince pruebas aprobadas. El compilador debe producir `static/css/tailwind.css`. La aplicación debe responder con código HTTP 200 en la portada, catálogo, categorías, productos existentes y carrito. La revisión automatizada del navegador comprobó anchos de 1440, 768, 390 y 320 píxeles sin desbordamiento horizontal ni errores de consola.
 
 ## 4.3 Límites declarados
 

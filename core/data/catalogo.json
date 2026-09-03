@@ -28,7 +28,7 @@
       "descripcion": "Audífonos inalámbricos circumaurales con cancelación activa de ruido y perfil equilibrado para jornadas largas.",
       "precio": 89990,
       "stock": 8,
-      "imagen": "img/productos/audifonos-pulse-x.png",
+      "imagen": "img/productos/audifonos-pulse-x.webp",
       "destacado": true,
       "etiquetas": ["bluetooth", "inalámbrico", "cancelación de ruido", "hi-fi"],
       "especificaciones": {
@@ -46,7 +46,7 @@
       "descripcion": "Monitores cerrados con cable desmontable, respuesta definida y almohadillas cómodas para edición y práctica musical.",
       "precio": 59990,
       "stock": 12,
-      "imagen": "img/productos/audifonos-pulse-x.png",
+      "imagen": "img/productos/audifonos-studio-m40.webp",
       "destacado": false,
       "etiquetas": ["estudio", "monitoreo", "cableado"],
       "especificaciones": {
@@ -64,7 +64,7 @@
       "descripcion": "Tornamesa de tracción por correa con preamplificador conmutable, cápsula magnética y cubierta antipolvo.",
       "precio": 149990,
       "stock": 5,
-      "imagen": "img/productos/tornamesa-orbit-one.png",
+      "imagen": "img/productos/tornamesa-orbit-one.webp",
       "destacado": true,
       "etiquetas": ["vinilo", "tornamesa", "preamplificador", "33 rpm", "45 rpm"],
       "especificaciones": {
@@ -82,7 +82,7 @@
       "descripcion": "Set de cuidado con cepillo de fibra, líquido limpiador y paño suave para discos de vinilo.",
       "precio": 22990,
       "stock": 0,
-      "imagen": "img/productos/tornamesa-orbit-one.png",
+      "imagen": "img/productos/kit-cuidado-vinilo.webp",
       "destacado": false,
       "etiquetas": ["limpieza", "vinilo", "accesorio"],
       "especificaciones": {
@@ -99,7 +99,7 @@
       "descripcion": "Micrófono condensador cardioide para voces, instrumentos acústicos, streaming y producción desde casa.",
       "precio": 79990,
       "stock": 6,
-      "imagen": "img/productos/microfono-vela-c1.png",
+      "imagen": "img/productos/microfono-vela-c1.webp",
       "destacado": true,
       "etiquetas": ["micrófono", "condensador", "podcast", "voz", "xlr"],
       "especificaciones": {
@@ -117,7 +117,7 @@
       "descripcion": "Interfaz de audio USB de dos canales con monitoreo directo y controles independientes para grabación doméstica.",
       "precio": 119990,
       "stock": 4,
-      "imagen": "img/productos/microfono-vela-c1.png",
+      "imagen": "img/productos/interfaz-miniwave-2.webp",
       "destacado": false,
       "etiquetas": ["interfaz", "usb-c", "grabación", "audio"],
       "especificaciones": {
