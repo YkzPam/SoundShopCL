@@ -30,4 +30,4 @@ Los errores no terminan en una página rota. Un producto inexistente vuelve al c
 
 Tailwind CSS se compila localmente desde `static/css/input.css`. `static/css/main.css` agrega el fondo, los paneles translúcidos y transiciones propias de SoundShop CL. El JavaScript se limita al menú móvil, cierre de mensajes y copia del código de pedido. El catálogo y el carrito continúan funcionando sin JavaScript porque las operaciones principales se resuelven en Django.
 
-El diagrama completo está disponible en [diagrama-flujo.svg](diagrama-flujo.svg).
+El diagrama completo está disponible como [SVG editable](diagrama-flujo.svg) y como [PNG listo para insertar en la entrega](diagrama-flujo.png).

@@ -119,7 +119,7 @@ SoundShopCL/
 - [Alcance de la Evaluación 1](docs/alcance-evaluacion-1.md)
 - [Modelo de datos, entradas y validaciones](docs/modelo-datos-y-validaciones.md)
 - [Arquitectura y flujo de navegación](docs/arquitectura-y-flujo.md)
-- [Diagrama de flujo](docs/diagrama-flujo.svg)
+- Diagrama de flujo: [SVG editable](docs/diagrama-flujo.svg) y [PNG listo para presentar](docs/diagrama-flujo.png)
 - [Mockups y evidencia del prototipo](docs/mockups-prototipo.md)
 - [Auditoría de los diez indicadores](docs/auditoria-rubrica.md)
 - [Registro del apoyo de inteligencia artificial](docs/uso-inteligencia-artificial.md)
