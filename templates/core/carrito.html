@@ -4,41 +4,51 @@
 {% block title %}Carrito | SoundShop CL{% endblock %}
 
 {% block content %}
-<section class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
-  <p class="text-xs font-bold uppercase tracking-[0.2em] text-violet-300">Compra simulada</p>
-  <h1 class="mt-3 text-4xl font-black tracking-[-0.04em] text-white sm:text-5xl">Tu carrito</h1>
-  <p class="mt-3 text-slate-400">Revisa las cantidades antes de confirmar. Ningún pago real será procesado.</p>
+<header class="page-intro page-intro--compact">
+  <div class="page-shell page-intro__grid">
+    <p class="section-index"><span>Pedido / 01</span> Compra demostrativa</p>
+    <div><h1>Tu carrito</h1><p>Revisa las cantidades antes de confirmar. Ningún pago real será procesado.</p></div>
+  </div>
+</header>
 
+<section class="page-shell cart-section">
   {% if lineas %}
-    <div class="mt-10 grid gap-8 lg:grid-cols-[1fr_22rem] lg:items-start">
-      <div class="space-y-4">
+    <div class="cart-layout">
+      <div class="cart-items">
+        <div class="cart-items__heading"><h2>Productos</h2><span>{{ cantidad }} unidad{{ cantidad|pluralize:"es" }}</span></div>
         {% for linea in lineas %}
-          <article class="glass-panel grid gap-5 rounded-2xl p-4 sm:grid-cols-[8rem_1fr_auto] sm:items-center">
-            <a href="{% url 'core:detalle_producto' linea.producto.id %}" class="overflow-hidden rounded-xl bg-slate-950"><img src="{% static linea.producto.imagen %}" alt="{{ linea.producto.nombre }}" class="aspect-square h-full w-full object-cover"></a>
-            <div><p class="text-xs font-bold uppercase tracking-[0.13em] text-violet-300">{{ linea.producto.marca }}</p><h2 class="mt-1 text-xl font-black text-white"><a class="hover:text-violet-300" href="{% url 'core:detalle_producto' linea.producto.id %}">{{ linea.producto.nombre }}</a></h2><p class="mt-2 text-sm text-slate-500">{{ linea.producto.precio|precio_clp }} por unidad</p>
-              <div class="mt-4 flex flex-wrap items-center gap-2">
-                <form method="post" action="{% url 'core:actualizar_carrito' linea.producto.id %}" class="flex items-center gap-2">{% csrf_token %}<label class="sr-only" for="cantidad-{{ linea.producto.id }}">Cantidad de {{ linea.producto.nombre }}</label><input id="cantidad-{{ linea.producto.id }}" name="cantidad" type="number" min="0" max="{{ linea.producto.stock }}" value="{{ linea.cantidad }}" class="h-9 w-16 rounded-lg border border-white/10 bg-slate-950 px-2 text-center text-sm text-white"><button type="submit" class="rounded-lg border border-white/10 px-3 py-2 text-xs font-bold text-slate-300 hover:bg-white/5">Actualizar</button></form>
-                <form method="post" action="{% url 'core:eliminar_del_carrito' linea.producto.id %}">{% csrf_token %}<button type="submit" class="px-2 py-2 text-xs font-bold text-rose-400 hover:text-rose-300">Eliminar</button></form>
+          <article class="cart-item">
+            <a href="{% url 'core:detalle_producto' linea.producto.id %}" class="cart-item__image"><img src="{% static linea.producto.imagen %}" alt="{{ linea.producto.nombre }}"></a>
+            <div class="cart-item__content">
+              <p>{{ linea.producto.marca }}</p>
+              <h3><a href="{% url 'core:detalle_producto' linea.producto.id %}">{{ linea.producto.nombre }}</a></h3>
+              <span>{{ linea.producto.precio|precio_clp }} por unidad</span>
+              <div class="cart-item__controls">
+                <form method="post" action="{% url 'core:actualizar_carrito' linea.producto.id %}">{% csrf_token %}<label for="cantidad-{{ linea.producto.id }}">Cantidad</label><input id="cantidad-{{ linea.producto.id }}" name="cantidad" type="number" min="0" max="{{ linea.producto.stock }}" value="{{ linea.cantidad }}"><button type="submit">Actualizar</button></form>
+                <form method="post" action="{% url 'core:eliminar_del_carrito' linea.producto.id %}">{% csrf_token %}<button type="submit" class="remove-button">Eliminar</button></form>
               </div>
             </div>
-            <p class="text-right text-xl font-black text-white">{{ linea.subtotal|precio_clp }}</p>
+            <p class="cart-item__subtotal">{{ linea.subtotal|precio_clp }}</p>
           </article>
         {% endfor %}
-        <a href="{% url 'core:catalogo' %}" class="inline-flex items-center gap-2 px-2 py-3 text-sm font-bold text-slate-400 hover:text-white"><span aria-hidden="true">←</span> Seguir comprando</a>
+        <a href="{% url 'core:catalogo' %}" class="text-link"><span aria-hidden="true">←</span> Seguir comprando</a>
       </div>
 
-      <aside class="glass-panel rounded-2xl p-6 lg:sticky lg:top-28">
-        <h2 class="text-lg font-black text-white">Resumen del pedido</h2>
-        <dl class="mt-5 space-y-4 border-b border-white/[0.08] pb-5 text-sm"><div class="flex justify-between"><dt class="text-slate-500">Productos</dt><dd class="font-bold text-slate-200">{{ cantidad }}</dd></div><div class="flex justify-between"><dt class="text-slate-500">Despacho</dt><dd class="font-bold text-emerald-400">Simulado</dd></div></dl>
-        <div class="flex items-end justify-between py-5"><p class="text-sm font-semibold text-slate-400">Total</p><p class="text-3xl font-black text-white">{{ total|precio_clp }}</p></div>
-        <form method="post" action="{% url 'core:confirmar_pedido' %}">{% csrf_token %}<button type="submit" class="w-full rounded-xl bg-violet-500 px-5 py-3.5 text-sm font-black text-white shadow-lg shadow-violet-950/40 transition hover:bg-violet-400">Confirmar pedido simulado</button></form>
-        <p class="mt-4 text-center text-[0.7rem] leading-5 text-slate-600">No se crea un cobro ni se almacena información personal.</p>
+      <aside class="order-summary">
+        <p class="order-summary__index">Resumen / Pedido</p>
+        <h2>Total estimado</h2>
+        <dl><div><dt>Productos</dt><dd>{{ cantidad }}</dd></div><div><dt>Despacho</dt><dd>Simulado</dd></div></dl>
+        <div class="order-summary__total"><span>Total</span><strong>{{ total|precio_clp }}</strong></div>
+        <form method="post" action="{% url 'core:confirmar_pedido' %}">{% csrf_token %}<button type="submit" class="button button--primary button--full">Confirmar pedido simulado</button></form>
+        <p class="order-summary__note">No se crea un cobro ni se almacena información personal.</p>
       </aside>
     </div>
   {% else %}
-    <div class="mt-10 flex min-h-96 flex-col items-center justify-center rounded-[2rem] border border-dashed border-white/10 bg-slate-900/30 px-6 text-center">
-      <span class="flex h-20 w-20 items-center justify-center rounded-2xl bg-violet-500/10 text-violet-300"><svg class="h-9 w-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 4h2l2.2 10.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 1.9-1.4L21 7H6"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg></span>
-      <h2 class="mt-6 text-2xl font-black text-white">El carrito está vacío</h2><p class="mt-2 max-w-md text-sm leading-6 text-slate-400">Explora el catálogo y agrega el equipo que quieras probar en este flujo de compra.</p><a href="{% url 'core:catalogo' %}" class="mt-6 rounded-xl bg-white px-6 py-3 text-sm font-black text-slate-950 transition hover:bg-violet-200">Ir al catálogo</a>
+    <div class="empty-state empty-state--cart">
+      <span class="empty-state__number">00</span>
+      <h2>El carrito está vacío</h2>
+      <p>Explora el catálogo y agrega el equipo que quieras probar en este flujo de compra.</p>
+      <a href="{% url 'core:catalogo' %}" class="button button--dark">Ir al catálogo</a>
     </div>
   {% endif %}
 </section>

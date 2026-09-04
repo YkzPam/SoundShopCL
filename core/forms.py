@@ -5,11 +5,7 @@ from django import forms
 from .catalogo import obtener_categorias
 
 
-CLASE_CAMPO = (
-    "w-full rounded-xl border border-white/10 bg-slate-950/70 px-4 py-3 "
-    "text-sm text-white outline-none transition focus:border-violet-400 "
-    "focus:ring-2 focus:ring-violet-400/20"
-)
+CLASE_CAMPO = "form-control"
 
 
 class FiltroCatalogoForm(forms.Form):
@@ -40,7 +36,7 @@ class FiltroCatalogoForm(forms.Form):
         label="Mostrar solo productos disponibles",
         widget=forms.CheckboxInput(
             attrs={
-                "class": "h-4 w-4 rounded border-white/20 bg-slate-950 text-violet-500 focus:ring-violet-400"
+                "class": "form-checkbox"
             }
         ),
     )
@@ -70,7 +66,7 @@ class CantidadProductoForm(forms.Form):
         initial=1,
         widget=forms.NumberInput(
             attrs={
-                "class": "w-20 rounded-xl border border-white/10 bg-slate-950/70 px-3 py-2 text-white",
+                "class": "quantity-input",
                 "aria-label": "Cantidad",
             }
         ),

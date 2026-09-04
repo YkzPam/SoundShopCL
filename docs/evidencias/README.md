@@ -4,9 +4,9 @@ Esta carpeta reúne capturas generadas desde la aplicación local con un navegad
 
 | Archivo | Vista comprobada |
 |---|---|
-| `portada-escritorio.png` | Portada a 1440 × 1000 px |
-| `catalogo-tableta.png` | Catálogo a 768 × 1024 px |
-| `portada-movil-390.png` | Portada a 390 × 844 px |
-| `portada-movil-320.png` | Portada a 320 × 740 px |
+| `portada-escritorio.png` | Portada, viewport nominal de 1440 × 1000 px |
+| `catalogo-tableta.png` | Catálogo, viewport nominal de 768 × 1024 px |
+| `portada-movil-390.png` | Portada, viewport nominal de 390 × 844 px |
+| `portada-movil-320.png` | Portada, viewport nominal de 320 × 740 px |
 | `carrito-escritorio.png` | Carrito con dos unidades y total calculado |
 | `pedido-confirmado.png` | Salida final del pedido simulado |

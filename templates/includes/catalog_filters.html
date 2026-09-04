@@ -1,8 +1,8 @@
-<form method="get" class="space-y-5">
-  <div><label class="mb-2 block text-xs font-bold uppercase tracking-[0.13em] text-slate-500" for="{{ formulario.q.id_for_label }}">{{ formulario.q.label }}</label>{{ formulario.q }}</div>
-  {% if not categoria_actual %}<div><label class="mb-2 block text-xs font-bold uppercase tracking-[0.13em] text-slate-500" for="{{ formulario.categoria.id_for_label }}">{{ formulario.categoria.label }}</label>{{ formulario.categoria }}</div>{% endif %}
-  <div><label class="mb-2 block text-xs font-bold uppercase tracking-[0.13em] text-slate-500" for="{{ formulario.precio_maximo.id_for_label }}">{{ formulario.precio_maximo.label }}</label>{{ formulario.precio_maximo }}</div>
-  <div><label class="mb-2 block text-xs font-bold uppercase tracking-[0.13em] text-slate-500" for="{{ formulario.orden.id_for_label }}">{{ formulario.orden.label }}</label>{{ formulario.orden }}</div>
-  <label class="flex cursor-pointer items-center gap-3 rounded-xl border border-white/[0.07] bg-white/[0.025] p-3 text-sm font-semibold text-slate-300">{{ formulario.solo_disponibles }}<span>Solo con stock</span></label>
-  <button type="submit" class="w-full rounded-xl bg-violet-500 px-4 py-3 text-sm font-black text-white transition hover:bg-violet-400">Aplicar filtros</button>
+<form method="get" class="filter-form">
+  <div class="field-group"><label for="{{ formulario.q.id_for_label }}">{{ formulario.q.label }}</label>{{ formulario.q }}</div>
+  {% if not categoria_actual %}<div class="field-group"><label for="{{ formulario.categoria.id_for_label }}">{{ formulario.categoria.label }}</label>{{ formulario.categoria }}</div>{% endif %}
+  <div class="field-group"><label for="{{ formulario.precio_maximo.id_for_label }}">{{ formulario.precio_maximo.label }}</label>{{ formulario.precio_maximo }}</div>
+  <div class="field-group"><label for="{{ formulario.orden.id_for_label }}">{{ formulario.orden.label }}</label>{{ formulario.orden }}</div>
+  <label class="check-field">{{ formulario.solo_disponibles }}<span>Mostrar solo productos con stock</span></label>
+  <button type="submit" class="button button--primary button--full">Aplicar filtros</button>
 </form>

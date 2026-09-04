@@ -3,5 +3,5 @@
 @source "../../core/**/*.py";
 
 @theme {
-  --font-sans: "Inter", "Segoe UI", system-ui, sans-serif;
+  --font-sans: "Segoe UI", Arial, sans-serif;
 }

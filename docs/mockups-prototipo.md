@@ -2,11 +2,11 @@
 
 ## 6.1 Criterio de presentación
 
-Los mockups corresponden a capturas del prototipo navegable, no a pantallas dibujadas sin implementación. Cada imagen proviene de la misma aplicación Django entregada en el repositorio y muestra el HTML semántico procesado con plantillas DTL y Tailwind CSS. Esta evidencia permite comparar las principales vistas con la navegación definida en el diagrama de flujo.
+Los mockups corresponden a capturas del prototipo navegable, no a pantallas dibujadas sin implementación. Cada imagen proviene de la misma aplicación Django entregada en el repositorio y muestra el HTML semántico procesado con plantillas DTL y Tailwind CSS. La dirección visual toma referencias de catálogos especializados en audio: fondo papel, negro carbón, rojo señal, bordes rectos y fotografías de producto como elemento principal. Se eliminaron los degradados decorativos, las transparencias y los movimientos continuos para obtener una presentación más sobria.
 
 ## 6.2 Portada en escritorio
 
-La vista de 1440 × 1000 píxeles presenta la identidad SoundShop CL, navegación principal, buscador, acceso al carrito, propuesta de la tienda, categorías y producto destacado.
+La vista de escritorio presenta la identidad SoundShop CL, navegación principal, buscador, acceso al carrito y una portada editorial dividida entre la propuesta de la tienda y el producto seleccionado. La jerarquía permite identificar las acciones principales sin desplazar primero un bloque publicitario ajeno al catálogo.
 
 ![Portada de SoundShop CL en escritorio](evidencias/portada-escritorio.png)
 
@@ -18,7 +18,7 @@ La vista de 768 × 1024 píxeles reorganiza la navegación, convierte los filtro
 
 ## 6.4 Portada en teléfono
 
-La captura de 390 × 844 píxeles conserva la misma información y reemplaza la navegación de escritorio por un botón de menú. Los botones ocupan el ancho disponible y el contenido no genera desplazamiento horizontal.
+El navegador se configuró con un viewport nominal de 390 × 844 píxeles. La captura conserva la misma información y reemplaza la navegación de escritorio por un botón de menú. Los botones ocupan el ancho disponible y el contenido no genera desplazamiento horizontal.
 
 ![Portada de SoundShop CL en teléfono](evidencias/portada-movil-390.png)
 
@@ -36,9 +36,9 @@ La última pantalla confirma que el flujo terminó y entrega código, total y fe
 
 ![Pedido simulado confirmado](evidencias/pedido-confirmado.png)
 
-## 6.6 Comprobación responsive
+## 6.6 Comprobación responsive y movimiento
 
-| Vista | Ancho | Código HTTP | Desbordamiento horizontal | Error de JavaScript o consola |
+| Vista | Ancho nominal | Código HTTP | Desbordamiento horizontal | Error de JavaScript o consola |
 |---|---:|---:|---|---|
 | Portada escritorio | 1440 px | 200 | No | No |
 | Catálogo tableta | 768 px | 200 | No | No |
@@ -46,3 +46,5 @@ La última pantalla confirma que el flujo terminó y entrega código, total y fe
 | Portada mínima | 320 px | 200 | No | No |
 
 El flujo automatizado abrió la ficha `Pulse X ANC`, agregó dos unidades, verificó el total `$179.980`, confirmó el pedido y buscó `microfono`. La búsqueda devolvió únicamente `Vela C1`, lo que comprueba la normalización de tildes y la representación dinámica del resultado.
+
+La interfaz no utiliza animaciones automáticas ni entradas escalonadas. Solo conserva transiciones breves de color y opacidad, entre 140 y 160 milisegundos, para comunicar estados de interacción. La regla `prefers-reduced-motion` reduce esas transiciones cuando el sistema del usuario solicita menos movimiento.

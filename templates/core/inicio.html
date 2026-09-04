@@ -1,81 +1,82 @@
 {% extends 'base.html' %}
 {% load static soundshop_extras %}
 
-{% block title %}SoundShop CL | Tu música, a tu manera{% endblock %}
+{% block title %}SoundShop CL | Audio para escuchar y crear{% endblock %}
 
 {% block content %}
-<section class="relative isolate overflow-hidden">
-  <div class="hero-grid absolute inset-0 -z-10" aria-hidden="true"></div>
-  <div class="absolute left-1/2 top-24 -z-10 h-72 w-72 rounded-full bg-violet-600/20 blur-[110px]" aria-hidden="true"></div>
-  <div class="mx-auto grid max-w-7xl items-center gap-10 px-4 pb-20 pt-14 sm:px-6 md:pt-20 lg:grid-cols-[1.05fr_.95fr] lg:px-8 lg:pb-28 lg:pt-24">
-    <div>
-      <div class="inline-flex items-center gap-2 rounded-full border border-violet-400/20 bg-violet-400/[0.08] px-3 py-1.5 text-xs font-bold uppercase tracking-[0.16em] text-violet-200">
-        <span class="h-1.5 w-1.5 rounded-full bg-violet-300 shadow-[0_0_12px_#c4b5fd]"></span>
-        Sonido elegido con intención
+<section class="home-hero">
+  <div class="page-shell home-hero__grid">
+    <div class="home-hero__copy">
+      <p class="section-index"><span>SS / 01</span> Selección de audio</p>
+      <h1>Tu próximo sonido, <em>bien elegido.</em></h1>
+      <p class="home-hero__intro">Audífonos, tornamesas y equipos de grabación escogidos por su utilidad, calidad y facilidad de uso.</p>
+      <div class="button-row">
+        <a href="{% url 'core:catalogo' %}" class="button button--primary">Ver catálogo <span aria-hidden="true">↗</span></a>
+        <a href="{% url 'core:categorias' %}" class="button button--quiet">Comprar por categoría</a>
       </div>
-      <h1 class="mt-7 max-w-3xl text-5xl font-black leading-[0.97] tracking-[-0.055em] text-white sm:text-6xl lg:text-7xl">Tu próximo sonido <span class="gradient-text">empieza acá.</span></h1>
-      <p class="mt-6 max-w-xl text-base leading-7 text-slate-400 sm:text-lg">Audífonos, tornamesas y equipos de grabación seleccionados para escuchar mejor, crear sin ruido y disfrutar cada detalle.</p>
-      <div class="mt-8 flex flex-col gap-3 sm:flex-row">
-        <a href="{% url 'core:catalogo' %}" class="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-3.5 text-sm font-black text-slate-950 transition hover:bg-violet-200">
-          Explorar productos
-          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-        </a>
-        <a href="{% url 'core:categorias' %}" class="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] px-6 py-3.5 text-sm font-bold text-white transition hover:border-violet-400/30 hover:bg-violet-500/10">Ver categorías</a>
-      </div>
-      <dl class="mt-10 grid max-w-lg grid-cols-3 gap-3 border-t border-white/[0.08] pt-6">
-        <div><dt class="text-xs text-slate-500">Catálogo</dt><dd class="mt-1 text-lg font-black text-white">6 productos</dd></div>
-        <div><dt class="text-xs text-slate-500">Despacho</dt><dd class="mt-1 text-lg font-black text-white">Todo Chile</dd></div>
-        <div><dt class="text-xs text-slate-500">Compra</dt><dd class="mt-1 text-lg font-black text-white">Simulada</dd></div>
+      <dl class="store-facts">
+        <div><dt>Selección</dt><dd>6 equipos</dd></div>
+        <div><dt>Cobertura</dt><dd>Todo Chile</dd></div>
+        <div><dt>Compra</dt><dd>Demostrativa</dd></div>
       </dl>
     </div>
 
-    <div class="relative mx-auto w-full max-w-xl lg:mx-0 lg:ml-auto">
-      <div class="absolute -inset-8 -z-10 rounded-full bg-gradient-to-br from-violet-600/18 to-sky-500/10 blur-3xl"></div>
-      <div class="glass-panel product-stage relative overflow-hidden rounded-[2rem] p-3">
-        <img src="{% static 'img/productos/microfono-vela-c1.webp' %}" alt="Micrófono de condensador Vela C1" class="aspect-square w-full rounded-[1.55rem] object-cover">
-        <div class="absolute inset-x-7 bottom-7 rounded-2xl border border-white/10 bg-slate-950/78 p-4 backdrop-blur-xl sm:flex sm:items-end sm:justify-between">
-          <div><p class="text-xs font-bold uppercase tracking-[0.16em] text-violet-300">Selección de la semana</p><p class="mt-1 text-xl font-black text-white">Vela C1</p></div>
-          <a href="{% url 'core:detalle_producto' 5 %}" class="mt-3 inline-flex items-center gap-2 text-sm font-bold text-white sm:mt-0">Ver equipo <span aria-hidden="true">→</span></a>
-        </div>
+    <aside class="feature-frame" aria-label="Producto seleccionado">
+      <div class="feature-frame__top"><span>Selección 05</span><span>Estudio / Voz</span></div>
+      <a href="{% url 'core:detalle_producto' 5 %}" class="feature-frame__image">
+        <img src="{% static 'img/productos/microfono-vela-c1.webp' %}" alt="Micrófono de condensador Vela C1">
+      </a>
+      <div class="feature-frame__caption">
+        <div><p>Voxline</p><h2>Vela C1</h2></div>
+        <p>Micrófono de condensador · XLR</p>
+        <a href="{% url 'core:detalle_producto' 5 %}" aria-label="Ver ficha del micrófono Vela C1">Ver ficha <span aria-hidden="true">→</span></a>
       </div>
-      <div class="absolute -right-2 top-8 hidden rounded-2xl border border-sky-300/20 bg-slate-950/80 px-4 py-3 shadow-xl backdrop-blur sm:block">
-        <p class="text-[0.65rem] font-bold uppercase tracking-[0.15em] text-sky-300">Señal limpia</p><p class="mt-1 text-sm font-black text-white">24 bit / 192 kHz</p>
-      </div>
+    </aside>
+  </div>
+</section>
+
+<section class="category-section" aria-labelledby="categorias-inicio">
+  <div class="page-shell">
+    <div class="section-heading">
+      <p class="section-index"><span>SS / 02</span> Tres maneras de entrar</p>
+      <div><h2 id="categorias-inicio">Comprar por categoría</h2><a href="{% url 'core:categorias' %}">Ver todas <span aria-hidden="true">→</span></a></div>
+    </div>
+
+    <div class="category-grid">
+      {% for item in resumen_categorias %}
+        <a href="{% url 'core:detalle_categoria' item.categoria.slug %}" class="category-tile">
+          <div class="category-tile__top">
+            <span class="category-tile__number">0{{ forloop.counter }}</span>
+            <span class="category-tile__icon" aria-hidden="true">
+              {% if item.categoria.icono == 'headphones' %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="13" width="4" height="7" rx="2"/><rect x="17" y="13" width="4" height="7" rx="2"/></svg>{% elif item.categoria.icono == 'disc' %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2"/><path d="M12 3v7"/></svg>{% else %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12v2M8 8v8M12 4v16M16 7v10M20 10v4"/></svg>{% endif %}
+            </span>
+          </div>
+          <h3>{{ item.categoria.nombre }}</h3>
+          <p>{{ item.categoria.descripcion }}</p>
+          <div class="category-tile__meta"><span>{{ item.cantidad }} productos</span><strong>Desde {{ item.precio_desde|precio_clp }}</strong></div>
+        </a>
+      {% endfor %}
     </div>
   </div>
 </section>
 
-<section class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8" aria-labelledby="categorias-inicio">
-  <div class="flex items-end justify-between gap-5">
-    <div><p class="text-xs font-bold uppercase tracking-[0.2em] text-violet-300">Encuentra tu equipo</p><h2 id="categorias-inicio" class="mt-2 text-3xl font-black tracking-tight text-white sm:text-4xl">Compra por categoría</h2></div>
-    <a href="{% url 'core:categorias' %}" class="hidden text-sm font-bold text-slate-400 transition hover:text-white sm:block">Ver todas →</a>
-  </div>
-  <div class="mt-8 grid gap-4 md:grid-cols-3">
-    {% for item in resumen_categorias %}
-      <a href="{% url 'core:detalle_categoria' item.categoria.slug %}" class="group relative overflow-hidden rounded-3xl border border-white/[0.08] bg-slate-900/50 p-6 transition hover:border-violet-400/30 hover:bg-slate-900/80">
-        <div class="absolute -right-12 -top-12 h-36 w-36 rounded-full bg-gradient-to-br from-violet-500/15 to-sky-400/10 blur-2xl transition group-hover:scale-125"></div>
-        <div class="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/[0.05] text-violet-300">
-          {% if item.categoria.icono == 'headphones' %}<svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="13" width="4" height="7" rx="2"/><rect x="17" y="13" width="4" height="7" rx="2"/></svg>{% elif item.categoria.icono == 'disc' %}<svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2"/><path d="M12 3v7"/></svg>{% else %}<svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 12v2M8 8v8M12 4v16M16 7v10M20 10v4"/></svg>{% endif %}
-        </div>
-        <h3 class="mt-8 text-xl font-black text-white">{{ item.categoria.nombre }}</h3>
-        <p class="mt-2 min-h-12 text-sm leading-6 text-slate-400">{{ item.categoria.descripcion }}</p>
-        <div class="mt-6 flex items-center justify-between border-t border-white/[0.07] pt-4 text-xs"><span class="font-semibold text-slate-500">{{ item.cantidad }} productos</span><span class="font-bold text-violet-300">Desde {{ item.precio_desde|precio_clp }}</span></div>
-      </a>
-    {% endfor %}
+<section class="featured-section" aria-labelledby="destacados-inicio">
+  <div class="page-shell">
+    <div class="section-heading section-heading--dark">
+      <p class="section-index"><span>SS / 03</span> Recomendados</p>
+      <div><h2 id="destacados-inicio">Equipos destacados</h2><p>Una selección corta para escuchar con detalle, recuperar el vinilo o empezar a grabar.</p></div>
+    </div>
+    <div class="product-grid">
+      {% for producto in productos_destacados %}{% include 'includes/product_card.html' %}{% endfor %}
+    </div>
   </div>
 </section>
 
-<section class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8" aria-labelledby="destacados-inicio">
-  <div class="max-w-2xl"><p class="text-xs font-bold uppercase tracking-[0.2em] text-sky-300">Los más buscados</p><h2 id="destacados-inicio" class="mt-2 text-3xl font-black tracking-tight text-white sm:text-4xl">Equipos destacados</h2><p class="mt-3 text-slate-400">Tres formas distintas de acercarte a la música, desde una escucha personal hasta tu primera grabación.</p></div>
-  <div class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-    {% for producto in productos_destacados %}{% include 'includes/product_card.html' %}{% endfor %}
-  </div>
-</section>
-
-<section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-  <div class="overflow-hidden rounded-[2rem] border border-white/[0.08] bg-gradient-to-br from-violet-950/65 via-slate-900 to-sky-950/40 px-6 py-10 sm:px-10 lg:flex lg:items-center lg:justify-between">
-    <div class="max-w-2xl"><p class="text-xs font-bold uppercase tracking-[0.2em] text-violet-300">Compra con claridad</p><h2 class="mt-3 text-3xl font-black tracking-tight text-white">Información simple, sin letras pequeñas.</h2><p class="mt-3 leading-7 text-slate-400">Cada ficha muestra precio, stock y especificaciones. El pedido final es una simulación académica y no solicita datos bancarios reales.</p></div>
-    <a href="{% url 'core:catalogo' %}?solo_disponibles=on" class="mt-7 inline-flex shrink-0 items-center justify-center rounded-xl bg-violet-500 px-6 py-3 text-sm font-black text-white shadow-lg shadow-violet-950/40 transition hover:bg-violet-400 lg:ml-10 lg:mt-0">Ver productos disponibles</a>
+<section class="service-note">
+  <div class="page-shell service-note__inner">
+    <p class="section-index"><span>SS / 04</span> Compra informada</p>
+    <div><h2>Precio, stock y especificaciones a la vista.</h2><p>Cada ficha reúne la información necesaria para comparar. La confirmación final es parte de una demostración académica y no solicita datos bancarios.</p></div>
+    <a href="{% url 'core:catalogo' %}?solo_disponibles=on" class="button button--light">Ver productos con stock <span aria-hidden="true">→</span></a>
   </div>
 </section>
 {% endblock %}

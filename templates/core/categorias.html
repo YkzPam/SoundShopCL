@@ -4,31 +4,34 @@
 {% block title %}Categorías | SoundShop CL{% endblock %}
 
 {% block content %}
-<section class="mx-auto max-w-7xl px-4 pb-8 pt-14 sm:px-6 lg:px-8 lg:pt-20">
-  <p class="text-xs font-bold uppercase tracking-[0.2em] text-violet-300">Tres formas de vivir la música</p>
-  <h1 class="mt-3 max-w-3xl text-4xl font-black tracking-[-0.04em] text-white sm:text-5xl">Encuentra el equipo según lo que quieres hacer.</h1>
-  <p class="mt-5 max-w-2xl text-base leading-7 text-slate-400">Escuchar con más detalle, volver al vinilo o comenzar a grabar: cada sección reúne productos relacionados y permite revisar solo lo que necesitas.</p>
-</section>
+<header class="page-intro">
+  <div class="page-shell page-intro__grid">
+    <p class="section-index"><span>Catálogo / 03</span> Categorías</p>
+    <div><h1>Equipo para escuchar, coleccionar y crear.</h1><p>Tres secciones simples para llegar más rápido al producto que necesitas.</p></div>
+  </div>
+</header>
 
-<section class="mx-auto grid max-w-7xl gap-5 px-4 py-10 sm:px-6 lg:grid-cols-3 lg:px-8">
+<section class="page-shell category-list" aria-label="Categorías de productos">
   {% for item in resumen_categorias %}
-    <article class="glass-panel group flex flex-col overflow-hidden rounded-[2rem]">
-      <div class="relative h-48 overflow-hidden bg-gradient-to-br {% if forloop.counter == 1 %}from-violet-700/35 to-slate-950{% elif forloop.counter == 2 %}from-fuchsia-700/25 to-slate-950{% else %}from-sky-700/30 to-slate-950{% endif %}">
-        <div class="absolute -right-12 -top-12 h-48 w-48 rounded-full border border-white/[0.06]"></div><div class="absolute -right-2 top-8 h-32 w-32 rounded-full border border-white/[0.08]"></div>
-        <div class="absolute bottom-6 left-6 flex h-16 w-16 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.07] text-white backdrop-blur">
-          {% if item.categoria.icono == 'headphones' %}<svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="13" width="4" height="7" rx="2"/><rect x="17" y="13" width="4" height="7" rx="2"/></svg>{% elif item.categoria.icono == 'disc' %}<svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2"/><path d="M12 3v7"/></svg>{% else %}<svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 12v2M8 8v8M12 4v16M16 7v10M20 10v4"/></svg>{% endif %}
-        </div>
+    <article class="category-row">
+      <span class="category-row__number">0{{ forloop.counter }}</span>
+      <div class="category-row__icon" aria-hidden="true">
+        {% if item.categoria.icono == 'headphones' %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.35"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="13" width="4" height="7" rx="2"/><rect x="17" y="13" width="4" height="7" rx="2"/></svg>{% elif item.categoria.icono == 'disc' %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.35"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2"/><path d="M12 3v7"/></svg>{% else %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.35"><path d="M4 12v2M8 8v8M12 4v16M16 7v10M20 10v4"/></svg>{% endif %}
       </div>
-      <div class="flex flex-1 flex-col p-6">
-        <p class="text-xs font-bold uppercase tracking-[0.16em] text-violet-300">{{ item.disponibles }} disponibles</p>
-        <h2 class="mt-2 text-2xl font-black text-white">{{ item.categoria.nombre }}</h2>
-        <p class="mt-3 text-sm leading-6 text-slate-400">{{ item.categoria.descripcion }}</p>
-        <div class="mt-auto flex items-center justify-between border-t border-white/[0.07] pt-6">
-          <div><p class="text-xs text-slate-500">Precios desde</p><p class="mt-1 font-black text-white">{{ item.precio_desde|precio_clp }}</p></div>
-          <a href="{% url 'core:detalle_categoria' item.categoria.slug %}" class="inline-flex h-11 items-center gap-2 rounded-xl bg-white px-4 text-sm font-black text-slate-950 transition hover:bg-violet-200">Ver productos <span aria-hidden="true">→</span></a>
-        </div>
+      <div class="category-row__content">
+        <p>{{ item.disponibles }} producto{{ item.disponibles|pluralize }} con stock</p>
+        <h2>{{ item.categoria.nombre }}</h2>
+        <span>{{ item.categoria.descripcion }}</span>
+      </div>
+      <div class="category-row__action">
+        <p>Desde <strong>{{ item.precio_desde|precio_clp }}</strong></p>
+        <a href="{% url 'core:detalle_categoria' item.categoria.slug %}" class="button button--dark">Ver productos <span aria-hidden="true">→</span></a>
       </div>
     </article>
   {% endfor %}
+</section>
+
+<section class="category-help">
+  <div class="page-shell category-help__inner"><p>¿No sabes por dónde empezar?</p><div><h2>Revisa el catálogo completo y compara por precio, marca o disponibilidad.</h2><a href="{% url 'core:catalogo' %}" class="text-link">Abrir catálogo <span aria-hidden="true">→</span></a></div></div>
 </section>
 {% endblock %}

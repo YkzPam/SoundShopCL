@@ -17,6 +17,8 @@ La entrega usa Django 5.2 LTS, plantillas DTL, datos JSON, Tailwind CSS y JavaSc
 - Mensajes de validación, rutas nombradas y redirecciones ante identificadores inválidos.
 - Quince pruebas automáticas que no requieren base de datos.
 
+La interfaz utiliza una dirección editorial inspirada en catálogos de audio: fondo papel, negro carbón y rojo señal. Se evitaron degradados decorativos, transparencias excesivas, sombras flotantes y animaciones continuas. Los cambios de estado se resuelven con transiciones breves y la hoja de estilos respeta `prefers-reduced-motion`.
+
 ## Instalación en Windows y Visual Studio Code
 
 ### 1. Abrir el proyecto

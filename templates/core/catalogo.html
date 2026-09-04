@@ -4,41 +4,44 @@
 {% block title %}{{ titulo_catalogo }} | SoundShop CL{% endblock %}
 
 {% block content %}
-<section class="border-b border-white/[0.06] bg-slate-950/25">
-  <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
-    <nav class="text-xs font-semibold text-slate-500" aria-label="Migas de pan"><a class="hover:text-white" href="{% url 'core:inicio' %}">Inicio</a><span class="mx-2">/</span><span class="text-slate-300">Catálogo</span></nav>
-    {% if categoria_actual %}<p class="mt-8 text-xs font-bold uppercase tracking-[0.2em] text-violet-300">Colección SoundShop</p>{% else %}<p class="mt-8 text-xs font-bold uppercase tracking-[0.2em] text-sky-300">Catálogo 2026</p>{% endif %}
-    <div class="mt-2 flex flex-col justify-between gap-4 md:flex-row md:items-end">
-      <div><h1 class="text-4xl font-black tracking-[-0.04em] text-white sm:text-5xl">{{ titulo_catalogo }}</h1>{% if categoria_actual %}<p class="mt-3 max-w-2xl text-slate-400">{{ categoria_actual.descripcion }}</p>{% else %}<p class="mt-3 max-w-2xl text-slate-400">Busca por nombre o marca, aplica filtros y abre cada ficha para revisar sus especificaciones.</p>{% endif %}</div>
-      <p class="text-sm font-semibold text-slate-500"><span class="text-white">{{ cantidad_resultados }}</span> resultado{{ cantidad_resultados|pluralize }}</p>
+<header class="catalog-header">
+  <div class="page-shell">
+    <nav class="breadcrumbs" aria-label="Migas de pan"><a href="{% url 'core:inicio' %}">Inicio</a><span>/</span><span>Catálogo</span></nav>
+    <p class="section-index"><span>{% if categoria_actual %}Colección{% else %}Catálogo / 2026{% endif %}</span> SoundShop CL</p>
+    <div class="catalog-header__row">
+      <div>
+        <h1>{{ titulo_catalogo }}</h1>
+        {% if categoria_actual %}<p>{{ categoria_actual.descripcion }}</p>{% else %}<p>Busca por nombre o marca, filtra por precio y revisa cada producto con sus especificaciones completas.</p>{% endif %}
+      </div>
+      <div class="result-count"><strong>{{ cantidad_resultados|stringformat:"02d" }}</strong><span>resultado{{ cantidad_resultados|pluralize }}</span></div>
     </div>
   </div>
-</section>
+</header>
 
-<section class="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 lg:grid-cols-[17rem_1fr] lg:px-8">
-  <aside>
-    <details class="glass-panel rounded-2xl lg:hidden" {% if request.GET %}open{% endif %}>
-      <summary class="cursor-pointer list-none px-5 py-4 text-sm font-black text-white">Filtros del catálogo <span class="float-right text-violet-300">＋</span></summary>
-      <div class="border-t border-white/[0.07] p-5">{% include 'includes/catalog_filters.html' %}</div>
+<section class="page-shell catalog-layout">
+  <aside class="catalog-sidebar">
+    <details class="filter-mobile" {% if request.GET %}open{% endif %}>
+      <summary>Filtrar catálogo <span aria-hidden="true">+</span></summary>
+      <div>{% include 'includes/catalog_filters.html' %}</div>
     </details>
-    <div class="glass-panel sticky top-24 hidden rounded-2xl p-5 lg:block">
-      <div class="mb-5 flex items-center justify-between"><h2 class="font-black text-white">Filtrar productos</h2>{% if request.GET %}<a href="{% if categoria_actual %}{% url 'core:detalle_categoria' categoria_actual.slug %}{% else %}{% url 'core:catalogo' %}{% endif %}" class="text-xs font-bold text-violet-300 hover:text-violet-200">Limpiar</a>{% endif %}</div>
+    <div class="filter-desktop">
+      <div class="filter-desktop__heading"><h2>Filtrar catálogo</h2>{% if request.GET %}<a href="{% if categoria_actual %}{% url 'core:detalle_categoria' categoria_actual.slug %}{% else %}{% url 'core:catalogo' %}{% endif %}">Limpiar</a>{% endif %}</div>
       {% include 'includes/catalog_filters.html' %}
     </div>
   </aside>
 
-  <div>
-    {% if formulario.errors %}<div class="mb-6 rounded-2xl border border-rose-400/20 bg-rose-950/30 p-4 text-sm text-rose-200">Revisa los valores de los filtros. El precio debe ser un número mayor que cero.</div>{% endif %}
+  <div class="catalog-results">
+    {% if formulario.errors %}<div class="form-error">Revisa los filtros. El precio debe ser un número mayor que cero.</div>{% endif %}
     {% if productos %}
-      <div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+      <div class="product-grid product-grid--catalog">
         {% for producto in productos %}{% include 'includes/product_card.html' %}{% endfor %}
       </div>
     {% else %}
-      <div class="flex min-h-96 flex-col items-center justify-center rounded-3xl border border-dashed border-white/10 bg-slate-900/30 px-6 text-center">
-        <span class="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/[0.05] text-slate-500"><svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.3-3.3M8 11h6"/></svg></span>
-        <h2 class="mt-5 text-xl font-black text-white">No encontramos coincidencias</h2>
-        <p class="mt-2 max-w-md text-sm leading-6 text-slate-400">Prueba con una palabra más general o elimina alguno de los filtros activos.</p>
-        <a href="{% url 'core:catalogo' %}" class="mt-6 rounded-xl bg-white px-5 py-3 text-sm font-black text-slate-950">Ver catálogo completo</a>
+      <div class="empty-state">
+        <span class="empty-state__number">00</span>
+        <h2>No encontramos coincidencias</h2>
+        <p>Prueba con una palabra más general o elimina alguno de los filtros activos.</p>
+        <a href="{% url 'core:catalogo' %}" class="button button--dark">Ver catálogo completo</a>
       </div>
     {% endif %}
   </div>
