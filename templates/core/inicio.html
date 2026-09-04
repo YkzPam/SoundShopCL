@@ -24,7 +24,7 @@
     <aside class="feature-frame" aria-label="Producto seleccionado">
       <div class="feature-frame__top"><span>Selección 05</span><span>Estudio / Voz</span></div>
       <a href="{% url 'core:detalle_producto' 5 %}" class="feature-frame__image">
-        <img src="{% static 'img/productos/microfono-vela-c1.webp' %}" alt="Micrófono de condensador Vela C1">
+        <img src="{% static 'img/productos/microfono-vela-c1.webp' %}" alt="Micrófono de condensador Vela C1" data-parallax="32">
       </a>
       <div class="feature-frame__caption">
         <div><p>Voxline</p><h2>Vela C1</h2></div>
@@ -44,7 +44,7 @@
 
     <div class="category-grid">
       {% for item in resumen_categorias %}
-        <a href="{% url 'core:detalle_categoria' item.categoria.slug %}" class="category-tile">
+        <a href="{% url 'core:detalle_categoria' item.categoria.slug %}" class="category-tile" data-grid-number="0{{ forloop.counter }}">
           <div class="category-tile__top">
             <span class="category-tile__number">0{{ forloop.counter }}</span>
             <span class="category-tile__icon" aria-hidden="true">

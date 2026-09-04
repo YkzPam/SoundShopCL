@@ -8,11 +8,25 @@
   <meta name="theme-color" content="#0b1220">
   <title>{% block title %}SoundShop CL{% endblock %}</title>
   <link rel="icon" href="{% static 'img/favicon.svg' %}" type="image/svg+xml">
+  <script>
+    (() => {
+      const root = document.documentElement;
+      root.classList.add("js");
+      try {
+        const savedTheme = localStorage.getItem("soundshop-theme");
+        const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        root.dataset.theme = savedTheme === "dark" || savedTheme === "light" ? savedTheme : systemTheme;
+      } catch {
+        root.dataset.theme = "light";
+      }
+    })();
+  </script>
   <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
   <link rel="stylesheet" href="{% static 'css/main.css' %}">
   <script src="{% static 'js/main.js' %}" defer></script>
 </head>
 <body class="site-body">
+  <div class="scroll-progress" aria-hidden="true"></div>
   <a class="skip-link" href="#contenido-principal">Saltar al contenido</a>
 
   <header class="site-header">
@@ -42,6 +56,12 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.7-4 3-6 7-6s6.3 2 7 6"/></svg>
         <span>{% if usuario_tienda %}{{ usuario_tienda.nombre }}{% else %}Cuenta{% endif %}</span>
       </a>
+
+      <button type="button" class="theme-toggle" data-theme-toggle aria-pressed="false" aria-label="Activar modo oscuro">
+        <svg class="theme-toggle__moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M20 15.2A8.5 8.5 0 0 1 8.8 4 8.5 8.5 0 1 0 20 15.2Z"/></svg>
+        <svg class="theme-toggle__sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="3.4"/><path d="M12 2v2.2M12 19.8V22M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M2 12h2.2M19.8 12H22M4.9 19.1l1.6-1.6M17.5 6.5l1.6-1.6"/></svg>
+        <span class="sr-only" data-theme-label>Activar modo oscuro</span>
+      </button>
 
       <a href="{% url 'core:carrito' %}" class="cart-link" aria-label="Carrito con {{ cantidad_carrito }} productos">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 4h2l2.2 10.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 1.9-1.4L21 7H6"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>

@@ -25,7 +25,7 @@ git status
 git log --oneline
 ```
 
-El resultado esperado de Django es `System check identified no issues` y veintidós pruebas aprobadas. El compilador debe producir `static/css/tailwind.css`. La aplicación debe responder con código HTTP 200 en la portada, catálogo, categorías, productos existentes, registro y carrito. La revisión automatizada del navegador comprobó anchos de 1440, 768, 390 y 320 píxeles sin desbordamiento horizontal ni errores de consola.
+El resultado esperado de Django es `System check identified no issues` y veintidós pruebas aprobadas. El compilador debe producir `static/css/tailwind.css`. La aplicación debe responder con código HTTP 200 en la portada, catálogo, categorías, productos existentes, registro y carrito. La revisión automatizada del navegador comprobó anchos de 1440, 768, 390 y 320 píxeles sin desbordamiento horizontal ni errores de consola. La misma revisión confirmó el cambio de tema, su persistencia tras recargar, las entradas activadas por scroll y la ausencia de esos efectos cuando el sistema solicita movimiento reducido.
 
 ## 4.3 Límites declarados
 

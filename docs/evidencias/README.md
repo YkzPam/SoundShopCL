@@ -5,6 +5,7 @@ Esta carpeta reúne capturas generadas desde la aplicación local con un navegad
 | Archivo | Vista comprobada |
 |---|---|
 | `portada-escritorio.png` | Portada, viewport nominal de 1440 × 1000 px |
+| `portada-oscura.png` | Portada completa con el tema oscuro activo |
 | `catalogo-tableta.png` | Catálogo, viewport nominal de 768 × 1024 px |
 | `portada-movil-390.png` | Portada, viewport nominal de 390 × 844 px |
 | `portada-movil-320.png` | Portada, viewport nominal de 320 × 740 px |

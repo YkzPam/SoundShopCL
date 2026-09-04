@@ -14,6 +14,9 @@ class CatalogoTests(SimpleTestCase):
         self.assertEqual(respuesta.status_code, 200)
         self.assertContains(respuesta, "Tu próximo sonido")
         self.assertContains(respuesta, "Pulse X ANC")
+        self.assertContains(respuesta, "data-theme-toggle")
+        self.assertContains(respuesta, "scroll-progress")
+        self.assertContains(respuesta, "data-grid-number")
 
     def test_catalogo_entrega_seis_productos_desde_json(self):
         respuesta = self.client.get(reverse("core:catalogo"))
@@ -112,6 +115,7 @@ class CarritoTests(SimpleTestCase):
 class ArchivosEstaticosTests(SimpleTestCase):
     def test_tailwind_compilado_esta_disponible(self):
         self.assertIsNotNone(finders.find("css/tailwind.css"))
+        self.assertIsNotNone(finders.find("js/main.js"))
 
     def test_imagenes_del_catalogo_existen(self):
         for ruta in (

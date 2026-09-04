@@ -7,6 +7,8 @@ La entrega usa Django 5.2 LTS, plantillas DTL, datos JSON, Tailwind CSS y JavaSc
 ## Funciones incluidas
 
 - Portada responsive con categorías y productos destacados.
+- Hero de primera pantalla con tipografía XXL y producto seleccionado.
+- Cuadrícula Bento asimétrica para recorrer las categorías.
 - Catálogo generado en el servidor mediante ciclos `{% for %}` y condiciones `{% if %}`.
 - Búsqueda sin distinción de mayúsculas ni tildes.
 - Filtros combinables por categoría, precio máximo y stock.
@@ -14,11 +16,13 @@ La entrega usa Django 5.2 LTS, plantillas DTL, datos JSON, Tailwind CSS y JavaSc
 - Ficha de producto con especificaciones, precio, disponibilidad y productos relacionados.
 - Carrito temporal con agregar, actualizar, eliminar y control de stock.
 - Registro de cuenta con validación de correo, contraseña, confirmación y aceptación de condiciones.
+- Modo claro y oscuro con preferencia guardada en el navegador.
+- Animaciones vinculadas al scroll, profundidad en imágenes y respuesta visual al seleccionar un producto.
 - Confirmación de pedido con código temporal, sin pago ni persistencia comercial.
 - Mensajes de validación, rutas nombradas y redirecciones ante identificadores inválidos.
 - Veintidós pruebas automáticas que no requieren base de datos.
 
-La interfaz utiliza una dirección visual contemporánea inspirada en catálogos técnicos de audio: azul noche, cobalto, gris frío y acentos aqua. La tipografía combina Bahnschrift, Aptos y las variantes modernas de Segoe UI disponibles en Windows. Las seis fotografías forman una colección de estudio coherente, sin marcas de terceros. Se evitaron movimientos continuos y la hoja de estilos respeta `prefers-reduced-motion`.
+La interfaz utiliza una dirección visual contemporánea inspirada en catálogos técnicos de audio: azul noche, cobalto, gris frío y acentos aqua. La tipografía combina Bahnschrift, Aptos y las variantes modernas de Segoe UI disponibles en Windows. Las seis fotografías forman una colección de estudio coherente, sin marcas de terceros. El movimiento aparece al entrar, recorrer secciones o seleccionar un producto; no hay animaciones continuas. La hoja de estilos y JavaScript respetan `prefers-reduced-motion`.
 
 ## Instalación en Windows y Visual Studio Code
 

@@ -8,9 +8,9 @@
   <nav class="breadcrumbs" aria-label="Migas de pan"><a href="{% url 'core:inicio' %}">Inicio</a><span>/</span><a href="{% url 'core:catalogo' %}">Productos</a>{% if categoria %}<span>/</span><a href="{% url 'core:detalle_categoria' categoria.slug %}">{{ categoria.nombre }}</a>{% endif %}<span>/</span><span>{{ producto.nombre }}</span></nav>
 
   <div class="product-detail">
-    <div class="product-detail__visual">
+    <div class="product-detail__visual" data-product-tilt>
       <div class="product-detail__visual-top"><span>Producto {{ producto.id|stringformat:"02d" }}</span>{% if producto.destacado %}<span class="selection-label">Selección SoundShop</span>{% endif %}</div>
-      <img src="{% static producto.imagen %}" alt="{{ producto.nombre }} de {{ producto.marca }}">
+      <img src="{% static producto.imagen %}" alt="{{ producto.nombre }} de {{ producto.marca }}" data-parallax="20">
       <p>Fotografía referencial del producto</p>
     </div>
 

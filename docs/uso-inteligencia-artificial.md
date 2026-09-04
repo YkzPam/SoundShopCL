@@ -11,6 +11,7 @@ La inteligencia artificial apoyó la lectura comparada de la pauta y la escala d
 - Revisar que las vistas de Django entreguen contexto y que las plantillas utilicen ciclos, condiciones, variables y URLs nombradas.
 - Crear casos de prueba para búsqueda, filtros, productos agotados, límites de stock, carrito, registro de cuenta y confirmación de pedido.
 - Revisar el comportamiento de la interfaz en escritorio, tableta y teléfono sin eliminar funciones.
+- Comprobar el modo oscuro, la persistencia de la preferencia, las animaciones de scroll y la salida para movimiento reducido.
 
 ## 5.3 Recursos visuales generados
 
