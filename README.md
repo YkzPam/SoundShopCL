@@ -1,8 +1,8 @@
 # SoundShop CL
 
-SoundShop CL es el prototipo de una tienda musical chilena desarrollado para la Evaluación 1 de Programación Backend. La aplicación permite recorrer un catálogo, buscar productos, filtrar por categoría, precio y disponibilidad, revisar fichas detalladas, modificar un carrito y completar un pedido simulado.
+SoundShop CL es el prototipo de una tienda musical chilena desarrollado para la Evaluación 1 de Programación Backend. La aplicación permite recorrer un catálogo, buscar productos, filtrar por categoría, precio y disponibilidad, revisar fichas detalladas, modificar un carrito, crear una cuenta de sesión y completar un pedido temporal.
 
-La entrega usa Django 5.2 LTS, plantillas DTL, datos JSON, Tailwind CSS y JavaScript. No se conecta a una base de datos porque esa integración pertenece a las siguientes unidades del caso semestral. El carrito se guarda temporalmente en una cookie firmada por Django y desaparece al borrar los datos del navegador.
+La entrega usa Django 5.2 LTS, plantillas DTL, datos JSON, Tailwind CSS y JavaScript. No se conecta a una base de datos porque esa integración pertenece a las siguientes unidades del caso semestral. El carrito y el nombre visible de la cuenta se guardan temporalmente en una cookie firmada por Django. El correo y la contraseña del formulario de registro se validan, pero no se almacenan.
 
 ## Funciones incluidas
 
@@ -12,12 +12,13 @@ La entrega usa Django 5.2 LTS, plantillas DTL, datos JSON, Tailwind CSS y JavaSc
 - Filtros combinables por categoría, precio máximo y stock.
 - Orden por destacados, nombre o precio.
 - Ficha de producto con especificaciones, precio, disponibilidad y productos relacionados.
-- Carrito simulado con agregar, actualizar, eliminar y control de stock.
-- Confirmación de pedido con código temporal, sin pago ni datos personales.
+- Carrito temporal con agregar, actualizar, eliminar y control de stock.
+- Registro de cuenta con validación de correo, contraseña, confirmación y aceptación de condiciones.
+- Confirmación de pedido con código temporal, sin pago ni persistencia comercial.
 - Mensajes de validación, rutas nombradas y redirecciones ante identificadores inválidos.
-- Quince pruebas automáticas que no requieren base de datos.
+- Veintidós pruebas automáticas que no requieren base de datos.
 
-La interfaz utiliza una dirección editorial inspirada en catálogos de audio: fondo papel, negro carbón y rojo señal. Se evitaron degradados decorativos, transparencias excesivas, sombras flotantes y animaciones continuas. Los cambios de estado se resuelven con transiciones breves y la hoja de estilos respeta `prefers-reduced-motion`.
+La interfaz utiliza una dirección visual contemporánea inspirada en catálogos técnicos de audio: azul noche, cobalto, gris frío y acentos aqua. La tipografía combina Bahnschrift, Aptos y las variantes modernas de Segoe UI disponibles en Windows. Las seis fotografías forman una colección de estudio coherente, sin marcas de terceros. Se evitaron movimientos continuos y la hoja de estilos respeta `prefers-reduced-motion`.
 
 ## Instalación en Windows y Visual Studio Code
 
@@ -89,7 +90,10 @@ La sección **Ejecutar y depurar** contiene la configuración `SoundShop CL: Dja
 | `/categorias/<slug>/` | `core:detalle_categoria` | Productos de una categoría |
 | `/buscar/?q=texto` | `core:buscar` | Resultado de búsqueda |
 | `/carrito/` | `core:carrito` | Resumen y edición del carrito |
-| `/pedido/confirmado/` | `core:pedido_confirmado` | Resultado del pedido simulado |
+| `/pedido/confirmado/` | `core:pedido_confirmado` | Resultado del pedido temporal |
+| `/registro/` | `core:registro` | Formulario de creación de cuenta |
+| `/registro/confirmado/` | `core:registro_confirmado` | Confirmación y nombre de sesión |
+| `/cuenta/salir/` | `core:cerrar_sesion` | Cierre de sesión mediante `POST` |
 
 Las operaciones que alteran el carrito aceptan únicamente solicitudes `POST` y están protegidas con token CSRF.
 
@@ -147,6 +151,6 @@ No se debe subir la carpeta `venv`, `node_modules`, cookies, claves personales n
 
 ## Decisiones de la primera entrega
 
-`core/models.py` utiliza `dataclasses` para describir las entidades y sus tipos. Los registros se cargan desde `core/data/catalogo.json`, se convierten en objetos Python y se envían a cada plantilla mediante diccionarios de contexto. Esta solución demuestra el flujo completo solicitado sin adelantar la conexión ORM ni el sistema de usuarios de evaluaciones posteriores.
+`core/models.py` utiliza `dataclasses` para describir las entidades y sus tipos. Los registros se cargan desde `core/data/catalogo.json`, se convierten en objetos Python y se envían a cada plantilla mediante diccionarios de contexto. El registro agregado en esta etapa representa la interfaz y sus validaciones; no reemplaza el modelo de usuarios, la autenticación ni la persistencia que requieren ORM y base de datos.
 
-Los nombres, precios y marcas del catálogo son ficticios. Las seis imágenes fueron creadas específicamente para el prototipo, optimizadas en WebP y no contienen logotipos de terceros. El pedido final no es una transacción comercial.
+Los nombres, precios y marcas del catálogo son ficticios. Las seis imágenes fueron creadas específicamente para SoundShop CL, optimizadas en WebP y no contienen logotipos de terceros. El pedido final no es una transacción comercial.

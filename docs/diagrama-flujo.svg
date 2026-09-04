@@ -1,27 +1,27 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1040" viewBox="0 0 1600 1040" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1260" viewBox="0 0 1600 1260" role="img" aria-labelledby="title desc">
   <title id="title">Diagrama de flujo de SoundShop CL</title>
-  <desc id="desc">Recorrido desde el inicio hasta la confirmación simulada del pedido, con decisiones para resultados, identificadores y stock.</desc>
+  <desc id="desc">Recorrido desde el inicio hasta la confirmación del pedido, con decisiones para resultados, identificadores, stock y creación de cuenta.</desc>
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#050812"/><stop offset="1" stop-color="#10172a"/></linearGradient>
-    <linearGradient id="primary" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#7c3aed"/><stop offset="1" stop-color="#2563eb"/></linearGradient>
-    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0891b2"/><stop offset="1" stop-color="#7c3aed"/></linearGradient>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#08111f"/><stop offset="1" stop-color="#111d31"/></linearGradient>
+    <linearGradient id="primary" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#315bea"/><stop offset="1" stop-color="#2140b4"/></linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#24b8aa"/><stop offset="1" stop-color="#315bea"/></linearGradient>
     <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#000" flood-opacity=".32"/></filter>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0l10 5-10 5z" fill="#64748b"/></marker>
     <style>
       .box{fill:#111827;stroke:#334155;stroke-width:2;filter:url(#shadow)}
-      .decision{fill:#172033;stroke:#8b5cf6;stroke-width:2;filter:url(#shadow)}
+      .decision{fill:#172033;stroke:#5f8dee;stroke-width:2;filter:url(#shadow)}
       .line{fill:none;stroke:#64748b;stroke-width:3;marker-end:url(#arrow)}
       .dash{fill:none;stroke:#475569;stroke-width:2.5;stroke-dasharray:9 8;marker-end:url(#arrow)}
-      .h{font:700 24px 'Segoe UI',sans-serif;fill:#f8fafc;text-anchor:middle}
-      .p{font:400 17px 'Segoe UI',sans-serif;fill:#aebbd0;text-anchor:middle}
-      .small{font:700 15px 'Segoe UI',sans-serif;fill:#c4b5fd;text-anchor:middle}
-      .label{font:700 16px 'Segoe UI',sans-serif;fill:#94a3b8}
+      .h{font:700 24px 'Bahnschrift','Segoe UI',sans-serif;fill:#f8fafc;text-anchor:middle}
+      .p{font:400 17px 'Aptos','Segoe UI',sans-serif;fill:#aebbd0;text-anchor:middle}
+      .small{font:700 15px 'Aptos','Segoe UI',sans-serif;fill:#b7c7fb;text-anchor:middle}
+      .label{font:700 16px 'Aptos','Segoe UI',sans-serif;fill:#94a3b8}
     </style>
   </defs>
-  <rect width="1600" height="1040" rx="34" fill="url(#bg)"/>
-  <circle cx="1410" cy="90" r="230" fill="#7c3aed" opacity=".08"/><circle cx="90" cy="920" r="250" fill="#0ea5e9" opacity=".06"/>
-  <text x="800" y="56" font-family="Segoe UI,sans-serif" font-size="34" font-weight="800" fill="#fff" text-anchor="middle">Flujo principal · SoundShop CL</text>
-  <text x="800" y="88" font-family="Segoe UI,sans-serif" font-size="16" fill="#8290a7" text-anchor="middle">Sistema de sucursal y vitrina musical · Evaluación 1</text>
+  <rect width="1600" height="1260" rx="34" fill="url(#bg)"/>
+  <circle cx="1410" cy="90" r="230" fill="#315bea" opacity=".08"/><circle cx="90" cy="1130" r="250" fill="#24b8aa" opacity=".06"/>
+  <text x="800" y="56" font-family="Bahnschrift,Segoe UI,sans-serif" font-size="34" font-weight="800" fill="#fff" text-anchor="middle">Flujo principal · SoundShop CL</text>
+  <text x="800" y="88" font-family="Aptos,Segoe UI,sans-serif" font-size="16" fill="#8290a7" text-anchor="middle">Sistema de sucursal y vitrina musical · Evaluación 1</text>
 
   <rect x="650" y="120" width="300" height="86" rx="43" fill="url(#primary)" filter="url(#shadow)"/>
   <text class="h" x="800" y="157">Inicio</text><text class="p" x="800" y="183" fill="#ddd6fe">Portada y destacados</text>
@@ -71,5 +71,19 @@
   <path class="line" d="M1480 919v55H985"/>
 
   <rect x="650" y="945" width="335" height="72" rx="36" fill="url(#primary)" filter="url(#shadow)"/>
-  <text class="h" x="817" y="977">Pedido simulado</text><text class="p" x="817" y="1001" fill="#ddd6fe">Código, total y fecha</text>
+  <text class="h" x="817" y="977">Pedido confirmado</text><text class="p" x="817" y="1001" fill="#dce5ff">Código, total y fecha</text>
+
+  <path class="dash" d="M650 163H90v947h140"/>
+  <text class="label" x="110" y="1092">Registro opcional</text>
+  <rect class="box" x="230" y="1055" width="320" height="110" rx="22"/>
+  <text class="h" x="390" y="1098">Crear cuenta</text><text class="p" x="390" y="1128">Nombre, correo y contraseña</text><text class="small" x="390" y="1152">Formulario protegido con CSRF</text>
+  <path class="line" d="M550 1110h100"/>
+  <path class="decision" d="M790 1038l140 72-140 72-140-72z"/>
+  <text class="h" x="790" y="1102">¿Datos válidos?</text><text class="small" x="790" y="1128">Clave y confirmación</text>
+  <path class="dash" d="M790 1182v46H390v-63"/>
+  <text class="label" x="565" y="1218">No: mostrar errores</text>
+  <path class="line" d="M930 1110h110"/>
+  <text class="label" x="970" y="1094">Sí</text>
+  <rect x="1040" y="1055" width="350" height="110" rx="22" fill="url(#accent)" filter="url(#shadow)"/>
+  <text class="h" x="1215" y="1098">Cuenta activa</text><text class="p" x="1215" y="1128" fill="#e0f2fe">Nombre visible en el menú</text><text class="small" x="1215" y="1152">Sesión firmada</text>
 </svg>

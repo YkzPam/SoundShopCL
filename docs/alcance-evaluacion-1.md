@@ -6,21 +6,21 @@ SoundShop CL desarrolla la alternativa **Sistema de Sucursal (Punto de Venta / V
 
 ## 1.2 Límite funcional de esta unidad
 
-La pauta de la Evaluación 1 solicita un sitio básico en Django sin conexión a base de datos. El catálogo se almacena en `core/data/catalogo.json`; la vista lo transforma en objetos Python y construye el contexto que recibe cada plantilla. El carrito utiliza una cookie firmada y permite comprobar el flujo sin crear tablas ni conservar información personal.
+La pauta de la Evaluación 1 solicita un sitio básico en Django sin conexión a base de datos. El catálogo se almacena en `core/data/catalogo.json`; la vista lo transforma en objetos Python y construye el contexto que recibe cada plantilla. El carrito y el nombre visible de la cuenta utilizan una cookie firmada y permiten comprobar ambos flujos sin crear tablas.
 
 | Incluido en esta entrega | Reservado para unidades posteriores |
 |---|---|
 | Catálogo JSON dinámico | Modelos ORM y migraciones de negocio |
 | Búsqueda, filtros y categorías | Administración persistente de productos |
-| Formulario y validación de cantidades | Registro e inicio de sesión de clientes |
+| Formularios de cantidad y creación de cuenta | Usuarios ORM, inicio de sesión y recuperación de contraseña |
 | Carrito temporal firmado | Historial real de compras por usuario |
 | Pedido simulado | Pasarela o medio de pago real |
 | Mensajes y control de rutas | Gestión persistente del estado del pedido |
 
 ## 1.3 Criterio de seguridad
 
-El prototipo no pide nombre, dirección, correo ni datos bancarios. Las rutas que cambian el carrito usan método `POST` y token CSRF. La confirmación genera un código solo para demostrar la salida del proceso. Ningún pedido se registra fuera de la sesión temporal del navegador.
+El formulario de cuenta solicita nombre, correo y contraseña para comprobar la interfaz y sus reglas. Django valida esos valores y descarta el correo y la contraseña al terminar la solicitud; la sesión conserva solo el primer nombre. Las rutas de registro, carrito, confirmación y cierre usan método `POST` y token CSRF. Ningún pedido se registra fuera de la sesión temporal del navegador.
 
 ## 1.4 Resultado observable
 
-Una persona puede entrar a la portada, elegir una categoría, filtrar el catálogo, abrir un producto disponible, agregar una cantidad válida, modificarla en el carrito y confirmar el pedido. Las cantidades inválidas, productos agotados e identificadores inexistentes generan mensajes o redirecciones controladas.
+Una persona puede entrar a la portada, crear una cuenta de sesión, ver su nombre en el menú, elegir una categoría, filtrar el catálogo, abrir un producto disponible, agregar una cantidad válida, modificarla en el carrito y confirmar el pedido. Las credenciales inválidas, cantidades fuera de rango, productos agotados e identificadores inexistentes generan mensajes o redirecciones controladas.

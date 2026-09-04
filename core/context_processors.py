@@ -5,8 +5,12 @@ from .catalogo import calcular_carrito, obtener_categorias
 
 def datos_globales(request):
     carrito = request.session.get("carrito", {})
+    usuario = request.session.get("usuario_tienda", {})
+    if not isinstance(usuario, dict) or not usuario.get("nombre"):
+        usuario = {}
     _, _, cantidad = calcular_carrito(carrito if isinstance(carrito, dict) else {})
     return {
         "categorias_globales": obtener_categorias(),
         "cantidad_carrito": cantidad,
+        "usuario_tienda": usuario,
     }

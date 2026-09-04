@@ -42,7 +42,8 @@ La propiedad calculada `puede_comprarse` devuelve `True` cuando el stock es mayo
 | Orden | `orden` | Una alternativa de la lista definida | Resultado por destacados, nombre o precio |
 | Agregar | `cantidad` | Entero desde 1 hasta el stock del producto | Nueva línea o incremento del carrito |
 | Actualizar | `cantidad` | Entero entre 0 y 99, con segunda revisión de stock | Cantidad modificada; cero elimina la línea |
-| Confirmar | Carrito firmado | Debe contener al menos una línea válida | Código, fecha, total y cantidad del pedido simulado |
+| Confirmar | Carrito firmado | Debe contener al menos una línea válida | Código, fecha, total y cantidad del pedido temporal |
+| Crear cuenta | `nombre`, `correo`, `contrasena`, `confirmar_contrasena`, `acepta_terminos` | Nombre mínimo de 2 caracteres, correo válido, clave mínima de 8 caracteres con letra y número, coincidencia y aceptación obligatoria | Nombre visible guardado en la sesión; correo y contraseña descartados |
 
 ## 2.3 Salidas del servidor
 
@@ -56,3 +57,6 @@ Las vistas construyen diccionarios de contexto con productos, categorías, canti
 - Una cantidad superior al stock conserva intacto el carrito.
 - Las operaciones de agregar, actualizar, eliminar y confirmar rechazan solicitudes `GET`.
 - Un carrito vacío no puede generar una confirmación.
+- Una contraseña sin letra o número se rechaza junto al campo correspondiente.
+- La confirmación debe coincidir con la contraseña y las condiciones deben aceptarse.
+- La pantalla de cuenta creada no se muestra si no existe un nombre de sesión válido.

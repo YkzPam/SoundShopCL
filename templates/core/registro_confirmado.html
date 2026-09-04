@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Cuenta creada | SoundShop CL{% endblock %}
+
+{% block content %}
+<section class="account-confirmation">
+  <div class="page-shell">
+    <article class="account-confirmation__card">
+      <div class="account-confirmation__mark" aria-hidden="true">✓</div>
+      <p class="section-index"><span>Cuenta / 02</span> Registro completo</p>
+      <h1>Tu cuenta está lista, {{ usuario.nombre }}.</h1>
+      <p>La sesión quedó activa en este navegador. Tu nombre ya aparece en el menú principal.</p>
+      <div class="button-row">
+        <a href="{% url 'core:catalogo' %}" class="button button--primary">Explorar productos <span aria-hidden="true">→</span></a>
+        <a href="{% url 'core:inicio' %}" class="button button--quiet">Volver al inicio</a>
+      </div>
+      <form method="post" action="{% url 'core:cerrar_sesion' %}" class="account-confirmation__logout">{% csrf_token %}<button type="submit">Cerrar sesión</button></form>
+    </article>
+  </div>
+</section>
+{% endblock %}

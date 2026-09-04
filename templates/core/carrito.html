@@ -6,8 +6,8 @@
 {% block content %}
 <header class="page-intro page-intro--compact">
   <div class="page-shell page-intro__grid">
-    <p class="section-index"><span>Pedido / 01</span> Compra demostrativa</p>
-    <div><h1>Tu carrito</h1><p>Revisa las cantidades antes de confirmar. Ningún pago real será procesado.</p></div>
+    <p class="section-index"><span>Pedido / 01</span> Tu selección</p>
+    <div><h1>Tu carrito</h1><p>Revisa las cantidades y la disponibilidad antes de confirmar tu pedido.</p></div>
   </div>
 </header>
 
@@ -37,17 +37,17 @@
       <aside class="order-summary">
         <p class="order-summary__index">Resumen / Pedido</p>
         <h2>Total estimado</h2>
-        <dl><div><dt>Productos</dt><dd>{{ cantidad }}</dd></div><div><dt>Despacho</dt><dd>Simulado</dd></div></dl>
+        <dl><div><dt>Productos</dt><dd>{{ cantidad }}</dd></div><div><dt>Despacho</dt><dd>Por calcular</dd></div></dl>
         <div class="order-summary__total"><span>Total</span><strong>{{ total|precio_clp }}</strong></div>
-        <form method="post" action="{% url 'core:confirmar_pedido' %}">{% csrf_token %}<button type="submit" class="button button--primary button--full">Confirmar pedido simulado</button></form>
-        <p class="order-summary__note">No se crea un cobro ni se almacena información personal.</p>
+        <form method="post" action="{% url 'core:confirmar_pedido' %}">{% csrf_token %}<button type="submit" class="button button--primary button--full">Confirmar pedido</button></form>
+        <p class="order-summary__note">El total no incluye el valor del despacho.</p>
       </aside>
     </div>
   {% else %}
     <div class="empty-state empty-state--cart">
       <span class="empty-state__number">00</span>
       <h2>El carrito está vacío</h2>
-      <p>Explora el catálogo y agrega el equipo que quieras probar en este flujo de compra.</p>
+      <p>Explora el catálogo y agrega el equipo que quieras comprar.</p>
       <a href="{% url 'core:catalogo' %}" class="button button--dark">Ir al catálogo</a>
     </div>
   {% endif %}

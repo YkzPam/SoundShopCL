@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="SoundShop CL, tienda musical chilena de audífonos, tornamesas y equipos de grabación.">
-  <meta name="theme-color" content="#151412">
+  <meta name="theme-color" content="#0b1220">
   <title>{% block title %}SoundShop CL{% endblock %}</title>
   <link rel="icon" href="{% static 'img/favicon.svg' %}" type="image/svg+xml">
   <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
@@ -38,6 +38,11 @@
         </label>
       </form>
 
+      <a href="{% url 'core:registro' %}" class="account-link {% if request.resolver_match.url_name == 'registro' or request.resolver_match.url_name == 'registro_confirmado' %}is-active{% endif %}" aria-label="{% if usuario_tienda %}Cuenta de {{ usuario_tienda.nombre }}{% else %}Crear una cuenta{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.7-4 3-6 7-6s6.3 2 7 6"/></svg>
+        <span>{% if usuario_tienda %}{{ usuario_tienda.nombre }}{% else %}Cuenta{% endif %}</span>
+      </a>
+
       <a href="{% url 'core:carrito' %}" class="cart-link" aria-label="Carrito con {{ cantidad_carrito }} productos">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 4h2l2.2 10.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 1.9-1.4L21 7H6"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
         <span class="cart-link__label">Carrito</span>
@@ -59,6 +64,7 @@
           <a href="{% url 'core:inicio' %}"><span>01</span>Inicio</a>
           <a href="{% url 'core:catalogo' %}"><span>02</span>Productos</a>
           <a href="{% url 'core:categorias' %}"><span>03</span>Categorías</a>
+          <a href="{% url 'core:registro' %}"><span>04</span>{% if usuario_tienda %}Cuenta de {{ usuario_tienda.nombre }}{% else %}Crear cuenta{% endif %}</a>
         </nav>
       </div>
     </div>
@@ -93,11 +99,12 @@
         </ul>
       </div>
       <div>
-        <h2>Sobre esta tienda</h2>
-        <p>Prototipo académico. El catálogo, el stock y la confirmación del pedido utilizan datos simulados.</p>
+        <h2>Tu cuenta</h2>
+        <p>Crea un perfil para mantener una experiencia más personal al recorrer la tienda.</p>
+        <a class="footer-account-link" href="{% url 'core:registro' %}">{% if usuario_tienda %}Ver mi cuenta{% else %}Crear cuenta{% endif %} <span aria-hidden="true">→</span></a>
       </div>
     </div>
-    <div class="page-shell site-footer__bottom"><span>© 2026 SoundShop CL</span><span>Santiago, Chile</span><span>No se procesan pagos reales</span></div>
+    <div class="page-shell site-footer__bottom"><span>© 2026 SoundShop CL</span><span>Santiago, Chile</span><span>Audio para escuchar y crear</span></div>
   </footer>
 </body>
 </html>

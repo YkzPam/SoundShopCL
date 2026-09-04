@@ -7,11 +7,11 @@
 <section class="confirmation-wrap">
   <div class="page-shell">
     <article class="confirmation-card">
-      <div class="confirmation-card__status"><span aria-hidden="true">✓</span><p>Flujo completado</p></div>
+      <div class="confirmation-card__status"><span aria-hidden="true">✓</span><p>Pedido recibido</p></div>
       <div class="confirmation-card__content">
         <p class="section-index"><span>Pedido / 02</span> Confirmación</p>
-        <h1>Pedido simulado confirmado</h1>
-        <p>El prototipo procesó correctamente los {{ pedido.cantidad }} productos del carrito. No hubo pago real ni almacenamiento en una base de datos.</p>
+        <h1>Tu pedido está confirmado</h1>
+        <p>Recibimos tu selección de {{ pedido.cantidad }} productos. Guarda el código del pedido como referencia.</p>
         <dl class="receipt-details"><div><dt>Código</dt><dd>{{ pedido.codigo }}</dd></div><div><dt>Total</dt><dd>{{ pedido.total|precio_clp }}</dd></div><div><dt>Fecha</dt><dd>{{ pedido.fecha }}</dd></div></dl>
         <div class="button-row"><a href="{% url 'core:catalogo' %}" class="button button--dark">Volver al catálogo</a><button type="button" data-copy-order="{{ pedido.codigo }}" class="button button--quiet">Copiar código</button></div>
       </div>

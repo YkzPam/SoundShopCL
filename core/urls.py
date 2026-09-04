@@ -20,4 +20,7 @@ urlpatterns = [
     path("carrito/eliminar/<int:producto_id>/", views.eliminar_del_carrito, name="eliminar_del_carrito"),
     path("carrito/confirmar/", views.confirmar_pedido, name="confirmar_pedido"),
     path("pedido/confirmado/", views.pedido_confirmado, name="pedido_confirmado"),
+    path("registro/", views.registro, name="registro"),
+    path("registro/confirmado/", views.registro_confirmado, name="registro_confirmado"),
+    path("cuenta/salir/", views.cerrar_sesion, name="cerrar_sesion"),
 ]

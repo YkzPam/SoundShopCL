@@ -17,7 +17,7 @@
       <dl class="store-facts">
         <div><dt>Selección</dt><dd>6 equipos</dd></div>
         <div><dt>Cobertura</dt><dd>Todo Chile</dd></div>
-        <div><dt>Compra</dt><dd>Demostrativa</dd></div>
+        <div><dt>Stock</dt><dd>Visible en línea</dd></div>
       </dl>
     </div>
 
@@ -72,10 +72,44 @@
   </div>
 </section>
 
+<section class="account-section" id="registro" aria-labelledby="registro-inicio">
+  <div class="page-shell account-section__grid">
+    <div class="account-section__copy">
+      <p class="section-index"><span>SS / 04</span> Tu espacio en SoundShop</p>
+      {% if usuario_tienda %}
+        <h2 id="registro-inicio">Hola, {{ usuario_tienda.nombre }}.</h2>
+        <p>Tu cuenta está activa en este navegador. Puedes seguir explorando equipos y conservar los productos que agregues al carrito.</p>
+        <div class="button-row">
+          <a href="{% url 'core:catalogo' %}" class="button button--primary">Explorar productos <span aria-hidden="true">→</span></a>
+          <form method="post" action="{% url 'core:cerrar_sesion' %}">{% csrf_token %}<button type="submit" class="button button--quiet">Cerrar sesión</button></form>
+        </div>
+      {% else %}
+        <h2 id="registro-inicio">Crea tu cuenta.</h2>
+        <p>Personaliza tu visita y accede a la tienda con tu nombre desde este navegador.</p>
+        <ul class="account-benefits">
+          <li><span>01</span><div><strong>Acceso personal</strong><p>Tu nombre aparecerá en el menú principal.</p></div></li>
+          <li><span>02</span><div><strong>Proceso directo</strong><p>Completa el registro sin salir de la tienda.</p></div></li>
+          <li><span>03</span><div><strong>Datos protegidos</strong><p>La contraseña no queda almacenada.</p></div></li>
+        </ul>
+      {% endif %}
+    </div>
+    {% if not usuario_tienda %}
+      <div class="account-section__form">
+        {% include 'includes/registro_form.html' with formulario=registro_formulario %}
+      </div>
+    {% else %}
+      <div class="account-profile-card" aria-label="Cuenta activa">
+        <span class="account-profile-card__icon" aria-hidden="true">{{ usuario_tienda.nombre|first|upper }}</span>
+        <div><p>Cuenta activa</p><strong>{{ usuario_tienda.nombre }}</strong><span>SoundShop CL</span></div>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
 <section class="service-note">
   <div class="page-shell service-note__inner">
-    <p class="section-index"><span>SS / 04</span> Compra informada</p>
-    <div><h2>Precio, stock y especificaciones a la vista.</h2><p>Cada ficha reúne la información necesaria para comparar. La confirmación final es parte de una demostración académica y no solicita datos bancarios.</p></div>
+    <p class="section-index"><span>SS / 05</span> Compra informada</p>
+    <div><h2>Precio, stock y especificaciones a la vista.</h2><p>Cada ficha reúne la información necesaria para comparar. Agrega equipos al carrito y revisa el total antes de confirmar tu pedido.</p></div>
     <a href="{% url 'core:catalogo' %}?solo_disponibles=on" class="button button--light">Ver productos con stock <span aria-hidden="true">→</span></a>
   </div>
 </section>

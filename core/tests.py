@@ -96,11 +96,11 @@ class CarritoTests(SimpleTestCase):
         self.assertEqual(respuesta.context["cantidad"], 0)
         self.assertContains(respuesta, "El carrito está vacío")
 
-    def test_confirmacion_simulada_limpia_carrito(self):
+    def test_confirmacion_limpia_carrito(self):
         self.client.post(reverse("core:agregar_al_carrito", args=[1]), {"cantidad": 1})
         respuesta = self.client.post(reverse("core:confirmar_pedido"), follow=True)
         self.assertEqual(respuesta.status_code, 200)
-        self.assertContains(respuesta, "Pedido simulado confirmado")
+        self.assertContains(respuesta, "Tu pedido está confirmado")
         self.assertEqual(self.client.session.get("carrito"), {})
         self.assertTrue(self.client.session.get("ultimo_pedido", {}).get("codigo", "").startswith("SSCL-"))
 
@@ -124,3 +124,66 @@ class ArchivosEstaticosTests(SimpleTestCase):
         ):
             with self.subTest(ruta=ruta):
                 self.assertIsNotNone(finders.find(ruta))
+
+
+class RegistroTests(SimpleTestCase):
+    datos_validos = {
+        "nombre": "Benjamin Soto",
+        "correo": "benjamin@example.cl",
+        "contrasena": "Sonido2026",
+        "confirmar_contrasena": "Sonido2026",
+        "acepta_terminos": "on",
+    }
+
+    def test_formulario_aparece_en_inicio_y_ruta_de_registro(self):
+        inicio = self.client.get(reverse("core:inicio"))
+        registro = self.client.get(reverse("core:registro"))
+        self.assertContains(inicio, "Crea tu cuenta")
+        self.assertContains(registro, "Completa tus datos")
+
+    def test_contrasenas_distintas_muestran_error(self):
+        datos = self.datos_validos | {"confirmar_contrasena": "OtraClave2026"}
+        respuesta = self.client.post(reverse("core:registro"), datos)
+        self.assertEqual(respuesta.status_code, 200)
+        self.assertContains(respuesta, "Las contraseñas no coinciden")
+        self.assertNotIn("usuario_tienda", self.client.session)
+
+    def test_contrasena_debe_incluir_letra_y_numero(self):
+        datos = self.datos_validos | {
+            "contrasena": "solonumeros",
+            "confirmar_contrasena": "solonumeros",
+        }
+        respuesta = self.client.post(reverse("core:registro"), datos)
+        self.assertContains(respuesta, "Incluye al menos un número")
+        self.assertNotIn("usuario_tienda", self.client.session)
+
+    def test_registro_valido_guarda_solo_nombre_visible(self):
+        respuesta = self.client.post(reverse("core:registro"), self.datos_validos)
+        self.assertRedirects(
+            respuesta,
+            reverse("core:registro_confirmado"),
+            fetch_redirect_response=False,
+        )
+        sesion = self.client.session
+        self.assertEqual(sesion.get("usuario_tienda"), {"nombre": "Benjamin"})
+        self.assertNotIn("correo", str(sesion.get("usuario_tienda")))
+        self.assertNotIn("Sonido2026", str(dict(sesion.items())))
+
+    def test_confirmacion_requiere_una_cuenta_activa(self):
+        respuesta = self.client.get(reverse("core:registro_confirmado"))
+        self.assertRedirects(respuesta, reverse("core:registro"), fetch_redirect_response=False)
+
+    def test_cerrar_sesion_elimina_cuenta_local(self):
+        self.client.post(reverse("core:registro"), self.datos_validos)
+        respuesta = self.client.post(reverse("core:cerrar_sesion"), follow=True)
+        self.assertEqual(respuesta.status_code, 200)
+        self.assertNotIn("usuario_tienda", self.client.session)
+        self.assertContains(respuesta, "La sesión se cerró correctamente")
+
+    def test_interfaz_no_expone_etiquetas_academicas(self):
+        for ruta in ("core:inicio", "core:catalogo", "core:categorias", "core:carrito"):
+            with self.subTest(ruta=ruta):
+                respuesta = self.client.get(reverse(ruta))
+                contenido = respuesta.content.decode().lower()
+                self.assertNotIn("prototipo académico", contenido)
+                self.assertNotIn("compra demostrativa", contenido)

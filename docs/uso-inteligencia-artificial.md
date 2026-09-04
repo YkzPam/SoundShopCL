@@ -9,12 +9,12 @@ La inteligencia artificial apoyó la lectura comparada de la pauta y la escala d
 - Identificar qué funciones pertenecen a la Evaluación 1 del caso de tienda y cuáles requieren base de datos en unidades posteriores.
 - Proponer un modelo tipado para categorías y productos almacenados en JSON.
 - Revisar que las vistas de Django entreguen contexto y que las plantillas utilicen ciclos, condiciones, variables y URLs nombradas.
-- Crear casos de prueba para búsqueda, filtros, productos agotados, límites de stock, carrito y confirmación simulada.
+- Crear casos de prueba para búsqueda, filtros, productos agotados, límites de stock, carrito, registro de cuenta y confirmación de pedido.
 - Revisar el comportamiento de la interfaz en escritorio, tableta y teléfono sin eliminar funciones.
 
 ## 5.3 Recursos visuales generados
 
-Se crearon seis imágenes originales: audífonos inalámbricos, audífonos de estudio, tornamesa, kit de limpieza de vinilos, micrófono e interfaz de audio. La solicitud visual mantuvo un mismo lenguaje para todo el conjunto: fotografía cuadrada de producto, fondo carbón oscuro, iluminación de estudio violeta, azul y magenta, materiales realistas, alta definición y ausencia de texto o logotipos. Las copias del proyecto se optimizaron en formato WebP y se guardaron en `static/img/productos`.
+Se crearon seis imágenes originales: audífonos inalámbricos, audífonos de estudio, tornamesa, kit de limpieza de vinilos, micrófono e interfaz de audio. La segunda versión visual mantuvo un mismo lenguaje para todo el conjunto: fotografía cuadrada de producto, fondo gris frío, equipos en grafito y plata, pequeños acentos cobalto o aqua, iluminación de estudio natural y ausencia de texto o logotipos. Las copias del proyecto se optimizaron en formato WebP y se guardaron en `static/img/productos`.
 
 ## 5.4 Verificación humana esperada
 

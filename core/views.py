@@ -1,4 +1,4 @@
-"""Vistas del catalogo y del flujo de compra simulado."""
+"""Vistas del catálogo, el carrito y la cuenta de usuario."""
 
 import secrets
 
@@ -15,7 +15,12 @@ from .catalogo import (
     obtener_producto,
     productos_destacados,
 )
-from .forms import CantidadCarritoForm, CantidadProductoForm, FiltroCatalogoForm
+from .forms import (
+    CantidadCarritoForm,
+    CantidadProductoForm,
+    FiltroCatalogoForm,
+    RegistroForm,
+)
 
 
 def _carrito_sesion(request) -> dict[str, int]:
@@ -61,6 +66,7 @@ def inicio(request):
     contexto = {
         "productos_destacados": productos_destacados(),
         "resumen_categorias": categorias_con_resumen(),
+        "registro_formulario": RegistroForm(),
     }
     return render(request, "core/inicio.html", contexto)
 
@@ -211,3 +217,29 @@ def pedido_confirmado(request):
     if not pedido:
         return redirect("core:inicio")
     return render(request, "core/pedido_confirmado.html", {"pedido": pedido})
+
+
+def registro(request):
+    formulario = RegistroForm(request.POST or None)
+    if request.method == "POST" and formulario.is_valid():
+        nombre = formulario.cleaned_data["nombre"].strip().split()[0]
+        request.session["usuario_tienda"] = {"nombre": nombre}
+        request.session.modified = True
+        messages.success(request, f"Cuenta creada. Bienvenido, {nombre}.")
+        return redirect("core:registro_confirmado")
+    return render(request, "core/registro.html", {"registro_formulario": formulario})
+
+
+def registro_confirmado(request):
+    usuario = request.session.get("usuario_tienda")
+    if not isinstance(usuario, dict) or not usuario.get("nombre"):
+        return redirect("core:registro")
+    return render(request, "core/registro_confirmado.html", {"usuario": usuario})
+
+
+@require_POST
+def cerrar_sesion(request):
+    request.session.pop("usuario_tienda", None)
+    request.session.modified = True
+    messages.info(request, "La sesión se cerró correctamente.")
+    return redirect("core:inicio")

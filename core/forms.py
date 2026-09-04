@@ -1,4 +1,4 @@
-"""Formularios y validaciones del catalogo y el carrito."""
+"""Formularios y validaciones de la tienda."""
 
 from django import forms
 
@@ -81,3 +81,73 @@ class CantidadProductoForm(forms.Form):
 
 class CantidadCarritoForm(forms.Form):
     cantidad = forms.IntegerField(min_value=0, max_value=99)
+
+
+class RegistroForm(forms.Form):
+    nombre = forms.CharField(
+        label="Nombre",
+        min_length=2,
+        max_length=60,
+        widget=forms.TextInput(
+            attrs={
+                "class": "account-form__input",
+                "autocomplete": "name",
+                "placeholder": "Nombre y apellido",
+            }
+        ),
+    )
+    correo = forms.EmailField(
+        label="Correo electrónico",
+        max_length=120,
+        widget=forms.EmailInput(
+            attrs={
+                "class": "account-form__input",
+                "autocomplete": "email",
+                "placeholder": "nombre@correo.cl",
+            }
+        ),
+    )
+    contrasena = forms.CharField(
+        label="Contraseña",
+        min_length=8,
+        max_length=128,
+        widget=forms.PasswordInput(
+            attrs={
+                "class": "account-form__input",
+                "autocomplete": "new-password",
+                "placeholder": "Mínimo 8 caracteres",
+            }
+        ),
+    )
+    confirmar_contrasena = forms.CharField(
+        label="Confirmar contraseña",
+        min_length=8,
+        max_length=128,
+        widget=forms.PasswordInput(
+            attrs={
+                "class": "account-form__input",
+                "autocomplete": "new-password",
+                "placeholder": "Repite tu contraseña",
+            }
+        ),
+    )
+    acepta_terminos = forms.BooleanField(
+        label="Acepto los términos de uso y la política de privacidad.",
+        widget=forms.CheckboxInput(attrs={"class": "account-form__checkbox"}),
+    )
+
+    def clean_contrasena(self):
+        contrasena = self.cleaned_data["contrasena"]
+        if not any(caracter.isalpha() for caracter in contrasena):
+            raise forms.ValidationError("Incluye al menos una letra.")
+        if not any(caracter.isdigit() for caracter in contrasena):
+            raise forms.ValidationError("Incluye al menos un número.")
+        return contrasena
+
+    def clean(self):
+        datos = super().clean()
+        contrasena = datos.get("contrasena")
+        confirmacion = datos.get("confirmar_contrasena")
+        if contrasena and confirmacion and contrasena != confirmacion:
+            self.add_error("confirmar_contrasena", "Las contraseñas no coinciden.")
+        return datos
