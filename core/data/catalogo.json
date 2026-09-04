@@ -17,6 +17,18 @@
       "nombre": "Estudio y creación",
       "descripcion": "Micrófonos e interfaces para grabar ideas con una señal clara y estable.",
       "icono": "waveform"
+    },
+    {
+      "slug": "instrumentos",
+      "nombre": "Instrumentos",
+      "descripcion": "Guitarras y controladores para interpretar, practicar y producir música.",
+      "icono": "instrument"
+    },
+    {
+      "slug": "sonido-en-vivo",
+      "nombre": "Sonido en vivo",
+      "descripcion": "Parlantes y mezcladores para ensayos, presentaciones y eventos.",
+      "icono": "speaker"
     }
   ],
   "productos": [
@@ -125,6 +137,78 @@
         "Resolución": "24 bit / 192 kHz",
         "Conexión": "USB-C",
         "Compatibilidad": "Windows y macOS"
+      }
+    },
+    {
+      "id": 7,
+      "nombre": "Astra Seven",
+      "marca": "Aster Works",
+      "categoria": "instrumentos",
+      "descripcion": "Guitarra eléctrica de siete cuerdas con construcción sólida, dos cápsulas humbucker y puente fijo para afinaciones graves.",
+      "precio": 349990,
+      "stock": 3,
+      "imagen": "img/productos/guitarra-astra-seven.webp",
+      "destacado": true,
+      "etiquetas": ["guitarra", "eléctrica", "siete cuerdas", "humbucker", "instrumento"],
+      "especificaciones": {
+        "Cuerdas": "7",
+        "Cuerpo": "Tilo sólido",
+        "Cápsulas": "2 humbucker",
+        "Escala": "25,5 pulgadas"
+      }
+    },
+    {
+      "id": 8,
+      "nombre": "Keyline 49",
+      "marca": "Aster Works",
+      "categoria": "instrumentos",
+      "descripcion": "Controlador MIDI de 49 teclas sensibles a la velocidad, ocho pads y controles asignables para producción musical.",
+      "precio": 179990,
+      "stock": 7,
+      "imagen": "img/productos/controlador-keyline-49.webp",
+      "destacado": false,
+      "etiquetas": ["controlador", "midi", "teclado", "producción", "usb-c"],
+      "especificaciones": {
+        "Teclas": "49 sensibles a la velocidad",
+        "Pads": "8 retroiluminados",
+        "Conexión": "USB-C",
+        "Compatibilidad": "Windows y macOS"
+      }
+    },
+    {
+      "id": 9,
+      "nombre": "Atlas 10",
+      "marca": "Stagecraft",
+      "categoria": "sonido-en-vivo",
+      "descripcion": "Parlante activo de diez pulgadas con mezclador integrado y gabinete compacto para ensayos, salas y presentaciones pequeñas.",
+      "precio": 279990,
+      "stock": 5,
+      "imagen": "img/productos/parlante-atlas-10.webp",
+      "destacado": true,
+      "etiquetas": ["parlante", "activo", "pa", "sonido en vivo", "monitor"],
+      "especificaciones": {
+        "Potencia": "800 W peak",
+        "Woofer": "10 pulgadas",
+        "Entradas": "2 combo XLR/TRS",
+        "Peso": "11,4 kg"
+      }
+    },
+    {
+      "id": 10,
+      "nombre": "MixLab 8",
+      "marca": "Stagecraft",
+      "categoria": "sonido-en-vivo",
+      "descripcion": "Mezclador compacto de ocho canales con preamplificadores, conexión USB estéreo y alimentación phantom para montajes flexibles.",
+      "precio": 229990,
+      "stock": 4,
+      "imagen": "img/productos/mezclador-mixlab-8.webp",
+      "destacado": false,
+      "etiquetas": ["mezclador", "mixer", "ocho canales", "usb", "phantom"],
+      "especificaciones": {
+        "Canales": "8",
+        "Preamplificadores": "6 de micrófono",
+        "Conexión USB": "Entrada y salida estéreo",
+        "Alimentación": "Phantom 48 V"
       }
     }
   ]

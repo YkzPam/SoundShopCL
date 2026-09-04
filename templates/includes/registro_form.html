@@ -1,5 +1,6 @@
 <form method="post" action="{% url 'core:registro' %}" class="account-form" novalidate>
   {% csrf_token %}
+  {% if siguiente %}<input type="hidden" name="next" value="{{ siguiente }}">{% endif %}
   <div class="account-form__heading">
     <p>Registro</p>
     <h3>Completa tus datos</h3>
@@ -29,6 +30,6 @@
     {% endfor %}
   </div>
 
-  <button type="submit" class="button button--primary button--full">Crear mi cuenta <span aria-hidden="true">→</span></button>
+  <button type="submit" class="button button--primary button--full">Crear cuenta e iniciar sesión <span aria-hidden="true">→</span></button>
   <p class="account-form__privacy">La cuenta queda activa en este navegador. La contraseña no se almacena.</p>
 </form>

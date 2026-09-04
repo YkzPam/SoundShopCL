@@ -8,9 +8,11 @@ def datos_globales(request):
     usuario = request.session.get("usuario_tienda", {})
     if not isinstance(usuario, dict) or not usuario.get("nombre"):
         usuario = {}
-    _, _, cantidad = calcular_carrito(carrito if isinstance(carrito, dict) else {})
+    lineas, total, cantidad = calcular_carrito(carrito if isinstance(carrito, dict) else {})
     return {
         "categorias_globales": obtener_categorias(),
         "cantidad_carrito": cantidad,
+        "lineas_carrito_global": lineas,
+        "total_carrito_global": total,
         "usuario_tienda": usuario,
     }

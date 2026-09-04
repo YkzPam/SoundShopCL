@@ -40,9 +40,9 @@ La propiedad calculada `puede_comprarse` devuelve `True` cuando el stock es mayo
 | Precio máximo | `precio_maximo` | Entero entre 1 y 2.000.000 | Productos con precio igual o inferior |
 | Disponibilidad | `solo_disponibles` | Valor booleano del formulario | Exclusión de productos con stock cero |
 | Orden | `orden` | Una alternativa de la lista definida | Resultado por destacados, nombre o precio |
-| Agregar | `cantidad` | Entero desde 1 hasta el stock del producto | Nueva línea o incremento del carrito |
+| Agregar | Sesión activa y `cantidad` | Cuenta temporal válida; entero desde 1 hasta el stock | Nueva línea o incremento del carrito |
 | Actualizar | `cantidad` | Entero entre 0 y 99, con segunda revisión de stock | Cantidad modificada; cero elimina la línea |
-| Confirmar | Carrito firmado | Debe contener al menos una línea válida | Código, fecha, total y cantidad del pedido temporal |
+| Confirmar | Sesión activa y carrito firmado | Cuenta temporal válida y al menos una línea | Código, fecha, total y cantidad del pedido temporal |
 | Crear cuenta | `nombre`, `correo`, `contrasena`, `confirmar_contrasena`, `acepta_terminos` | Nombre mínimo de 2 caracteres, correo válido, clave mínima de 8 caracteres con letra y número, coincidencia y aceptación obligatoria | Nombre visible guardado en la sesión; correo y contraseña descartados |
 
 ## 2.3 Salidas del servidor
@@ -53,6 +53,7 @@ Las vistas construyen diccionarios de contexto con productos, categorías, canti
 
 - Un identificador de producto desconocido redirige al catálogo y muestra una advertencia.
 - Una categoría desconocida redirige al listado de categorías.
+- Una persona sin sesión puede explorar, pero no agregar productos ni confirmar el pedido.
 - Un producto con stock cero no puede agregarse.
 - Una cantidad superior al stock conserva intacto el carrito.
 - Las operaciones de agregar, actualizar, eliminar y confirmar rechazan solicitudes `GET`.
@@ -60,3 +61,4 @@ Las vistas construyen diccionarios de contexto con productos, categorías, canti
 - Una contraseña sin letra o número se rechaza junto al campo correspondiente.
 - La confirmación debe coincidir con la contraseña y las condiciones deben aceptarse.
 - La pantalla de cuenta creada no se muestra si no existe un nombre de sesión válido.
+- Un parámetro `next` externo se descarta; el retorno posterior al acceso solo acepta rutas de la propia tienda.

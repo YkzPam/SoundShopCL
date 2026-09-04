@@ -11,17 +11,17 @@ python manage.py test
 python manage.py runserver
 ```
 
-El primer comando activa el entorno aislado; el segundo revisa la configuración; el tercero ejecuta las veintidós pruebas; el último inicia la página en `http://127.0.0.1:8000/`.
+El primer comando activa el entorno aislado; el segundo revisa la configuración; el tercero ejecuta las treinta pruebas; el último inicia la página en `http://127.0.0.1:8000/`.
 
 ## 7.2 Recorrido sugerido
 
-1. La portada permite explicar que SoundShop CL corresponde al sistema de sucursal y vitrina de Music Pro. Se muestran categorías y productos destacados enviados por una vista Django.
-2. El catálogo demuestra el ciclo `{% for %}`. Se busca `microfono` sin tilde para comprobar que el servidor encuentra `Vela C1`; luego se combina categoría, precio y disponibilidad.
+1. La portada permite explicar que SoundShop CL corresponde al sistema de sucursal y vitrina de Music Pro. Se muestran el hero, las cinco categorías, las guías editoriales y los productos destacados enviados por una vista Django. Al bajar aparecen los bloques mediante scroll y los íconos responden al mouse.
+2. El catálogo demuestra el ciclo `{% for %}` con diez productos. Se busca `guitarra` para encontrar `Astra Seven`; luego se combina categoría, precio y disponibilidad.
 3. La ficha `Orbit One` muestra variables simples y un ciclo sobre el diccionario de especificaciones. La condición de stock decide si aparece el formulario o el estado agotado.
-4. La sección de cuenta permite mostrar el formulario de registro. Primero se prueban contraseñas diferentes para observar el error; después se usa una clave válida y se comprueba que el nombre aparece en el encabezado.
-5. Se agrega una cantidad válida al carrito. El servidor revisa que sea mayor que cero y que no supere las existencias. El carrito calcula subtotal, cantidad total y total general.
+4. Sin una sesión activa, la ficha y la vista rápida muestran el aviso `Inicia sesión para comprar` y no presentan el formulario de cantidad. La sección de cuenta permite crear la sesión. Primero se prueban contraseñas diferentes para observar el error; después se usa una clave válida, se comprueba que `Benjamin` aparece en el encabezado y que la tienda regresa al producto solicitado.
+5. Con la sesión activa se abre una vista rápida y se agregan dos unidades. El servidor vuelve a revisar la cuenta, la cantidad y el stock. La confirmación, el contador y el mini carrito se actualizan sin abandonar la página; el carrito completo conserva los controles de edición, calcula el total y exige la sesión antes de confirmar.
 6. La confirmación genera un código temporal y vacía el carrito. El alcance técnico explica que la operación no se almacena como una compra comercial.
-7. Se reduce la ventana para mostrar el menú móvil y la reorganización de tarjetas, filtros y formulario. Las mismas funciones permanecen disponibles.
+7. Se amplía la fotografía de `Orbit One` y se cambia el tema. Después se reduce la ventana para mostrar el menú móvil y la reorganización de tarjetas, paneles, filtros y formulario. Las mismas funciones permanecen disponibles.
 
 ## 7.3 Archivos que conviene explicar
 
@@ -40,4 +40,4 @@ En Django, el **Model** representa los datos, el **Template** construye la salid
 
 ## 7.5 Respuesta ante funciones no incluidas
 
-La Evaluación 1 pide un prototipo sin conexión a base de datos. El formulario de cuenta agregado representa el registro, valida sus campos y conserva solo el nombre en la sesión; el modelo de usuarios, inicio de sesión persistente, recuperación de contraseña, administrador Django, CRUD, historial de pedidos y API REST se desarrollarán en evaluaciones posteriores. La entrega actual comprueba el flujo principal con datos JSON sin crear tablas.
+La Evaluación 1 pide un prototipo sin conexión a base de datos. El formulario valida sus campos, conserva solo el nombre en una cookie firmada y esa sesión temporal es obligatoria para comprar. El modelo de usuarios, el reingreso persistente con credenciales, la recuperación de contraseña, el administrador Django, el CRUD, el historial de pedidos y la API REST se desarrollarán en evaluaciones posteriores. La entrega actual comprueba el flujo principal con datos JSON sin crear tablas.

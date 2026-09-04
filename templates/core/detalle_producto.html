@@ -11,6 +11,10 @@
     <div class="product-detail__visual" data-product-tilt>
       <div class="product-detail__visual-top"><span>Producto {{ producto.id|stringformat:"02d" }}</span>{% if producto.destacado %}<span class="selection-label">Selección SoundShop</span>{% endif %}</div>
       <img src="{% static producto.imagen %}" alt="{{ producto.nombre }} de {{ producto.marca }}" data-parallax="20">
+      <button type="button" class="product-detail__zoom" data-image-viewer-open data-image="{% static producto.imagen %}" data-caption="{{ producto.nombre }} de {{ producto.marca }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.2"/><path d="m15 15 5 5M10.5 7.7v5.6M7.7 10.5h5.6"/></svg>
+        Ampliar imagen
+      </button>
       <p>Fotografía referencial del producto</p>
     </div>
 
@@ -21,18 +25,26 @@
 
       <div class="product-detail__purchase">
         <div><span>Precio</span><strong>{{ producto.precio|precio_clp }}</strong></div>
-        {% if producto.puede_comprarse %}<p class="stock stock--available"><i></i> En stock · {{ producto.stock }} unidades</p>{% else %}<p class="stock stock--empty"><i></i> Temporalmente agotado</p>{% endif %}
+        {% if not producto.puede_comprarse %}<p class="stock-pill stock-pill--empty">Temporalmente agotado</p>{% elif producto.stock <= 5 %}<p class="stock-pill stock-pill--low">Últimas {{ producto.stock }} unidades</p>{% else %}<p class="stock-pill stock-pill--available">Disponible · {{ producto.stock }} unidades</p>{% endif %}
       </div>
 
       {% if producto.puede_comprarse %}
-        <form method="post" action="{% url 'core:agregar_al_carrito' producto.id %}" class="add-to-cart">
-          {% csrf_token %}
-          <label><span>Cantidad</span>{{ formulario_cantidad.cantidad }}</label>
-          <button class="button button--primary" type="submit">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 4h2l2.2 10.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 1.9-1.4L21 7H6"/><path d="M12 9v4M10 11h4"/></svg>
-            Agregar al carrito
-          </button>
-        </form>
+        {% if usuario_tienda %}
+          <form method="post" action="{% url 'core:agregar_al_carrito' producto.id %}" class="add-to-cart" data-ajax-cart>
+            {% csrf_token %}
+            <label><span>Cantidad</span>{{ formulario_cantidad.cantidad }}</label>
+            <button class="button button--primary" type="submit">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 4h2l2.2 10.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 1.9-1.4L21 7H6"/><path d="M12 9v4M10 11h4"/></svg>
+              Agregar al carrito
+            </button>
+          </form>
+        {% else %}
+          <div class="purchase-lock">
+            <span class="purchase-lock__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8.5 10V7.5a3.5 3.5 0 0 1 7 0V10M12 14v3"/></svg></span>
+            <div><strong>Inicia sesión para comprar</strong><p>La cuenta activa protege el carrito durante esta visita.</p></div>
+            <a href="{% url 'core:registro' %}?next={% url 'core:detalle_producto' producto.id %}" class="button button--primary">Ingresar o crear cuenta</a>
+          </div>
+        {% endif %}
       {% else %}
         <button disabled class="button button--disabled button--full">Producto sin stock</button>
       {% endif %}

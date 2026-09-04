@@ -1,26 +1,26 @@
 {% extends 'base.html' %}
 
-{% block title %}Crear cuenta | SoundShop CL{% endblock %}
+{% block title %}Ingresar a la tienda | SoundShop CL{% endblock %}
 
 {% block content %}
 <header class="page-intro account-page-intro">
   <div class="page-shell page-intro__grid">
-    <p class="section-index"><span>Cuenta / 01</span> Registro</p>
-    <div><h1>Crea tu cuenta</h1><p>Completa tus datos para activar una experiencia personal dentro de SoundShop CL.</p></div>
+    <p class="section-index"><span>Cuenta / 01</span> Acceso</p>
+    <div><h1>Crea tu cuenta e inicia sesión</h1><p>Completa tus datos para activar la compra y mantener protegido el carrito durante esta visita.</p></div>
   </div>
 </header>
 
 <section class="page-shell account-page">
   <div class="account-page__info">
     <p class="account-page__label">Tu espacio</p>
-    <h2>Una cuenta simple, sin pasos innecesarios.</h2>
-    <p>Al terminar, tu nombre aparecerá en la navegación y podrás continuar recorriendo el catálogo con la sesión activa en este navegador.</p>
+    <h2>Acceso simple, sin pasos innecesarios.</h2>
+    <p>Al terminar, tu nombre aparecerá en la navegación y podrás agregar productos o confirmar el pedido con la sesión activa en este navegador.</p>
     <ul class="account-benefits account-benefits--light">
-      <li><span>01</span><div><strong>Registro inmediato</strong><p>Solo se solicitan los datos necesarios.</p></div></li>
+      <li><span>01</span><div><strong>Sesión inmediata</strong><p>La cuenta queda activa apenas se validan los datos.</p></div></li>
       <li><span>02</span><div><strong>Validación clara</strong><p>Los errores se muestran junto al campo correspondiente.</p></div></li>
       <li><span>03</span><div><strong>Contraseña privada</strong><p>No queda almacenada después del registro.</p></div></li>
     </ul>
   </div>
-  <div class="account-page__form">{% include 'includes/registro_form.html' with formulario=registro_formulario %}</div>
+  <div class="account-page__form">{% include 'includes/registro_form.html' with formulario=registro_formulario siguiente=siguiente %}</div>
 </section>
 {% endblock %}

@@ -1,10 +1,10 @@
-{% load static %}
+{% load static soundshop_extras %}
 <!doctype html>
 <html lang="es-CL">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="SoundShop CL, tienda musical chilena de audífonos, tornamesas y equipos de grabación.">
+  <meta name="description" content="SoundShop CL, tienda musical chilena de instrumentos, audio, tornamesas, grabación y sonido en vivo.">
   <meta name="theme-color" content="#0b1220">
   <title>{% block title %}SoundShop CL{% endblock %}</title>
   <link rel="icon" href="{% static 'img/favicon.svg' %}" type="image/svg+xml">
@@ -26,6 +26,8 @@
   <script src="{% static 'js/main.js' %}" defer></script>
 </head>
 <body class="site-body">
+  {% url 'core:registro' as registro_url %}
+  {% url 'core:registro_confirmado' as cuenta_activa_url %}
   <div class="scroll-progress" aria-hidden="true"></div>
   <a class="skip-link" href="#contenido-principal">Saltar al contenido</a>
 
@@ -52,9 +54,9 @@
         </label>
       </form>
 
-      <a href="{% url 'core:registro' %}" class="account-link {% if request.resolver_match.url_name == 'registro' or request.resolver_match.url_name == 'registro_confirmado' %}is-active{% endif %}" aria-label="{% if usuario_tienda %}Cuenta de {{ usuario_tienda.nombre }}{% else %}Crear una cuenta{% endif %}">
+      <a href="{% if usuario_tienda %}{{ cuenta_activa_url }}{% else %}{{ registro_url }}{% endif %}" class="account-link {% if request.resolver_match.url_name == 'registro' or request.resolver_match.url_name == 'registro_confirmado' %}is-active{% endif %}" aria-label="{% if usuario_tienda %}Cuenta de {{ usuario_tienda.nombre }}{% else %}Ingresar o crear una cuenta{% endif %}">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.7-4 3-6 7-6s6.3 2 7 6"/></svg>
-        <span>{% if usuario_tienda %}{{ usuario_tienda.nombre }}{% else %}Cuenta{% endif %}</span>
+        <span>{% if usuario_tienda %}{{ usuario_tienda.nombre }}{% else %}Ingresar{% endif %}</span>
       </a>
 
       <button type="button" class="theme-toggle" data-theme-toggle aria-pressed="false" aria-label="Activar modo oscuro">
@@ -63,10 +65,10 @@
         <span class="sr-only" data-theme-label>Activar modo oscuro</span>
       </button>
 
-      <a href="{% url 'core:carrito' %}" class="cart-link" aria-label="Carrito con {{ cantidad_carrito }} productos">
+      <a href="{% url 'core:carrito' %}" class="cart-link" data-cart-toggle aria-label="Carrito con {{ cantidad_carrito }} productos">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 4h2l2.2 10.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 1.9-1.4L21 7H6"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
         <span class="cart-link__label">Carrito</span>
-        {% if cantidad_carrito %}<span class="cart-link__count">{{ cantidad_carrito }}</span>{% endif %}
+        <span class="cart-link__count{% if not cantidad_carrito %} hidden{% endif %}" data-cart-count>{{ cantidad_carrito }}</span>
       </a>
 
       <button type="button" class="menu-toggle" aria-label="Abrir menú" aria-expanded="false" data-menu-button>
@@ -84,7 +86,7 @@
           <a href="{% url 'core:inicio' %}"><span>01</span>Inicio</a>
           <a href="{% url 'core:catalogo' %}"><span>02</span>Productos</a>
           <a href="{% url 'core:categorias' %}"><span>03</span>Categorías</a>
-          <a href="{% url 'core:registro' %}"><span>04</span>{% if usuario_tienda %}Cuenta de {{ usuario_tienda.nombre }}{% else %}Crear cuenta{% endif %}</a>
+          <a href="{% if usuario_tienda %}{{ cuenta_activa_url }}{% else %}{{ registro_url }}{% endif %}"><span>04</span>{% if usuario_tienda %}Cuenta de {{ usuario_tienda.nombre }}{% else %}Ingresar / crear cuenta{% endif %}</a>
         </nav>
       </div>
     </div>
@@ -104,11 +106,66 @@
 
   <main id="contenido-principal" class="site-main">{% block content %}{% endblock %}</main>
 
+  <dialog class="quick-view" data-quick-view-dialog aria-labelledby="quick-view-title">
+    <button type="button" class="dialog-close" data-quick-view-close aria-label="Cerrar vista rápida">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+    </button>
+    <div data-quick-view-body></div>
+  </dialog>
+
+  <dialog class="mini-cart" data-mini-cart aria-labelledby="mini-cart-title">
+    <div class="mini-cart__panel">
+      <div class="mini-cart__heading">
+        <div><p>Tu selección</p><h2 id="mini-cart-title">Mini carrito</h2></div>
+        <button type="button" class="dialog-close" data-mini-cart-close aria-label="Cerrar mini carrito">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+      <div class="mini-cart__lines" data-mini-cart-lines>
+        {% if lineas_carrito_global %}
+          {% for linea in lineas_carrito_global %}
+            <article class="mini-cart__item">
+              <a href="{% url 'core:detalle_producto' linea.producto.id %}"><img src="{% static linea.producto.imagen %}" alt="{{ linea.producto.nombre }}"></a>
+              <div><p>{{ linea.producto.marca }}</p><h3><a href="{% url 'core:detalle_producto' linea.producto.id %}">{{ linea.producto.nombre }}</a></h3><span>{{ linea.cantidad }} unidad{% if linea.cantidad != 1 %}es{% endif %}</span></div>
+              <strong>{{ linea.subtotal|precio_clp }}</strong>
+            </article>
+          {% endfor %}
+        {% else %}
+          <div class="mini-cart__empty" data-mini-cart-empty>
+            <span aria-hidden="true">00</span>
+            <h3>Aún no has elegido productos.</h3>
+            <p>Abre una vista rápida o recorre el catálogo para comenzar.</p>
+          </div>
+        {% endif %}
+      </div>
+      <div class="mini-cart__footer{% if not lineas_carrito_global %} is-empty{% endif %}" data-mini-cart-footer>
+        <div><span>Total</span><strong data-mini-cart-total>{{ total_carrito_global|precio_clp }}</strong></div>
+        <a href="{% url 'core:carrito' %}" class="button button--primary">Revisar carrito completo <span aria-hidden="true">→</span></a>
+      </div>
+    </div>
+  </dialog>
+
+  <div class="cart-toast" data-cart-toast role="status" aria-live="polite" aria-hidden="true">
+    <img src="" alt="" data-cart-toast-image>
+    <div class="cart-toast__copy"><span data-cart-toast-label>Agregado al carrito</span><strong data-cart-toast-name></strong><p data-cart-toast-meta></p></div>
+    <button type="button" class="cart-toast__cart" data-cart-toast-cart>Ver carrito</button>
+    <button type="button" class="cart-toast__close" data-cart-toast-close aria-label="Cerrar confirmación">×</button>
+    <i aria-hidden="true"></i>
+  </div>
+
+  <dialog class="image-viewer" data-image-viewer aria-labelledby="image-viewer-caption">
+    <button type="button" class="dialog-close image-viewer__close" data-image-viewer-close aria-label="Cerrar imagen ampliada">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+    </button>
+    <img src="" alt="" data-image-viewer-image>
+    <p id="image-viewer-caption" data-image-viewer-caption></p>
+  </dialog>
+
   <footer class="site-footer">
     <div class="page-shell site-footer__grid">
       <div class="site-footer__brand">
         <a href="{% url 'core:inicio' %}">SoundShop <span>CL</span></a>
-        <p>Una selección breve de equipos para escuchar, coleccionar y grabar música.</p>
+        <p>Instrumentos y equipos para escuchar, interpretar, grabar y llevar música al escenario.</p>
       </div>
       <div>
         <h2>Catálogo</h2>
@@ -120,8 +177,8 @@
       </div>
       <div>
         <h2>Tu cuenta</h2>
-        <p>Crea un perfil para mantener una experiencia más personal al recorrer la tienda.</p>
-        <a class="footer-account-link" href="{% url 'core:registro' %}">{% if usuario_tienda %}Ver mi cuenta{% else %}Crear cuenta{% endif %} <span aria-hidden="true">→</span></a>
+        <p>La sesión protege el carrito y es necesaria antes de agregar o confirmar una compra.</p>
+        <a class="footer-account-link" href="{% if usuario_tienda %}{{ cuenta_activa_url }}{% else %}{{ registro_url }}{% endif %}">{% if usuario_tienda %}Ver mi cuenta{% else %}Ingresar o crear cuenta{% endif %} <span aria-hidden="true">→</span></a>
       </div>
     </div>
     <div class="page-shell site-footer__bottom"><span>© 2026 SoundShop CL</span><span>Santiago, Chile</span><span>Audio para escuchar y crear</span></div>

@@ -1,11 +1,19 @@
 """Pruebas del flujo principal sin utilizar base de datos."""
 
+from django.conf import settings
 from django.contrib.staticfiles import finders
 from django.test import SimpleTestCase
 from django.urls import reverse
 
 from .catalogo import filtrar_productos, obtener_producto
 from .models import Producto
+
+
+def guardar_sesion_cliente(cliente, **datos):
+    sesion = cliente.session
+    sesion.update(datos)
+    sesion.save()
+    cliente.cookies[settings.SESSION_COOKIE_NAME] = sesion.session_key
 
 
 class CatalogoTests(SimpleTestCase):
@@ -17,16 +25,24 @@ class CatalogoTests(SimpleTestCase):
         self.assertContains(respuesta, "data-theme-toggle")
         self.assertContains(respuesta, "scroll-progress")
         self.assertContains(respuesta, "data-grid-number")
+        self.assertContains(respuesta, "data-scroll-cue")
+        self.assertContains(respuesta, "editorial-section")
+        self.assertContains(respuesta, "data-quick-view-dialog")
+        self.assertContains(respuesta, "data-mini-cart")
 
-    def test_catalogo_entrega_seis_productos_desde_json(self):
+    def test_catalogo_entrega_diez_productos_desde_json(self):
         respuesta = self.client.get(reverse("core:catalogo"))
         self.assertEqual(respuesta.status_code, 200)
-        self.assertEqual(respuesta.context["cantidad_resultados"], 6)
+        self.assertEqual(respuesta.context["cantidad_resultados"], 10)
         self.assertContains(respuesta, "Record Care Kit")
+        self.assertContains(respuesta, "Astra Seven")
 
-    def test_busqueda_ignora_tildes_y_encuentra_microfono(self):
+    def test_busqueda_ignora_tildes_y_encuentra_equipos_de_microfono(self):
         resultados = filtrar_productos(consulta="microfono")
-        self.assertEqual([producto.nombre for producto in resultados], ["Vela C1"])
+        self.assertEqual(
+            [producto.nombre for producto in resultados],
+            ["Vela C1", "MixLab 8"],
+        )
 
     def test_filtros_combinan_categoria_precio_y_stock(self):
         respuesta = self.client.get(
@@ -43,10 +59,13 @@ class CatalogoTests(SimpleTestCase):
         self.assertNotContains(respuesta, "Pulse X ANC")
 
     def test_detalle_muestra_variables_y_especificaciones(self):
+        guardar_sesion_cliente(self.client, usuario_tienda={"nombre": "Benjamin"})
         respuesta = self.client.get(reverse("core:detalle_producto", args=[3]))
         self.assertEqual(respuesta.status_code, 200)
         self.assertContains(respuesta, "Orbit One")
         self.assertContains(respuesta, "33⅓ y 45 RPM")
+        self.assertContains(respuesta, "data-image-viewer-open")
+        self.assertContains(respuesta, "data-ajax-cart")
 
     def test_identificador_inexistente_redirige_al_catalogo(self):
         respuesta = self.client.get(reverse("core:detalle_producto", args=[999]))
@@ -60,6 +79,9 @@ class CatalogoTests(SimpleTestCase):
 
 
 class CarritoTests(SimpleTestCase):
+    def setUp(self):
+        guardar_sesion_cliente(self.client, usuario_tienda={"nombre": "Benjamin"})
+
     def test_agregar_producto_actualiza_carrito(self):
         respuesta = self.client.post(
             reverse("core:agregar_al_carrito", args=[1]),
@@ -79,6 +101,33 @@ class CarritoTests(SimpleTestCase):
         self.assertContains(respuesta, "Solo quedan 5 unidades de Orbit One")
         carrito = self.client.session.get("carrito", {})
         self.assertEqual(carrito, {})
+
+    def test_agregar_por_ajax_devuelve_resumen_para_mini_carrito(self):
+        respuesta = self.client.post(
+            reverse("core:agregar_al_carrito", args=[1]),
+            {"cantidad": 2},
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(respuesta.status_code, 200)
+        datos = respuesta.json()
+        self.assertTrue(datos["ok"])
+        self.assertEqual(datos["cantidad"], 2)
+        self.assertEqual(datos["total_formateado"], "$179.980")
+        self.assertEqual(datos["lineas"][0]["nombre"], "Pulse X ANC")
+        self.assertEqual(datos["producto_agregado"]["cantidad_en_carrito"], 2)
+
+    def test_error_ajax_informa_stock_sin_modificar_carrito(self):
+        respuesta = self.client.post(
+            reverse("core:agregar_al_carrito", args=[3]),
+            {"cantidad": 6},
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(respuesta.status_code, 400)
+        datos = respuesta.json()
+        self.assertFalse(datos["ok"])
+        self.assertIn("Solo quedan 5 unidades", datos["mensaje"])
+        self.assertEqual(datos["cantidad"], 0)
+        self.assertEqual(self.client.session.get("carrito", {}), {})
 
     def test_no_permite_agregar_producto_agotado(self):
         respuesta = self.client.post(
@@ -125,6 +174,10 @@ class ArchivosEstaticosTests(SimpleTestCase):
             "img/productos/kit-cuidado-vinilo.webp",
             "img/productos/microfono-vela-c1.webp",
             "img/productos/interfaz-miniwave-2.webp",
+            "img/productos/guitarra-astra-seven.webp",
+            "img/productos/controlador-keyline-49.webp",
+            "img/productos/parlante-atlas-10.webp",
+            "img/productos/mezclador-mixlab-8.webp",
         ):
             with self.subTest(ruta=ruta):
                 self.assertIsNotNone(finders.find(ruta))
@@ -142,7 +195,7 @@ class RegistroTests(SimpleTestCase):
     def test_formulario_aparece_en_inicio_y_ruta_de_registro(self):
         inicio = self.client.get(reverse("core:inicio"))
         registro = self.client.get(reverse("core:registro"))
-        self.assertContains(inicio, "Crea tu cuenta")
+        self.assertContains(inicio, "Inicia sesión para comprar")
         self.assertContains(registro, "Completa tus datos")
 
     def test_contrasenas_distintas_muestran_error(self):
@@ -172,6 +225,28 @@ class RegistroTests(SimpleTestCase):
         self.assertEqual(sesion.get("usuario_tienda"), {"nombre": "Benjamin"})
         self.assertNotIn("correo", str(sesion.get("usuario_tienda")))
         self.assertNotIn("Sonido2026", str(dict(sesion.items())))
+        inicio = self.client.get(reverse("core:inicio"))
+        self.assertContains(inicio, f'href="{reverse("core:registro_confirmado")}"')
+
+    def test_registro_regresa_a_un_producto_cuando_next_es_local(self):
+        destino = reverse("core:detalle_producto", args=[7])
+        respuesta = self.client.post(
+            reverse("core:registro"),
+            self.datos_validos | {"next": destino},
+        )
+        self.assertRedirects(respuesta, destino, fetch_redirect_response=False)
+        self.assertEqual(self.client.session.get("usuario_tienda"), {"nombre": "Benjamin"})
+
+    def test_registro_rechaza_un_next_externo(self):
+        respuesta = self.client.post(
+            reverse("core:registro"),
+            self.datos_validos | {"next": "https://ejemplo-malicioso.invalid/"},
+        )
+        self.assertRedirects(
+            respuesta,
+            reverse("core:registro_confirmado"),
+            fetch_redirect_response=False,
+        )
 
     def test_confirmacion_requiere_una_cuenta_activa(self):
         respuesta = self.client.get(reverse("core:registro_confirmado"))
@@ -191,3 +266,43 @@ class RegistroTests(SimpleTestCase):
                 contenido = respuesta.content.decode().lower()
                 self.assertNotIn("prototipo académico", contenido)
                 self.assertNotIn("compra demostrativa", contenido)
+
+
+class SesionCompraTests(SimpleTestCase):
+    def test_ficha_anonima_muestra_acceso_y_oculta_formulario_de_compra(self):
+        respuesta = self.client.get(reverse("core:detalle_producto", args=[7]))
+        self.assertContains(respuesta, "Inicia sesión para comprar")
+        self.assertContains(respuesta, "purchase-lock")
+        self.assertNotContains(respuesta, "data-ajax-cart")
+
+    def test_publicacion_anonima_no_agrega_y_redirige_al_acceso(self):
+        respuesta = self.client.post(
+            reverse("core:agregar_al_carrito", args=[1]),
+            {"cantidad": 1},
+        )
+        destino = f'{reverse("core:registro")}?next={reverse("core:detalle_producto", args=[1])}'
+        self.assertRedirects(respuesta, destino, fetch_redirect_response=False)
+        self.assertEqual(self.client.session.get("carrito", {}), {})
+
+    def test_publicacion_ajax_anonima_responde_que_requiere_sesion(self):
+        respuesta = self.client.post(
+            reverse("core:agregar_al_carrito", args=[1]),
+            {"cantidad": 1},
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(respuesta.status_code, 401)
+        datos = respuesta.json()
+        self.assertFalse(datos["ok"])
+        self.assertTrue(datos["requiere_sesion"])
+        self.assertEqual(
+            datos["registro_url"],
+            f'{reverse("core:registro")}?next={reverse("core:detalle_producto", args=[1])}',
+        )
+        self.assertEqual(self.client.session.get("carrito", {}), {})
+
+    def test_confirmacion_anonima_con_carrito_redirige_al_acceso(self):
+        guardar_sesion_cliente(self.client, carrito={"1": 1})
+        respuesta = self.client.post(reverse("core:confirmar_pedido"))
+        destino = f'{reverse("core:registro")}?next={reverse("core:carrito")}'
+        self.assertRedirects(respuesta, destino, fetch_redirect_response=False)
+        self.assertEqual(self.client.session.get("carrito"), {"1": 1})

@@ -9,13 +9,14 @@ La inteligencia artificial apoyó la lectura comparada de la pauta y la escala d
 - Identificar qué funciones pertenecen a la Evaluación 1 del caso de tienda y cuáles requieren base de datos en unidades posteriores.
 - Proponer un modelo tipado para categorías y productos almacenados en JSON.
 - Revisar que las vistas de Django entreguen contexto y que las plantillas utilicen ciclos, condiciones, variables y URLs nombradas.
-- Crear casos de prueba para búsqueda, filtros, productos agotados, límites de stock, carrito, registro de cuenta y confirmación de pedido.
+- Crear casos de prueba para búsqueda, filtros, productos agotados, límites de stock, carrito, sesión obligatoria, retornos seguros, registro y confirmación de pedido.
 - Revisar el comportamiento de la interfaz en escritorio, tableta y teléfono sin eliminar funciones.
 - Comprobar el modo oscuro, la persistencia de la preferencia, las animaciones de scroll y la salida para movimiento reducido.
+- Comprobar la vista rápida, el agregado asincrónico, el mini carrito, la ampliación de imagen y los mensajes de error de stock.
 
 ## 5.3 Recursos visuales generados
 
-Se crearon seis imágenes originales: audífonos inalámbricos, audífonos de estudio, tornamesa, kit de limpieza de vinilos, micrófono e interfaz de audio. La segunda versión visual mantuvo un mismo lenguaje para todo el conjunto: fotografía cuadrada de producto, fondo gris frío, equipos en grafito y plata, pequeños acentos cobalto o aqua, iluminación de estudio natural y ausencia de texto o logotipos. Las copias del proyecto se optimizaron en formato WebP y se guardaron en `static/img/productos`.
+Se crearon diez imágenes originales: audífonos inalámbricos, audífonos de estudio, tornamesa, kit de limpieza de vinilos, micrófono, interfaz de audio, guitarra eléctrica de siete cuerdas, controlador MIDI, parlante activo y mezclador. Las cuatro incorporaciones se generaron como fotografía cuadrada de catálogo con fondo gris frío, equipos en grafito y plata, acentos cobalto o aqua, luz de estudio natural y sin texto, personas, marcas ni logotipos. Las copias finales se optimizaron a 1024 × 1024 píxeles en formato WebP y se guardaron en `static/img/productos`.
 
 ## 5.4 Verificación humana esperada
 

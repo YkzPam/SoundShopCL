@@ -2,7 +2,7 @@
 
 ## 1.1 Caso seleccionado
 
-SoundShop CL desarrolla la alternativa **Sistema de Sucursal (Punto de Venta / Vitrina)**. El resultado es una tienda web de productos musicales con una portada comercial, categorías, catálogo, búsqueda, fichas detalladas, validación de stock, carrito y confirmación de pedido. No corresponde a una tarjeta de pago, billetera digital ni servicio financiero.
+SoundShop CL desarrolla la alternativa **Sistema de Sucursal (Punto de Venta / Vitrina)**. El resultado es una tienda web con diez productos distribuidos en cinco categorías: audífonos, tornamesas y vinilos, estudio y creación, instrumentos y sonido en vivo. Incluye portada comercial, búsqueda, fichas detalladas, validación de stock, sesión obligatoria para comprar, carrito y confirmación de pedido. No corresponde a una tarjeta de pago, billetera digital ni servicio financiero.
 
 ## 1.2 Límite funcional de esta unidad
 
@@ -12,15 +12,16 @@ La pauta de la Evaluación 1 solicita un sitio básico en Django sin conexión a
 |---|---|
 | Catálogo JSON dinámico | Modelos ORM y migraciones de negocio |
 | Búsqueda, filtros y categorías | Administración persistente de productos |
-| Formularios de cantidad y creación de cuenta | Usuarios ORM, inicio de sesión y recuperación de contraseña |
+| Formularios de cantidad y creación de cuenta de sesión | Usuarios ORM, reingreso con credenciales y recuperación de contraseña |
+| Bloqueo de agregado y confirmación sin sesión activa | Autenticación persistente asociada a una cuenta real |
 | Carrito temporal firmado | Historial real de compras por usuario |
 | Pedido simulado | Pasarela o medio de pago real |
 | Mensajes y control de rutas | Gestión persistente del estado del pedido |
 
 ## 1.3 Criterio de seguridad
 
-El formulario de cuenta solicita nombre, correo y contraseña para comprobar la interfaz y sus reglas. Django valida esos valores y descarta el correo y la contraseña al terminar la solicitud; la sesión conserva solo el primer nombre. Las rutas de registro, carrito, confirmación y cierre usan método `POST` y token CSRF. Ningún pedido se registra fuera de la sesión temporal del navegador.
+El formulario de cuenta solicita nombre, correo y contraseña para comprobar la interfaz y sus reglas. Django valida esos valores y descarta el correo y la contraseña al terminar la solicitud; la sesión conserva solo el primer nombre. Las operaciones que cambian el carrito, confirman el pedido o cierran la sesión usan `POST` y token CSRF. El servidor rechaza el agregado y la confirmación cuando no existe una sesión activa. La ruta de retorno del acceso se valida para aceptar únicamente destinos locales. Ningún pedido se registra fuera de la sesión temporal del navegador.
 
 ## 1.4 Resultado observable
 
-Una persona puede entrar a la portada, crear una cuenta de sesión, ver su nombre en el menú, elegir una categoría, filtrar el catálogo, abrir un producto disponible, agregar una cantidad válida, modificarla en el carrito y confirmar el pedido. Las credenciales inválidas, cantidades fuera de rango, productos agotados e identificadores inexistentes generan mensajes o redirecciones controladas.
+Una persona puede entrar a la portada, recorrer las cinco categorías, filtrar el catálogo y abrir la vista rápida o una ficha sin registrarse. Al intentar comprar, la interfaz solicita una cuenta de sesión. Después del registro vuelve al producto, muestra el nombre en el menú, permite agregar una cantidad válida, revisar el mini carrito, modificar la selección y confirmar el pedido. Las credenciales inválidas, la ausencia de sesión, las cantidades fuera de rango, los productos agotados y los identificadores inexistentes generan mensajes o redirecciones controladas.
