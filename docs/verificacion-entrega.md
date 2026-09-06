@@ -22,4 +22,6 @@ La suite de Django contrasta solicitudes y validaciones, incluido el carrito de 
 
 ## 8.3 Cierre de publicación y presentación
 
-La publicación final se debe contrastar con el repositorio público y su revisión vigente antes de marcarla como terminada. La aprobación del alcance por el docente y la demostración corresponden a actividades externas a estas pruebas. El documento no garantiza 100 puntos ni presenta como otorgada una calificación de la rúbrica.
+El proyecto se publicó en [YkzPam/SoundShopCL](https://github.com/YkzPam/SoundShopCL). La primera subida de esta revisión se identificó con `a72e359`; la rama remota coincidió con la local y el repositorio respondió HTTP 200 sin sesión. Se incorporó después un cierre documental y el editable extraído de la escena incrustada en el SVG original de Excalidraw, para conservar las mismas flechas lisas del PNG. El PNG del proyecto coincide por SHA-256 con el exportado desde Excalidraw.
+
+La comprobación de enlaces locales recorrió 16 documentos Markdown sin destinos inexistentes. La aprobación del alcance por el docente y la demostración corresponden a actividades externas a estas pruebas. El documento no garantiza 100 puntos ni presenta como otorgada una calificación de la rúbrica.

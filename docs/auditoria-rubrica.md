@@ -11,7 +11,7 @@ La revisión utiliza la escala incluida en `Instrucciones Evaluación 1-20260903
 | 3 | Condiciones y ciclos del servidor vinculados al flujo administrativo | 10 | `core/gestion.py`, validación, estados y recorrido de fichas documentado | Evidencia implementada |
 | 4 | Plantillas administrativas, variables y operadores coherentes con el diagrama | 10 | `gestion_producto.html`, ciclos, condiciones y cálculo de existencias | Evidencia implementada |
 | 5 | Uso de paquetes externos | 10 | `requirements.txt`, `package.json`, lockfile y Tailwind compilado | Evidencia implementada |
-| 6 | Formularios, mensajes, estilos y proyecto en GitHub | 10 | Formularios Django, mensajes, CSS y pruebas; falta verificar publicación pública final | Parcial hasta publicar |
+| 6 | Formularios, mensajes, estilos y proyecto en GitHub | 10 | Formularios Django, mensajes, CSS, pruebas y repositorio público verificado | Evidencia implementada y publicada |
 | 7 | Creación e instalación de proyecto y aplicación Django | 10 | `manage.py`, paquete `soundshop`, app `core` registrada | Evidencia implementada |
 | 8 | Rutas semánticas, nombradas y organizadas | 10 | `soundshop/urls.py`, `core/urls.py`, namespace `core` | Evidencia implementada |
 | 9 | Vistas, solicitudes, contexto y renderizado | 10 | `core/views.py`, `core/gestion.py` y plantillas | Evidencia implementada |
@@ -28,11 +28,11 @@ La revisión utiliza la escala incluida en `Instrucciones Evaluación 1-20260903
 | Investigación de proyectos similares | `investigacion-referentes.md` con dos fuentes oficiales | Documentada retrospectivamente |
 | Alcance validado por docente | `alcance-evaluacion-1.md` | Aprobación por confirmar con el docente |
 | Sistema integrado y documentación básica | README, rutas, datos y guía de instalación | Disponible |
-| Repositorio público | Enlace real de GitHub y última versión subida | Pendiente |
+| Repositorio público | [YkzPam/SoundShopCL](https://github.com/YkzPam/SoundShopCL), rama main | Publicado y accesible sin sesión |
 | Demostración y comprensión del código | `guion-demostracion.md` | Guion preparado; exposición pendiente |
 
 ## 3.3 Verificación y límites
 
-Las comprobaciones finales y sus resultados se registran en [Verificación de entrega](verificacion-entrega.md). Las pruebas automáticas no sustituyen la revisión visual, la evaluación del docente ni la explicación del estudiante. No se presenta una estimación numérica como nota garantizada. Para cerrar la entrega se debe verificar el repositorio público desde fuera de la cuenta propietaria, confirmar el alcance aceptado y realizar la demostración solicitada.
+Las comprobaciones finales y sus resultados se registran en [Verificación de entrega](verificacion-entrega.md). Las pruebas automáticas no sustituyen la revisión visual, la evaluación del docente ni la explicación del estudiante. No se presenta una estimación numérica como nota garantizada. El repositorio público se verificó sin sesión mediante una solicitud HTTP 200. Restan la confirmación del alcance aceptado y la demostración solicitada al estudiante. La rama remota se contrastó con la revisión local.
 
 La aplicación sigue sin base de datos. El formulario administrativo valida, pero no guarda ni publica. El carrito admite invitados y exige cuenta solo al confirmar. Las cuentas y los pedidos son temporales; no existe pago real. Estas restricciones deben explicarse con el mismo criterio en la presentación.

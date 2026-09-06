@@ -1,5 +1,7 @@
 # SoundShop CL
 
+Repositorio público de la entrega: [YkzPam/SoundShopCL](https://github.com/YkzPam/SoundShopCL). La documentación, el diagrama original y las capturas están incluidos en la carpeta `docs`.
+
 La identidad visual vigente utiliza marfil, negro, dorado suave y violeta. La descripción del sistema y las pruebas del rediseño se encuentran en [Identidad visual](docs/identidad-visual.md); la selección final de capturas está en [Prototipo de interfaz](docs/mockups-prototipo.md), con el prefijo `final-`.
 
 La vista inicial de [Gestión de productos](http://127.0.0.1:8000/gestion/productos/) permite validar fichas comerciales y calcular sus salidas sin publicar cambios. La evidencia del indicador 2 se encuentra en [Formularios administrativos](docs/indicador-2-formularios.md).
@@ -155,23 +157,21 @@ SoundShopCL/
 
 ## Git y publicación en GitHub
 
-El repositorio usa la rama `main` y separa el trabajo en commits verificables. Mientras no se configure la identidad personal del estudiante, los commits locales emplean el nombre técnico `SoundShop CL Student` y el correo no publicable `soundshopcl@local.invalid`. Antes de publicar, se deben reemplazar por los datos de la cuenta real:
+El repositorio público está en [GitHub](https://github.com/YkzPam/SoundShopCL), utiliza la rama `main` y conserva el historial del proyecto. Para obtener la entrega en otro computador:
 
 ```powershell
-git config user.name "Nombre Apellido"
-git config user.email "correo-vinculado-a-github@example.com"
+git clone https://github.com/YkzPam/SoundShopCL.git
+cd SoundShopCL
+python -m venv venv
+.\venv\Scripts\python.exe -m pip install -r requirements.txt
+.\venv\Scripts\python.exe manage.py check
+.\venv\Scripts\python.exe manage.py test
+.\venv\Scripts\python.exe manage.py runserver
 ```
 
-Después de crear un repositorio público vacío en GitHub, se conecta y publica con:
+En el archivo original, los commits locales se identifican como `SoundShop CL Student`, con el correo técnico no entregable `soundshopcl@local.invalid`. La cuenta propietaria del repositorio es `YkzPam`; no se presenta ese correo técnico como una dirección personal del estudiante.
 
-```powershell
-git add README.md core soundshop templates static docs requirements.txt package.json package-lock.json .gitignore .vscode manage.py
-git commit -m "Completa entrega de Evaluación 1"
-git remote add origin https://github.com/YkzPam/SoundShopCL.git
-git push -u origin main
-```
-
-No se debe subir la carpeta `venv`, `node_modules`, cookies, claves personales ni un archivo `.env`. Estas rutas ya están cubiertas por `.gitignore`.
+La publicación contiene código y documentación, no un sitio Django alojado en GitHub Pages. El docente puede clonar el proyecto y seguir la instalación para ejecutar la aplicación. No se incluyen `venv`, `node_modules`, bases de datos ni archivos `.env`. La configuración de Django corresponde únicamente al servidor local de esta entrega.
 
 ## Decisiones de la primera entrega
 
