@@ -3,6 +3,9 @@
    including the wide final row, instead of cropping the equipment to fill it. */
 .category-grid--collections .category-tile .category-tile__thumbnail {
   aspect-ratio: 1;
+  width: 100%;
+  max-width: 280px;
+  margin-inline: auto;
 }
 .category-grid--collections .category-tile__thumbnail img {
   object-fit: contain;
@@ -10,6 +13,47 @@
 }
 .category-grid--collections .category-tile:hover .category-tile__thumbnail img {
   transform: none;
+}
+
+/* Compact photography without cropping product silhouettes. Keep the optional
+   image viewer large: that is the explicit action for inspecting details. */
+.category-grid--collections { max-width: 960px; margin-inline: auto; }
+.category-grid--collections .category-tile:nth-child(even) { padding-top: 0; }
+.category-grid--collections .category-tile:last-child {
+  grid-template-columns: 1fr 1fr;
+  column-gap: 40px;
+}
+.product-card__image { aspect-ratio: 1; max-width: 260px; margin-inline: auto; }
+.product-card__image img { object-fit: contain; }
+.collection-stage { width: 100%; max-width: 380px; justify-self: center; }
+.collection-stage__photo { aspect-ratio: 1; }
+.collection-stage__photo img { object-fit: contain; transform: none; }
+.product-detail__visual { width: 100%; max-width: 440px; justify-self: center; }
+.product-detail__visual > img { object-fit: contain; }
+.about-composition { width: calc(100% - 45px); max-width: 400px; justify-self: center; }
+.footer-statement--illustrated .footer-statement__art {
+  width: 100%; max-width: 320px; justify-self: center; margin: 0;
+}
+@media (min-width: 861px) {
+  .footer-statement.footer-statement--illustrated { padding-bottom: 32px; }
+  .footer-statement.footer-statement--illustrated > a {
+    font-size: clamp(64px, 6vw, 96px);
+    grid-template-columns: 1.3fr 1fr;
+  }
+  .footer-statement--illustrated .footer-statement__art { max-width: 240px; }
+}
+@media (max-width: 860px) {
+  .product-detail__visual { max-width: 360px; }
+  .collection-stage { max-width: 320px; }
+  .about-composition { max-width: 340px; }
+}
+@media (max-width: 520px) {
+  .category-grid--collections .category-tile .category-tile__thumbnail { max-width: 260px; }
+  .category-grid--collections .category-tile:nth-child(even) { padding-top: 0; }
+  .product-card__image { max-width: 180px; }
+  .product-detail__visual, .collection-stage { max-width: 280px; }
+  .about-composition { width: calc(100% - 20px); max-width: 260px; }
+  .footer-statement--illustrated .footer-statement__art { max-width: 220px; }
 }
 
 .brand { flex-shrink: 0; }
