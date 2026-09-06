@@ -1,4 +1,17 @@
-/* Visible navigation, guest checkout and the projected Las Condes space. */
+/* Shared category photography, navigation and store refinements. */
+/* Product photos are square: preserve their frame in both category galleries,
+   including the wide final row, instead of cropping the equipment to fill it. */
+.category-grid--collections .category-tile .category-tile__thumbnail {
+  aspect-ratio: 1;
+}
+.category-grid--collections .category-tile__thumbnail img {
+  object-fit: contain;
+  object-position: center;
+}
+.category-grid--collections .category-tile:hover .category-tile__thumbnail img {
+  transform: none;
+}
+
 .brand { flex-shrink: 0; }
 .brand__mark { flex-shrink: 0; }
 .brand__mark > .brand__groove {

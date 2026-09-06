@@ -27,3 +27,9 @@ El proyecto se publicó en [YkzPam/SoundShopCL](https://github.com/YkzPam/SoundS
 Una clonación independiente de la publicación `2194be7` completó `manage.py check` sin problemas y las 50 pruebas en 7,005 segundos. Se utilizó el entorno Python ya instalado, pero el código se obtuvo desde GitHub; no constituye una instalación de dependencias desde cero en otro computador.
 
 La comprobación de enlaces locales recorrió 16 documentos Markdown sin destinos inexistentes. La aprobación del alcance por el docente y la demostración corresponden a actividades externas a estas pruebas. El documento no garantiza 100 puntos ni presenta como otorgada una calificación de la rúbrica.
+
+## 8.4 Ajuste del encuadre de categorías
+
+El 6 de septiembre de 2026 se corrigió el recorte de las imágenes compartidas por Inicio y Categorías. Los marcos respetan la proporción cuadrada de las fotografías y utilizan `object-fit: contain`; el hover ya no amplía la imagen. El ajuste incluye la fila de Sonido en vivo, que antes cortaba el parlante por utilizar un marco horizontal. No se modificaron los datos ni el funcionamiento de Django.
+
+La revisión cubrió ambas páginas en 320, 390, 768 y 1440 píxeles, en claro y oscuro: 16 combinaciones y 80 imágenes comprobadas, sin desbordamiento de página ni errores JavaScript detectados. Se revisaron carga, proporción y ausencia de ampliación, incluido hover en escritorio. Django completó nuevamente sus 50 pruebas. Se actualizaron las ocho capturas `final-inicio-*` y `final-categorias-*`; el detalle se puede consultar en [escritorio](evidencias/encuadre-sonido-en-vivo-light-1440.png) y [móvil](evidencias/encuadre-sonido-en-vivo-light-390.png).
