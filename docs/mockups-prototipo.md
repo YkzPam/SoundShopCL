@@ -1,91 +1,31 @@
-# 6. Mockups y evidencia del prototipo de interfaz
+# 7. Prototipo de interfaz y selección de evidencias
 
-## 6.1 Criterio de presentación
+## 7.1 Criterio de entrega
 
-Los mockups corresponden a capturas del prototipo navegable, no a pantallas dibujadas sin implementación. Cada imagen proviene de la misma aplicación Django entregada en el repositorio y muestra el HTML semántico procesado con plantillas DTL y Tailwind CSS. La dirección visual toma referencias de catálogos técnicos de audio: azul noche, cobalto, gris frío, acentos aqua, tipografía Bahnschrift/Aptos y fotografías de estudio con fondo neutro. La portada utiliza un hero de primera pantalla, tipografía XXL y una cuadrícula Bento para las categorías. La interfaz pública no muestra etiquetas de evaluación ni mensajes que la presenten como una maqueta.
+La aplicación navegable constituye el prototipo implementado de la Evaluación 1. Las capturas permiten revisar sus vistas sin iniciar Django; no se presentan como bocetos anteriores al desarrollo. La selección `final-*` corresponde a la revisión de entrega del 6 de septiembre de 2026. Las series anteriores se conservan como historial y no deben mezclarse para interpretar el flujo vigente.
 
-## 6.2 Portada en escritorio
+## 7.2 Vistas principales
 
-La vista de escritorio presenta la identidad SoundShop CL, navegación principal, buscador, selector de tema, acceso de cuenta y carrito. La primera pantalla divide la propuesta de la tienda y el producto seleccionado. El fondo usa una retícula técnica ligera y un indicador invita a recorrer la página. Al continuar aparecen cinco categorías en una cuadrícula Bento, tres composiciones editoriales, los productos destacados y el formulario de acceso.
+| Vista | Ruta | Escritorio claro | Móvil claro |
+|---|---|---|---|
+| Inicio | `/` | [1440 px](evidencias/final-inicio-light-1440.png) | [390 px](evidencias/final-inicio-light-390.png) |
+| Productos | `/productos/` | [1440 px](evidencias/final-catalogo-light-1440.png) | [390 px](evidencias/final-catalogo-light-390.png) |
+| Categorías | `/categorias/` | [1440 px](evidencias/final-categorias-light-1440.png) | [390 px](evidencias/final-categorias-light-390.png) |
+| Ficha de producto | `/productos/1/` | [1440 px](evidencias/final-producto-light-1440.png) | [390 px](evidencias/final-producto-light-390.png) |
+| Nosotros | `/nosotros/` | [1440 px](evidencias/final-nosotros-light-1440.png) | [390 px](evidencias/final-nosotros-light-390.png) |
+| Iniciar sesión | `/registro/` | [1440 px](evidencias/final-cuenta-light-1440.png) | [390 px](evidencias/final-cuenta-light-390.png) |
+| Crear cuenta | `/registro/?modo=crear` | [1440 px](evidencias/final-crear-light-1440.png) | [390 px](evidencias/final-crear-light-390.png) |
+| Carrito vacío | `/carrito/` | [1440 px](evidencias/final-carrito-light-1440.png) | [390 px](evidencias/final-carrito-light-390.png) |
+| Gestión de ficha | `/gestion/productos/` | [1440 px](evidencias/final-gestion-light-1440.png) | [390 px](evidencias/final-gestion-light-390.png) |
 
-![Portada de SoundShop CL en escritorio](evidencias/portada-escritorio.png)
+Cada vista dispone de una variante oscura en la misma carpeta, cambiando `light` por `dark` en el nombre. Por ejemplo, [Inicio oscuro](evidencias/final-inicio-dark-1440.png), [Cuenta oscura móvil](evidencias/final-cuenta-dark-390.png) y [Gestión oscura](evidencias/final-gestion-dark-1440.png). La revisión también comprueba un ancho intermedio de 768 px.
 
-## 6.3 Portada en modo oscuro
+## 7.3 Estados funcionales complementarios
 
-El modo oscuro es una variante nativa de toda la interfaz, no un filtro aplicado a la captura. Cambia superficies, texto, líneas, formularios, tarjetas y controles mediante variables CSS. La selección queda guardada en `localStorage` y se conserva al recargar o cambiar de ruta.
+Se conservan como evidencia de interacciones previamente capturadas la [ficha con errores](evidencias/identity-gestion-error.png), la [ficha validada](evidencias/identity-gestion-validada.png), el [carrito con productos](evidencias/identity-carrito-lleno-light-1440.png), los [errores de registro](evidencias/identity-registro-errores.png) y el [pedido confirmado](evidencias/identity-pedido-confirmado.png). Estas imágenes no son nuevas capturas de la revisión final; los comportamientos actuales se contrastan con la suite de Django.
 
-![Portada de SoundShop CL en modo oscuro](evidencias/portada-oscura.png)
+## 7.4 Correspondencia visual y navegación
 
-## 6.4 Vista rápida, confirmación y mini carrito
+La estructura comparte marca, tipografía, navegación, Cuenta y carrito. Negro y marfil forman las superficies principales; dorado y violeta se reservan para acentos y estados. Inicio conduce al catálogo y a categorías; una ficha conduce al carrito; Cuenta interviene al confirmar. La gestión presenta ingreso, errores y resultado en una misma vista, tal como explica [Arquitectura y flujo](arquitectura-y-flujo.md).
 
-Cada tarjeta ofrece una vista rápida al pasar el mouse o enfocar el control. El diálogo conserva la fotografía, descripción, precio, stock y especificaciones del producto. Cuando no existe una sesión, reemplaza la cantidad por un acceso claro y no altera el carrito.
-
-![Compra bloqueada hasta iniciar sesión](evidencias/compra-requiere-sesion.png)
-
-Con la cuenta activa, el mismo diálogo habilita la cantidad. El formulario se envía con `POST` y CSRF a la misma vista Django utilizada por la ficha completa.
-
-![Vista rápida de Pulse X ANC](evidencias/vista-rapida-escritorio.png)
-
-El agregado válido no cambia de ruta. Una confirmación breve informa el producto y la cantidad; el mini carrito lateral muestra inmediatamente la línea, el subtotal y el total. Desde ese panel se abre el carrito completo para editar o confirmar.
-
-![Confirmación visual de producto agregado](evidencias/confirmacion-carrito-escritorio.png)
-
-![Mini carrito lateral](evidencias/mini-carrito-escritorio.png)
-
-La ficha detallada permite ampliar la fotografía sin perder la página ni las especificaciones del producto.
-
-![Fotografía de producto ampliada](evidencias/imagen-ampliada-escritorio.png)
-
-## 6.5 Catálogo en tableta
-
-La vista de 768 × 1024 píxeles reorganiza la navegación, convierte los filtros en un panel desplegable y mantiene dos columnas de productos. Las tarjetas muestran marca, categoría, precio, stock y acceso a la ficha.
-
-![Catálogo de SoundShop CL en tableta](evidencias/catalogo-tableta.png)
-
-## 6.6 Portada y vista rápida en teléfono
-
-El navegador se configuró con un viewport nominal de 390 × 844 píxeles. La captura conserva la misma información y reemplaza la navegación de escritorio por un botón de menú. Los botones ocupan el ancho disponible y el contenido no genera desplazamiento horizontal.
-
-![Portada de SoundShop CL en teléfono](evidencias/portada-movil-390.png)
-
-La vista rápida se convierte en un panel vertical desplazable. El control de cierre, la fotografía, el stock, las especificaciones y el aviso de sesión conservan el ancho del dispositivo.
-
-![Vista rápida de producto en teléfono](evidencias/vista-rapida-movil-390.png)
-
-La anchura mínima comprobada fue 320 píxeles. El encabezado, el texto, los botones y las estadísticas se mantienen dentro del área visible.
-
-![Portada de SoundShop CL a 320 píxeles](evidencias/portada-movil-320.png)
-
-## 6.7 Registro de cuenta
-
-La ruta de acceso organiza los campos en una vista propia y conserva el mismo sistema visual de la tienda. Nombre, correo, contraseña, confirmación y aceptación de condiciones poseen etiquetas visibles y errores asociados. Al completar el formulario se inicia una sesión temporal, aparece el nombre en el encabezado y se vuelve al producto solicitado. El correo y la contraseña no se guardan.
-
-![Registro de cuenta en escritorio](evidencias/registro-escritorio.png)
-
-## 6.8 Carrito y salida del proceso
-
-El carrito representa la operación principal de entrada y cálculo. La vista muestra dos unidades, su subtotal, controles de actualización y el total del pedido. El servidor valida la cantidad antes de aceptar cualquier cambio.
-
-![Carrito con dos productos](evidencias/carrito-escritorio.png)
-
-La última pantalla confirma que el flujo terminó y entrega código, total y fecha. La interfaz mantiene un lenguaje comercial limpio; la limitación técnica del pedido temporal queda documentada en el alcance de la entrega.
-
-![Pedido confirmado](evidencias/pedido-confirmado.png)
-
-## 6.9 Comprobación responsive, movimiento e interacción
-
-| Vista | Ancho nominal | Código HTTP | Desbordamiento horizontal | Error de JavaScript o consola |
-|---|---:|---:|---|---|
-| Portada escritorio | 1440 px | 200 | No | No |
-| Portada oscura | 1440 px | 200 | No | No |
-| Catálogo tableta | 768 px | 200 | No | No |
-| Portada teléfono | 390 px | 200 | No | No |
-| Portada mínima | 320 px | 200 | No | No |
-| Registro | 390 px | 200 | No | No |
-| Compra sin sesión | 1440 px | 200 | No | No |
-| Vista rápida | 1440 y 390 px | 200 | No | No |
-| Mini carrito | 1440 px | 200 | No | No |
-
-El flujo automatizado revisó diez productos y cinco categorías. Primero comprobó que una visita anónima viera el bloqueo y no pudiera publicar una compra. Después completó el registro, regresó al producto, abrió la vista rápida de `Pulse X ANC`, agregó dos unidades sin abandonar la página y verificó el contador, la confirmación y el total `$179.980` del mini carrito. También amplió la imagen de `Orbit One`, confirmó el pedido y validó la búsqueda. Los intentos con contraseñas distintas se rechazaron y una clave válida dejó `Benjamin` visible en el encabezado.
-
-La interfaz incorpora una entrada inicial del hero, revelado escalonado al recorrer las secciones, barra de progreso vinculada al scroll, profundidad en la imagen principal, microinteracciones distintas en los íconos y una respuesta breve antes de abrir la ficha seleccionada. La ficha agrega una inclinación máxima de 3,2 grados cuando existe un puntero preciso. Las entradas de los diálogos terminan en menos de medio segundo y no existen ciclos decorativos permanentes. Con `prefers-reduced-motion: reduce`, JavaScript omite el observador, el paralaje y la inclinación; CSS muestra el contenido de inmediato, oculta la barra de progreso y conserva disponibles los paneles funcionales.
+El menú móvil mantiene los destinos principales sin depender de una navegación de escritorio desbordada. Los formularios incluyen etiquetas y mensajes, y el movimiento respeta la preferencia de reducción del sistema. Las capturas no acreditan por sí solas accesibilidad completa ni pruebas en teléfonos físicos; su alcance se precisa en [Verificación de entrega](verificacion-entrega.md).

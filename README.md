@@ -1,15 +1,23 @@
 # SoundShop CL
 
+La identidad visual vigente utiliza marfil, negro, dorado suave y violeta. La descripción del sistema y las pruebas del rediseño se encuentran en [Identidad visual](docs/identidad-visual.md); la selección final de capturas está en [Prototipo de interfaz](docs/mockups-prototipo.md), con el prefijo `final-`.
+
+La vista inicial de [Gestión de productos](http://127.0.0.1:8000/gestion/productos/) permite validar fichas comerciales y calcular sus salidas sin publicar cambios. La evidencia del indicador 2 se encuentra en [Formularios administrativos](docs/indicador-2-formularios.md).
+
 SoundShop CL es el prototipo de una tienda musical chilena desarrollado para la Evaluación 1 de Programación Backend. La aplicación reúne diez productos en cinco categorías, permite buscar y filtrar, revisar fichas detalladas, crear una cuenta de sesión, modificar un carrito y completar un pedido temporal.
 
-La entrega usa Django 5.2 LTS, plantillas DTL, datos JSON, Tailwind CSS y JavaScript. No se conecta a una base de datos porque esa integración pertenece a las siguientes unidades del caso semestral. El carrito y el nombre visible de la cuenta se guardan temporalmente en una cookie firmada por Django. El correo y la contraseña del formulario de registro se validan, pero no se almacenan.
+La entrega usa Django 5.2 LTS, plantillas DTL, datos JSON, Tailwind CSS y JavaScript. No se conecta a una base de datos porque esa integración pertenece a las siguientes unidades del caso semestral. El carrito y el nombre visible de la cuenta se guardan temporalmente en una cookie firmada por Django. Cuenta ofrece formularios separados para crear una cuenta e iniciar sesión. El servidor conserva temporalmente un identificador derivado del correo, el nombre y el hash de la contraseña en memoria; las credenciales no se incluyen en la cookie. Reiniciar el servidor elimina estas cuentas. Este acceso local de un proceso no sustituye autenticación persistente ni un despliegue seguro de producción.
+
+## Diagrama de flujo de la Evaluación 1
+
+El diagrama se puede revisar directamente en [Excalidraw, mediante este enlace compartido](https://excalidraw.com/#json=1MN8Hxbolx-qeb1thQvVD,qJzWBc68wzA_RRld-BPexA). La carpeta `docs` contiene la [imagen PNG exportada desde Excalidraw](docs/diagrama-flujo.png), la [versión SVG](docs/diagrama-flujo.svg) y el [archivo editable de Excalidraw](docs/diagrama-flujo.excalidraw). La imagen conserva la composición vertical original; no es una recreación del diagrama.
 
 ## Funciones incluidas
 
-- Portada responsive con categorías y productos destacados.
-- Hero de primera pantalla con tipografía XXL, fondo técnico, producto seleccionado e indicador de recorrido.
-- Cuadrícula Bento asimétrica para recorrer las categorías.
-- Sección editorial con tres rutas de compra según la forma de escuchar o crear música.
+- Portada responsive, limpia y centrada en una sola fotografía protagonista, tipografía XXL y accesos directos.
+- Cinco categorías con fotografías y composición asimétrica abierta en el inicio y en su directorio.
+- Página independiente Nosotros, con presentación de SoundShop CL y sus áreas de catálogo.
+- Cuenta en su propia ruta, con una composición tipográfica centrada y formularios separados de acceso y registro.
 - Catálogo generado en el servidor mediante ciclos `{% for %}` y condiciones `{% if %}`.
 - Búsqueda sin distinción de mayúsculas ni tildes.
 - Filtros combinables por categoría, precio máximo y stock.
@@ -17,15 +25,15 @@ La entrega usa Django 5.2 LTS, plantillas DTL, datos JSON, Tailwind CSS y JavaSc
 - Tarjetas con estados de stock claros, movimiento al pasar el mouse y vista rápida accesible.
 - Ficha de producto con especificaciones, precio, disponibilidad, ampliación de imagen y productos relacionados.
 - Carrito temporal con agregado sin recargar, confirmación visual, mini carrito, edición y control de stock.
-- Compra protegida por sesión: una persona sin cuenta activa puede explorar, pero no agregar ni confirmar productos.
+- Carrito de invitado: cualquier visitante puede agregar, editar y eliminar productos. La cuenta se solicita solo al continuar con el pedido y la selección se conserva después del acceso.
 - Creación de cuenta con validación de correo, contraseña, confirmación, aceptación de condiciones y regreso seguro al producto solicitado.
 - Modo claro y oscuro con preferencia guardada en el navegador.
 - Animaciones vinculadas al scroll, profundidad en imágenes, microinteracciones por categoría y respuesta visual al seleccionar un producto.
 - Confirmación de pedido con código temporal, sin pago ni persistencia comercial.
 - Mensajes de validación, rutas nombradas y redirecciones ante identificadores inválidos.
-- Treinta pruebas automáticas que no requieren base de datos.
+- Cincuenta pruebas automáticas que no requieren base de datos.
 
-La interfaz utiliza una dirección visual contemporánea inspirada en catálogos técnicos de audio: azul noche, cobalto, gris frío y acentos aqua. La tipografía combina Bahnschrift, Aptos y las variantes modernas de Segoe UI disponibles en Windows. Las diez fotografías forman una colección de estudio coherente, sin marcas de terceros. El movimiento aparece al entrar, recorrer secciones, abrir paneles o seleccionar un producto; no hay animaciones decorativas permanentes. La hoja de estilos y JavaScript respetan `prefers-reduced-motion`.
+La interfaz utiliza negro `#121212`, marfil `#F4F0E8`, dorado `#B89B5E`, violeta `#4B2E5A` y texto claro `#F8F6F2`. El modo oscuro adapta superficies y contraste con variantes claras del violeta para textos pequeños. Una sola navegación acompaña los títulos amplios, las fotografías abiertas y los formularios sin contenedores pesados. Segoe UI Variable, con alternativas locales, se combina con Georgia en algunos títulos. La hoja `static/css/identity.css` reúne el sistema visual actual; las hojas anteriores permanecen como historial y no se cargan desde la plantilla base. Se conserva Tailwind compilado. Las animaciones de entrada, el acercamiento de las fotografías, los diálogos y el desplazamiento de la portada respetan la reducción de movimiento del sistema y el control del pie de página.
 
 ## Instalación en Windows y Visual Studio Code
 
@@ -88,21 +96,26 @@ La sección **Ejecutar y depurar** contiene la configuración `SoundShop CL: Dja
 
 ## Rutas principales
 
+Cada colección incorpora una portada editorial propia, un equipo destacado y dos notas de orientación basadas en el catálogo. Las composiciones usan formas relacionadas con audífonos, vinilo, grabación, cuerdas y escenario, conservando la paleta de la tienda. El movimiento incluye entrada de página, revelado al recorrer secciones, profundidad limitada al scroll y respuesta al puntero. El pie de página permite reducirlo y guardar la preferencia; la configuración de movimiento reducido del sistema siempre tiene prioridad. Los enlaces navegan sin retardos artificiales. El enlace antiguo `/#nosotros` se redirige en el navegador a `/nosotros/`.
+
 | Ruta | Nombre Django | Función |
 |---|---|---|
+| `/gestion/productos/` | `core:gestion_productos` | Validación de ficha administrativa |
+| `/gestion/productos/<id>/` | `core:gestion_producto` | Selección de ficha por identificador |
 | `/` | `core:inicio` | Portada y productos destacados |
+| `/nosotros/` | `core:nosotros` | Presentación y propósito de la tienda, fuera del inicio |
 | `/productos/` | `core:catalogo` | Catálogo, filtros y ordenamiento |
 | `/productos/<id>/` | `core:detalle_producto` | Ficha dinámica de un producto |
-| `/categorias/` | `core:categorias` | Resumen de categorías |
-| `/categorias/<slug>/` | `core:detalle_categoria` | Productos de una categoría |
+| `/categorias/` | `core:categorias` | Directorio fotográfico con las tarjetas compartidas del inicio |
+| `/categorias/<slug>/` | `core:detalle_categoria` | Colección con cabecera, navegación entre categorías y filtros |
 | `/buscar/?q=texto` | `core:buscar` | Resultado de búsqueda |
 | `/carrito/` | `core:carrito` | Resumen y edición del carrito |
 | `/pedido/confirmado/` | `core:pedido_confirmado` | Resultado del pedido temporal |
-| `/registro/` | `core:registro` | Creación de cuenta e inicio de sesión temporal |
+| `/registro/` | `core:registro` | Inicio de sesión; `?modo=crear` abre la creación de cuenta |
 | `/registro/confirmado/` | `core:registro_confirmado` | Confirmación de la sesión activa |
 | `/cuenta/salir/` | `core:cerrar_sesion` | Cierre de sesión mediante `POST` |
 
-Las operaciones que alteran el carrito aceptan únicamente solicitudes `POST` y están protegidas con token CSRF. Agregar o confirmar productos exige una cuenta de sesión activa. La vista rápida utiliza la misma ruta y recibe un resumen JSON cuando JavaScript solicita actualizar el mini carrito; si JavaScript no está disponible, el formulario conserva el flujo Django tradicional. Los retornos posteriores al acceso solo aceptan rutas locales para impedir redirecciones externas.
+Las operaciones que alteran el carrito aceptan únicamente solicitudes `POST` y están protegidas con token CSRF. Agregar, actualizar y eliminar productos no exige una cuenta; confirmar el pedido sí mantiene la validación de sesión en el servidor. La vista rápida utiliza la misma ruta y recibe un resumen JSON cuando JavaScript solicita actualizar el mini carrito; si JavaScript no está disponible, el formulario conserva el flujo Django tradicional. Los retornos posteriores al acceso solo aceptan rutas locales para impedir redirecciones externas. El pedido sigue siendo temporal: no existe pasarela de pago ni cobro real.
 
 ## Estructura del proyecto
 
@@ -129,10 +142,12 @@ SoundShopCL/
 
 ## Documentación académica
 
+- [Verificación final de la entrega](docs/verificacion-entrega.md)
+- [Investigación de tiendas similares](docs/investigacion-referentes.md)
 - [Alcance de la Evaluación 1](docs/alcance-evaluacion-1.md)
 - [Modelo de datos, entradas y validaciones](docs/modelo-datos-y-validaciones.md)
 - [Arquitectura y flujo de navegación](docs/arquitectura-y-flujo.md)
-- Diagrama de flujo: [SVG editable](docs/diagrama-flujo.svg) y [PNG listo para presentar](docs/diagrama-flujo.png)
+- Diagrama de flujo: [abrir en Excalidraw](https://excalidraw.com/#json=1MN8Hxbolx-qeb1thQvVD,qJzWBc68wzA_RRld-BPexA), [descargar el archivo editable](docs/diagrama-flujo.excalidraw) o [consultar la vista previa](docs/diagrama-flujo.png)
 - [Mockups y evidencia del prototipo](docs/mockups-prototipo.md)
 - [Auditoría de los diez indicadores](docs/auditoria-rubrica.md)
 - [Registro del apoyo de inteligencia artificial](docs/uso-inteligencia-artificial.md)
@@ -150,7 +165,9 @@ git config user.email "correo-vinculado-a-github@example.com"
 Después de crear un repositorio público vacío en GitHub, se conecta y publica con:
 
 ```powershell
-git remote add origin https://github.com/USUARIO/SoundShopCL.git
+git add README.md core soundshop templates static docs requirements.txt package.json package-lock.json .gitignore .vscode manage.py
+git commit -m "Completa entrega de Evaluación 1"
+git remote add origin https://github.com/YkzPam/SoundShopCL.git
 git push -u origin main
 ```
 
@@ -160,4 +177,4 @@ No se debe subir la carpeta `venv`, `node_modules`, cookies, claves personales n
 
 `core/models.py` utiliza `dataclasses` para describir las entidades y sus tipos. Los registros se cargan desde `core/data/catalogo.json`, se convierten en objetos Python y se envían a cada plantilla mediante diccionarios de contexto. La cuenta de esta etapa valida los datos y abre una sesión firmada para proteger la compra; no reemplaza el modelo de usuarios ni la autenticación persistente que requieren ORM y base de datos.
 
-Los nombres, precios y marcas del catálogo son ficticios. Las diez imágenes fueron creadas específicamente para SoundShop CL, optimizadas en WebP y no contienen logotipos de terceros. El pedido final no es una transacción comercial.
+Los nombres, precios y marcas del catálogo son ficticios. Las diez imágenes de productos y la variante panorámica de portada fueron creadas específicamente para SoundShop CL, optimizadas en WebP y no contienen logotipos de terceros. El pedido final no es una transacción comercial.

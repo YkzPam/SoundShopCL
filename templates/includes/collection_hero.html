@@ -1,0 +1,29 @@
+{% load static soundshop_extras %}
+<header class="collection-cover collection-cover--{{ categoria_actual.slug }}" data-scroll-scene>
+  <div class="page-shell">
+    <nav class="breadcrumbs" aria-label="Migas de pan"><a href="{% url 'core:inicio' %}">Inicio</a><span aria-hidden="true">/</span><a href="{% url 'core:categorias' %}">Categorías</a><span aria-hidden="true">/</span><span aria-current="page">{{ categoria_actual.nombre }}</span></nav>
+    <div class="collection-cover__grid">
+      <div class="collection-cover__copy">
+        <p class="section-index"><span>{{ coleccion_visual.numero|stringformat:"02d" }} / Colección</span> {{ categoria_actual.nombre }}</p>
+        <h1>{{ coleccion_visual.titular }} <em>{{ coleccion_visual.enfasis }}</em></h1>
+        <p class="collection-cover__intro">{{ coleccion_visual.introduccion }}</p>
+        <a href="#seleccion" class="button button--primary">Explorar {{ categoria_actual.nombre|lower }} <span aria-hidden="true">↓</span></a>
+        <p class="collection-cover__meta"><span>{{ coleccion_visual.cantidad|stringformat:"02d" }} equipos</span><span>Desde {{ coleccion_visual.precio_desde|precio_clp }}</span></p>
+      </div>
+      <div class="collection-stage" data-motion-surface>
+        <div class="collection-stage__art" aria-hidden="true"><span></span><span></span><span></span></div>
+        <span class="collection-stage__word" aria-hidden="true">{{ coleccion_visual.sello }}</span>
+        <figure class="collection-stage__photo"><img src="{% static coleccion_visual.imagen %}" alt="{{ coleccion_visual.imagen_alt }}" width="1024" height="1024" fetchpriority="high"></figure>
+        <div class="collection-stage__signal">{% include 'includes/sound_marks.html' %}<span>{{ coleccion_visual.ruta }}</span></div>
+        {% with producto=coleccion_visual.destacado %}
+        <a href="{% url 'core:detalle_producto' producto.id %}" class="collection-stage__note">
+          <span>En esta colección <i aria-hidden="true">↗</i></span>
+          <strong>{{ producto.nombre }}</strong>
+          <small>{{ producto.marca }} · {{ producto.precio|precio_clp }}</small>
+        </a>
+        {% endwith %}
+      </div>
+    </div>
+    {% include 'includes/collection_tabs.html' %}
+  </div>
+</header>

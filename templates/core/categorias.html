@@ -1,37 +1,29 @@
 {% extends 'base.html' %}
-{% load soundshop_extras %}
+{% load static soundshop_extras %}
 
 {% block title %}Categorías | SoundShop CL{% endblock %}
+{% block body_class %}page-categories{% endblock %}
 
 {% block content %}
-<header class="page-intro">
-  <div class="page-shell page-intro__grid">
-    <p class="section-index"><span>Catálogo / 03</span> Categorías</p>
-    <div><h1>Equipo para escuchar, interpretar y crear.</h1><p>Cinco secciones para llegar más rápido al producto que necesitas.</p></div>
+<header class="collection-intro">
+  <div class="page-shell">
+    <nav class="breadcrumbs" aria-label="Migas de pan"><a href="{% url 'core:inicio' %}">Inicio</a><span aria-hidden="true">/</span><span aria-current="page">Categorías</span></nav>
+    <p class="section-index"><span>SoundShop CL</span> Nuestras colecciones</p>
+    <div class="collection-intro__row">
+      <h1>Cada forma de <em>vivir la música.</em></h1>
+      <div><p>Encuentra el equipo que acompaña tu manera de escuchar, tocar y crear.</p><span>{{ resumen_categorias|length|stringformat:"02d" }} categorías · Instrumentos y audio</span></div>
+    </div>
   </div>
 </header>
 
-<section class="page-shell category-list" aria-label="Categorías de productos">
-  {% for item in resumen_categorias %}
-    <article class="category-row">
-      <span class="category-row__number">0{{ forloop.counter }}</span>
-      <div class="category-row__icon" aria-hidden="true">
-        {% include 'includes/category_icon.html' with icono=item.categoria.icono %}
-      </div>
-      <div class="category-row__content">
-        <p>{{ item.disponibles }} producto{{ item.disponibles|pluralize }} con stock</p>
-        <h2>{{ item.categoria.nombre }}</h2>
-        <span>{{ item.categoria.descripcion }}</span>
-      </div>
-      <div class="category-row__action">
-        <p>Desde <strong>{{ item.precio_desde|precio_clp }}</strong></p>
-        <a href="{% url 'core:detalle_categoria' item.categoria.slug %}" class="button button--dark">Ver productos <span aria-hidden="true">→</span></a>
-      </div>
-    </article>
-  {% endfor %}
+<section class="category-section" aria-labelledby="colecciones-titulo" data-scroll-scene>
+  <div class="page-shell">
+    <h2 class="sr-only" id="colecciones-titulo">Explora las cinco categorías</h2>
+    {% include 'includes/category_tiles.html' with show_images=True %}
+  </div>
 </section>
 
 <section class="category-help">
-  <div class="page-shell category-help__inner"><p>¿No sabes por dónde empezar?</p><div><h2>Revisa el catálogo completo y compara por precio, marca o disponibilidad.</h2><a href="{% url 'core:catalogo' %}" class="text-link">Abrir catálogo <span aria-hidden="true">→</span></a></div></div>
+  <div class="page-shell category-help__inner"><div><p class="section-index"><span>Sigue explorando</span> Tu próximo equipo</p><h2>Todo el catálogo, <em>en un solo lugar.</em></h2><p>Compara instrumentos y equipos por precio, marca o disponibilidad.</p></div><a href="{% url 'core:catalogo' %}" class="button button--light">Explorar productos <span aria-hidden="true">↗</span></a></div>
 </section>
 {% endblock %}

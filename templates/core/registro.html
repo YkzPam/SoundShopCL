@@ -1,26 +1,27 @@
 {% extends 'base.html' %}
 
-{% block title %}Ingresar a la tienda | SoundShop CL{% endblock %}
+{% load static %}
+{% block title %}{% if modo_cuenta == 'crear' %}Crear cuenta{% else %}Iniciar sesión{% endif %} | SoundShop CL{% endblock %}
 
 {% block content %}
-<header class="page-intro account-page-intro">
-  <div class="page-shell page-intro__grid">
-    <p class="section-index"><span>Cuenta / 01</span> Acceso</p>
-    <div><h1>Crea tu cuenta e inicia sesión</h1><p>Completa tus datos para activar la compra y mantener protegido el carrito durante esta visita.</p></div>
+<section class="page-shell account-page account-page--access" aria-labelledby="cuenta-titulo">
+  <header class="account-page__info">
+    <p class="section-index"><span>SoundShop / Acceso</span> Tu espacio en la música</p>
+    <h1 id="cuenta-titulo">Backstage<span aria-hidden="true">.</span></h1>
+    <p>{% if modo_cuenta == 'crear' %}Toda gran selección tiene un comienzo.{% else %}Tu próxima selección empieza aquí.{% endif %}</p>
+  </header>
+  <div class="account-orbit" aria-hidden="true"><i></i><i></i><i></i><span>SS / 01</span></div>
+  <div class="account-page__form">
+    {% url 'core:carrito' as carrito_url %}
+    {% if siguiente == carrito_url %}
+      <div class="checkout-context"><span>Tu selección sigue aquí</span><p>Inicia sesión o crea una cuenta para continuar con el pedido. No necesitas volver a agregar los productos.</p><a href="{{ carrito_url }}">Volver al carrito <span aria-hidden="true">↗</span></a></div>
+    {% endif %}
+    <nav class="account-switch" aria-label="Opciones de cuenta">
+      <a href="{% url 'core:registro' %}?modo=ingresar{% if siguiente %}&amp;next={{ siguiente|urlencode }}{% endif %}" {% if modo_cuenta == 'ingresar' %}aria-current="page"{% endif %}>Iniciar sesión</a>
+      <a href="{% url 'core:registro' %}?modo=crear{% if siguiente %}&amp;next={{ siguiente|urlencode }}{% endif %}" {% if modo_cuenta == 'crear' %}aria-current="page"{% endif %}>Crear cuenta</a>
+    </nav>
+    {% include 'includes/registro_form.html' with formulario=registro_formulario siguiente=siguiente %}
   </div>
-</header>
-
-<section class="page-shell account-page">
-  <div class="account-page__info">
-    <p class="account-page__label">Tu espacio</p>
-    <h2>Acceso simple, sin pasos innecesarios.</h2>
-    <p>Al terminar, tu nombre aparecerá en la navegación y podrás agregar productos o confirmar el pedido con la sesión activa en este navegador.</p>
-    <ul class="account-benefits account-benefits--light">
-      <li><span>01</span><div><strong>Sesión inmediata</strong><p>La cuenta queda activa apenas se validan los datos.</p></div></li>
-      <li><span>02</span><div><strong>Validación clara</strong><p>Los errores se muestran junto al campo correspondiente.</p></div></li>
-      <li><span>03</span><div><strong>Contraseña privada</strong><p>No queda almacenada después del registro.</p></div></li>
-    </ul>
-  </div>
-  <div class="account-page__form">{% include 'includes/registro_form.html' with formulario=registro_formulario siguiente=siguiente %}</div>
+  <p class="account-endnote">SOUNDSHOP CL <span>ESCUCHAR / CREAR / COMPARTIR</span></p>
 </section>
 {% endblock %}

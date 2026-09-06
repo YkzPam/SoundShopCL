@@ -39,16 +39,7 @@
         <h2>Total estimado</h2>
         <dl><div><dt>Productos</dt><dd>{{ cantidad }}</dd></div><div><dt>Despacho</dt><dd>Por calcular</dd></div></dl>
         <div class="order-summary__total"><span>Total</span><strong>{{ total|precio_clp }}</strong></div>
-        {% if usuario_tienda %}
-          <form method="post" action="{% url 'core:confirmar_pedido' %}">{% csrf_token %}<button type="submit" class="button button--primary button--full">Confirmar pedido</button></form>
-        {% else %}
-          <div class="order-summary__session">
-            <span aria-hidden="true">Cuenta requerida</span>
-            <strong>Inicia sesión para confirmar</strong>
-            <p>El contenido del carrito se mantendrá mientras activas tu cuenta.</p>
-          </div>
-          <a href="{% url 'core:registro' %}?next={% url 'core:carrito' %}" class="button button--primary button--full">Ingresar o crear cuenta</a>
-        {% endif %}
+        <form method="post" action="{% url 'core:confirmar_pedido' %}">{% csrf_token %}<button type="submit" class="button button--primary button--full">{% if usuario_tienda %}Confirmar pedido{% else %}Continuar con el pedido <span aria-hidden="true">→</span>{% endif %}</button></form>
         <p class="order-summary__note">El total no incluye el valor del despacho.</p>
       </aside>
     </div>

@@ -1,0 +1,11 @@
+# Imagen editorial del pie de página
+
+La composición de audífonos y vinilo acompaña «Que suene a ti.» en el pie de página compartido de SoundShop CL. Se generó con la herramienta integrada de imágenes, usando la skill imagegen. Es una ilustración fotográfica editorial, sin marca ni asociación con un producto específico del catálogo. La integración conserva el enlace al catálogo y adapta su composición a teléfono y escritorio. El movimiento del hover respeta la preferencia de reducción de animaciones.
+
+El original se conserva en `static/img/footer-audio-culture-source.png`. La página carga `static/img/footer-audio-culture.jpg`, una conversión JPEG de 1254 × 1254 píxeles, calidad 88 y 140290 bytes. La imagen utiliza carga diferida y dimensiones explícitas. La máscara CSS desvanece los bordes para integrarla con el fondo, sin modificar el original generado. Esta actualización sucede al ZIP de identidad premium anterior; aquel archivo y las capturas anteriores conservan el estado previo.
+
+## Prompt final utilizado
+
+```text
+Use case: product-mockup. Asset type: original editorial photographic illustration for the right half of a premium music store website footer, SoundShop CL. Create a standalone photorealistic still life, NOT a website screenshot. Subject: a beautiful pair of unbranded matte-black over-ear studio headphones in front of a single upright slightly tilted black vinyl record, arranged as a sculptural music still life. Brushed metal earcup details, soft leather padding, finely resolved concentric vinyl grooves, plain deep-violet record center without lettering. Three-quarter view, both headphones and record fully visible, compact centered composition occupying 80% of a square image. Seamless charcoal backdrop matching #121212, fading smoothly to uniform #121212 around all four edges so the image blends into a dark website without a rectangular frame. Understated warm gold #B89B5E rim light from upper left, muted deep-violet #4B2E5A rim light from right, gentle ivory highlights. Sophisticated physical studio lighting, rich restrained contrast, tactile material detail. No text, no letters, no logos, no watermarks, no people, no extra props, no neon glow, no bright colorful background. The result should feel like an art-directed musical editorial photograph, elegant and believable.
+```

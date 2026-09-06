@@ -10,6 +10,79 @@ from .models import Categoria, Producto
 
 RUTA_CATALOGO = Path(__file__).resolve().parent / "data" / "catalogo.json"
 
+CATEGORIAS_EDITORIALES = {
+    "audifonos": {
+        "imagen": "img/productos/audifonos-pulse-x.webp",
+        "imagen_alt": "Audífonos Pulse X ANC",
+        "ruta": "Escuchar sin distracciones",
+        "titular": "Baja el ruido.",
+        "enfasis": "Sube tu música.",
+        "sello": "Escucha",
+        "introduccion": "Tu disco favorito, una mezcla en proceso o un momento a solas. Encuentra los audífonos que acompañan tu forma de escuchar.",
+        "guia_titulo": "Dos maneras de desconectarse.",
+        "guia": (
+            ("Libertad inalámbrica", "Pulse X ANC combina Bluetooth, conexión por cable y cancelación activa de ruido."),
+            ("Conexión directa", "Studio M40 ofrece cable desmontable y formato cerrado para edición y práctica musical."),
+        ),
+    },
+    "tornamesas-vinilos": {
+        "imagen": "img/productos/tornamesa-orbit-one.webp",
+        "imagen_alt": "Tornamesa Orbit One",
+        "ruta": "Volver al ritual del vinilo",
+        "titular": "El sonido tiene",
+        "enfasis": "otra vuelta.",
+        "sello": "33⅓ RPM",
+        "introduccion": "Elegir un disco. Bajar la aguja. Escuchar hasta el último surco. Un espacio para disfrutar el vinilo y cuidar la colección.",
+        "guia_titulo": "Del primer giro al cuidado del disco.",
+        "guia": (
+            ("El centro de la colección", "Orbit One reúne tracción por correa, salida RCA y preamplificador conmutable."),
+            ("Cuidar cada surco", "Record Care Kit incluye cepillo, líquido y paño. Revisa su disponibilidad antes de comprar."),
+        ),
+    },
+    "estudio-creacion": {
+        "imagen": "img/productos/microfono-vela-c1.webp",
+        "imagen_alt": "Micrófono Vela C1",
+        "ruta": "Grabar y producir en casa",
+        "titular": "Esa idea merece",
+        "enfasis": "ser escuchada.",
+        "sello": "Rec / 01",
+        "introduccion": "De una voz a una primera toma. Micrófonos e interfaces para darle un lugar a tus ideas y comenzar a construir tu estudio.",
+        "guia_titulo": "Arma tu espacio de creación.",
+        "guia": (
+            ("Capturar una idea", "Vela C1 es un micrófono de conexión XLR. Su ficha detalla el patrón y la alimentación que necesita."),
+            ("Conectar el estudio", "MiniWave 2 incorpora dos entradas combo y conexión USB-C. Compara sus entradas con tu equipo."),
+        ),
+    },
+    "instrumentos": {
+        "imagen": "img/productos/guitarra-astra-seven.webp",
+        "imagen_alt": "Guitarra eléctrica Astra Seven",
+        "ruta": "Tocar y crear nuevas ideas",
+        "titular": "Todo empieza",
+        "enfasis": "con una nota.",
+        "sello": "Play / 07",
+        "introduccion": "Una guitarra, unas teclas y una idea propia. Instrumentos para practicar, componer y encontrar un sonido que se sienta tuyo.",
+        "guia_titulo": "Elige cómo empieza tu próxima canción.",
+        "guia": (
+            ("Explorar las cuerdas", "Astra Seven tiene siete cuerdas, dos cápsulas humbucker y puente fijo."),
+            ("Crear desde las teclas", "Keyline 49 es un controlador MIDI con teclas sensibles a la velocidad, pads y controles asignables."),
+        ),
+    },
+    "sonido-en-vivo": {
+        "imagen": "img/productos/parlante-atlas-10.webp",
+        "imagen_alt": "Parlante activo Atlas 10",
+        "ruta": "Preparar el escenario",
+        "titular": "Haz que llegue",
+        "enfasis": "a todos.",
+        "sello": "En vivo",
+        "introduccion": "El ensayo, la sala y ese primer público. Parlantes y mezcladores para reunir las señales y llevar la música más allá del instrumento.",
+        "guia_titulo": "Cada señal tiene su lugar.",
+        "guia": (
+            ("Dar salida al sonido", "Atlas 10 es un parlante activo de diez pulgadas con mezclador integrado para espacios pequeños."),
+            ("Organizar las entradas", "La ficha de MixLab 8 permite revisar sus canales y conexiones antes de sumarlo a tu configuración."),
+        ),
+    },
+}
+
 
 def _normalizar(texto: object) -> str:
     valor = unicodedata.normalize("NFD", str(texto).casefold())
@@ -119,6 +192,9 @@ def categorias_con_resumen() -> list[dict[str, object]]:
                 "cantidad": len(asociados),
                 "disponibles": sum(producto.puede_comprarse for producto in asociados),
                 "precio_desde": min((producto.precio for producto in asociados), default=0),
+                "numero": len(resultado) + 1,
+                "destacado": next((producto for producto in asociados if producto.destacado), asociados[0] if asociados else None),
+                **CATEGORIAS_EDITORIALES.get(categoria.slug, {}),
             }
         )
     return resultado

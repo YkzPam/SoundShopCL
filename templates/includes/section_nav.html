@@ -1,0 +1,10 @@
+<nav class="home-section-nav" aria-label="Secciones rápidas">
+  <div class="page-shell home-section-nav__inner">
+    <span>Secciones</span>
+    <a href="{% url 'core:inicio' %}" {% if request.resolver_match.url_name == 'inicio' %}class="is-active" aria-current="page"{% endif %}>Inicio</a>
+    <a href="{% url 'core:catalogo' %}" {% if request.resolver_match.url_name == 'catalogo' or request.resolver_match.url_name == 'buscar' or request.resolver_match.url_name == 'detalle_producto' %}class="is-active" aria-current="page"{% endif %}>Productos</a>
+    <a href="{% url 'core:categorias' %}" {% if request.resolver_match.url_name == 'categorias' or request.resolver_match.url_name == 'detalle_categoria' %}class="is-active" aria-current="page"{% endif %}>Categorías</a>
+    <a href="{% url 'core:nosotros' %}" {% if request.resolver_match.url_name == 'nosotros' %}class="is-active" aria-current="page"{% endif %}>Nosotros</a>
+    <a href="{% if usuario_tienda %}{% url 'core:registro_confirmado' %}{% else %}{% url 'core:registro' %}{% endif %}" {% if request.resolver_match.url_name == 'registro' or request.resolver_match.url_name == 'registro_confirmado' %}class="is-active" aria-current="page"{% endif %}>Cuenta</a>
+  </div>
+</nav>

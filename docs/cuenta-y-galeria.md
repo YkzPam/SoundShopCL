@@ -1,0 +1,9 @@
+# Cuenta y fotografías de categorías
+
+El inicio conserva su fotografía principal y añade una imagen a cada una de las cinco categorías. El bloque de registro se eliminó de la portada; Cuenta conduce al acceso independiente. Las fotografías existentes conservan la identidad del catálogo y los efectos de puntero y scroll. El enlace antiguo `/#registro` conduce a `/registro/`.
+
+La ruta `/registro/` presenta Iniciar sesión por defecto. La opción Crear cuenta abre `?modo=crear`. Ambos formularios funcionan sin JavaScript, muestran errores y conservan el retorno a un producto mediante un destino local validado. Un registro correcto abre la sesión; después de cerrarla se puede ingresar con el mismo correo y contraseña. Un correo duplicado no sobrescribe una cuenta. Cinco errores de acceso bloquean temporalmente nuevos intentos para ese correo durante cinco minutos.
+
+Esta versión reemplaza la validación de registro sin credenciales de la versión anterior. Para mantener el requisito de E1 sin base de datos, `core/cuentas.py` utiliza caché de memoria del servidor. Guarda el nombre, un identificador SHA-256 del correo normalizado y un hash de contraseña generado por Django. No guarda contraseñas legibles ni hashes en cookies. Las cuentas se pierden al reiniciar el proceso o al agotarse el caché; no se comparten entre procesos. Las cuentas de versiones anteriores no poseen credenciales recuperables y requieren un nuevo registro.
+
+El ejercicio sigue siendo local: no incluye pagos reales, verificación de correo, recuperación de contraseña, gestión persistente de usuarios ni controles de producción. La cookie firmada existente tampoco permite revocar una copia antigua mediante el cierre de sesión. Un despliegue real requiere reemplazar este acceso temporal por autenticación y sesiones persistentes, HTTPS, un secreto privado y controles adicionales. Esta limitación no se presenta como seguridad comercial resuelta.

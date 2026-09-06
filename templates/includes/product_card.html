@@ -1,6 +1,6 @@
 {% load static soundshop_extras %}
 <article class="product-card" data-product-card>
-  <div class="product-card__media">
+  <div class="product-card__media" data-motion-surface>
     <a href="{% url 'core:detalle_producto' producto.id %}" class="product-card__image">
       <img src="{% static producto.imagen %}" alt="{{ producto.nombre }} de {{ producto.marca }}" loading="lazy">
       <span class="product-card__brand">{{ producto.marca }}</span>
@@ -31,7 +31,7 @@
   </div>
 
   <template data-quick-view-template>
-    <div class="quick-view__layout">
+    <div class="quick-view__grid">
       <div class="quick-view__visual">
         <img src="{% static producto.imagen %}" alt="{{ producto.nombre }} de {{ producto.marca }}">
         <span>{{ producto.marca }}</span>
@@ -56,7 +56,6 @@
         </dl>
 
         {% if producto.puede_comprarse %}
-          {% if usuario_tienda %}
             <form method="post" action="{% url 'core:agregar_al_carrito' producto.id %}" class="quick-view__form" data-ajax-cart>
               {% csrf_token %}
               <label>
@@ -65,13 +64,6 @@
               </label>
               <button type="submit" class="button button--primary">Agregar al carrito</button>
             </form>
-          {% else %}
-            <div class="purchase-lock purchase-lock--compact">
-              <span class="purchase-lock__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8.5 10V7.5a3.5 3.5 0 0 1 7 0V10M12 14v3"/></svg></span>
-              <div><strong>Inicia sesión para comprar</strong><p>Activa una cuenta para proteger tu carrito durante esta visita.</p></div>
-              <a href="{% url 'core:registro' %}?next={% url 'core:detalle_producto' producto.id %}" class="button button--primary">Ingresar o crear cuenta</a>
-            </div>
-          {% endif %}
         {% else %}
           <button type="button" class="button button--disabled button--full" disabled>Producto sin stock</button>
         {% endif %}

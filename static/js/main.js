@@ -1,16 +1,73 @@
 document.addEventListener("DOMContentLoaded", () => {
   const root = document.documentElement;
-  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const systemMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const reducedMotion = { get matches() { return systemMotion.matches || root.dataset.motion === "reduce"; } };
 
   const menuButton = document.querySelector("[data-menu-button]");
   const mobileMenu = document.querySelector("[data-mobile-menu]");
+  const siteHeader = document.querySelector('.site-header');
+  if (siteHeader) {
+    const syncHeaderHeight = () => root.style.setProperty('--site-header-height', `${siteHeader.offsetHeight}px`);
+    syncHeaderHeight();
+    new ResizeObserver(syncHeaderHeight).observe(siteHeader);
+  }
 
   if (menuButton && mobileMenu) {
+    const pageRegions = [...document.querySelectorAll('.site-main, .site-footer')];
+    const closeMenu = () => {
+      menuButton.setAttribute("aria-expanded", "false");
+      menuButton.setAttribute("aria-label", "Abrir menú");
+      mobileMenu.classList.add("hidden");
+      document.body.classList.remove("menu-is-open");
+      pageRegions.forEach(region => { region.inert = false; });
+    };
     menuButton.addEventListener("click", () => {
       const isOpen = menuButton.getAttribute("aria-expanded") === "true";
       menuButton.setAttribute("aria-expanded", String(!isOpen));
       menuButton.setAttribute("aria-label", isOpen ? "Abrir menú" : "Cerrar menú");
       mobileMenu.classList.toggle("hidden", isOpen);
+      document.body.classList.toggle("menu-is-open", !isOpen);
+      pageRegions.forEach(region => { region.inert = !isOpen; });
+      if (!isOpen) document.querySelector('.search-popover')?.removeAttribute('open');
+      if (!isOpen) mobileMenu.querySelector('input, a, button')?.focus();
+    });
+    siteHeader.addEventListener("click", (event) => {
+      if (event.target.closest("a")) closeMenu();
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Tab" && menuButton.getAttribute("aria-expanded") === "true") {
+        const controls = [...siteHeader.querySelectorAll('a, input, button, summary')].filter(control => control.getClientRects().length && !control.disabled);
+        const first = controls[0], last = controls[controls.length - 1];
+        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+        if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+      }
+      if (event.key === "Escape" && menuButton.getAttribute("aria-expanded") === "true") {
+        closeMenu();
+        menuButton.focus();
+      }
+    });
+    window.matchMedia('(min-width: 1101px)').addEventListener('change', event => {
+      if (event.matches) {
+        const restoreFocus = mobileMenu.contains(document.activeElement) || document.activeElement === menuButton;
+        closeMenu();
+        if (restoreFocus) siteHeader.querySelector('.desktop-nav .is-active, .desktop-nav a')?.focus();
+      }
+    });
+  }
+
+  const searchPopover = document.querySelector('.search-popover');
+  if (searchPopover) {
+    searchPopover.addEventListener('toggle', () => {
+      if (searchPopover.open) searchPopover.querySelector('input')?.focus();
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && searchPopover.open) {
+        searchPopover.open = false;
+        searchPopover.querySelector('summary').focus();
+      }
+    });
+    document.addEventListener('click', event => {
+      if (!searchPopover.contains(event.target)) searchPopover.open = false;
     });
   }
 
@@ -54,7 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.querySelector('meta[name="theme-color"]')?.setAttribute(
       "content",
-      darkModeIsActive ? "#050b14" : "#0a1323",
+      darkModeIsActive ? "#121212" : "#F4F0E8",
     );
   };
 
@@ -358,39 +415,14 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   closeOnBackdrop(imageViewer);
 
-  if (!reducedMotion.matches) {
-    document.querySelectorAll('.product-card a[href*="/productos/"], .feature-frame a[href*="/productos/"]').forEach((link) => {
-      link.addEventListener("click", (event) => {
-        if (
-          event.defaultPrevented
-          || event.button !== 0
-          || event.metaKey
-          || event.ctrlKey
-          || event.shiftKey
-          || event.altKey
-          || link.target === "_blank"
-        ) {
-          return;
-        }
-
-        const destination = new URL(link.href, window.location.href);
-        if (destination.origin !== window.location.origin) return;
-
-        event.preventDefault();
-        const productSurface = link.closest(".product-card, .feature-frame");
-        productSurface?.classList.add("is-selected");
-        productSurface?.setAttribute("aria-busy", "true");
-        window.setTimeout(() => window.location.assign(destination.href), 230);
-      });
-    });
-  }
+  // La entrada de cada página se resuelve en CSS. Los enlaces siguen
+  // siendo nativos: no se retrasa la navegación ni se interceptan modificadores.
 
   const progressBar = document.querySelector(".scroll-progress");
   const scrollCue = document.querySelector("[data-scroll-cue]");
-  const nativeScrollTimeline = window.CSS?.supports?.("animation-timeline: scroll()") ?? false;
 
   const updateScrollProgress = () => {
-    if (!progressBar || nativeScrollTimeline) return;
+    if (!progressBar) return;
     const scrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
     const progress = scrollableHeight > 0 ? window.scrollY / scrollableHeight : 0;
     progressBar.style.setProperty("--scroll-progress", String(Math.min(1, Math.max(0, progress))));
@@ -398,16 +430,29 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!reducedMotion.matches) {
     const revealSelector = [
+      "[data-reveal]",
       ".section-heading",
       ".category-tile",
       ".editorial-card",
+      ".about-section__visual",
+      ".about-section__copy",
       ".product-card",
       ".service-note__inner",
       ".account-section__copy",
       ".account-section__form",
+      ".account-entry-card",
       ".account-profile-card",
       ".page-intro__grid",
-      ".catalog-layout",
+      ".filter-desktop",
+      ".catalog-toolbar",
+      ".collection-guide__heading",
+      ".collection-guide__item",
+      ".about-composition",
+      ".about-story",
+      ".about-beliefs__heading",
+      ".about-beliefs__list article",
+      ".about-outro",
+      ".category-help__inner",
       ".category-row",
       ".product-detail__visual",
       ".product-detail__info",
@@ -445,20 +490,38 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  const parallaxImages = reducedMotion.matches
-    ? []
-    : [...document.querySelectorAll("[data-parallax]")];
+  const parallaxImages = [...document.querySelectorAll("[data-parallax]")];
+  const scrollScenes = [...document.querySelectorAll("[data-scroll-scene]")];
   let visualFrameRequested = false;
+  const heroImage = document.querySelector(".home-hero__image img");
+  const desktopMotion = window.matchMedia("(hover: hover) and (min-width: 761px)");
 
   const updateScrollVisuals = () => {
     const viewportHeight = window.innerHeight;
+    if (heroImage) {
+      const offset = !reducedMotion.matches && desktopMotion.matches ? Math.min(window.scrollY * 0.045, 14) : 0;
+      heroImage.style.setProperty("--hero-y", `${offset}px`);
+    }
     parallaxImages.forEach((image) => {
+      if (reducedMotion.matches) {
+        image.style.setProperty("--parallax-y", "0px");
+        return;
+      }
       const rect = image.parentElement?.getBoundingClientRect();
       if (!rect || rect.bottom < -100 || rect.top > viewportHeight + 100) return;
       const distanceFromCenter = viewportHeight / 2 - (rect.top + rect.height / 2);
       const normalizedDistance = Math.min(1, Math.max(-1, distanceFromCenter / viewportHeight));
       const maximumOffset = Number.parseFloat(image.dataset.parallax || "24");
       image.style.setProperty("--parallax-y", `${(normalizedDistance * maximumOffset).toFixed(2)}px`);
+    });
+    scrollScenes.forEach((scene) => {
+      const rect = scene.getBoundingClientRect();
+      if (!reducedMotion.matches && (rect.bottom < 0 || rect.top > viewportHeight)) return;
+      const progress = Math.min(1, Math.max(0, (viewportHeight - rect.top) / (viewportHeight + rect.height)));
+      const shift = reducedMotion.matches ? 0 : (progress - .5) * 36;
+      scene.style.setProperty("--scene-y", `${shift.toFixed(2)}px`);
+      scene.style.setProperty("--scene-turn", `${(shift * .35).toFixed(2)}deg`);
+      scene.style.setProperty("--scene-progress", reducedMotion.matches ? "0" : progress.toFixed(3));
     });
     scrollCue?.classList.toggle("is-hidden", window.scrollY > 80);
     updateScrollProgress();
@@ -476,12 +539,13 @@ document.addEventListener("DOMContentLoaded", () => {
   requestVisualUpdate();
 
   const precisePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
-  if (!reducedMotion.matches && precisePointer.matches) {
+  if (precisePointer.matches) {
     document.querySelectorAll("[data-product-tilt]").forEach((visual) => {
       const image = visual.querySelector("img");
       if (!image) return;
 
       visual.addEventListener("pointermove", (event) => {
+        if (reducedMotion.matches) return;
         const rect = visual.getBoundingClientRect();
         const horizontal = (event.clientX - rect.left) / rect.width - 0.5;
         const vertical = (event.clientY - rect.top) / rect.height - 0.5;
@@ -495,4 +559,64 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
   }
+
+  document.querySelectorAll("[data-motion-surface]").forEach((surface) => {
+    let frame;
+    let latestPointer;
+    const reset = () => {
+      cancelAnimationFrame(frame);
+      surface.style.removeProperty("--pointer-shift-x");
+      surface.style.removeProperty("--pointer-rotate");
+      surface.style.removeProperty("--pointer-x");
+      surface.style.removeProperty("--pointer-y");
+      frame = null;
+    };
+    surface.addEventListener("pointermove", (event) => {
+      if (reducedMotion.matches || !precisePointer.matches || event.pointerType === "touch") return;
+      latestPointer = { x: event.clientX, y: event.clientY };
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        const rect = surface.getBoundingClientRect();
+        const x = Math.min(1, Math.max(0, (latestPointer.x - rect.left) / rect.width));
+        const y = Math.min(1, Math.max(0, (latestPointer.y - rect.top) / rect.height));
+        surface.style.setProperty("--pointer-x", `${(x * 100).toFixed(1)}%`);
+        surface.style.setProperty("--pointer-y", `${(y * 100).toFixed(1)}%`);
+        surface.style.setProperty("--pointer-shift-x", `${((x - .5) * 8).toFixed(2)}px`);
+        surface.style.setProperty("--pointer-rotate", `${((x - .5) * 1.6).toFixed(2)}deg`);
+        frame = null;
+      });
+    }, { passive: true });
+    surface.addEventListener("pointerleave", reset);
+    surface.addEventListener("pointercancel", reset);
+  });
+
+  const motionButton = document.querySelector("[data-motion-toggle]");
+  const motionLabel = document.querySelector("[data-motion-label]");
+  const applyMotionPreference = () => {
+    let saved = "";
+    try { saved = localStorage.getItem("soundshop-motion"); } catch { /* Preferencia solo durante la visita. */ }
+    root.dataset.motion = systemMotion.matches || saved === "reduce" ? "reduce" : "full";
+    if (motionButton) {
+      motionButton.hidden = false;
+      motionButton.disabled = systemMotion.matches;
+      motionButton.setAttribute("aria-pressed", String(reducedMotion.matches));
+    }
+    if (motionLabel) motionLabel.textContent = systemMotion.matches
+      ? "Movimiento reducido por el sistema"
+      : reducedMotion.matches ? "Activar movimiento" : "Reducir movimiento";
+    requestVisualUpdate();
+  };
+  motionButton?.addEventListener("click", () => {
+    const next = reducedMotion.matches ? "full" : "reduce";
+    try { localStorage.setItem("soundshop-motion", next); } catch {
+      root.dataset.motion = next;
+      motionButton.setAttribute("aria-pressed", String(next === "reduce"));
+      if (motionLabel) motionLabel.textContent = next === "reduce" ? "Activar movimiento" : "Reducir movimiento";
+      requestVisualUpdate();
+      return;
+    }
+    applyMotionPreference();
+  });
+  systemMotion.addEventListener("change", applyMotionPreference);
+  applyMotionPreference();
 });

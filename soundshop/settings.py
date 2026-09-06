@@ -51,6 +51,16 @@ WSGI_APPLICATION = "soundshop.wsgi.application"
 # La Evaluacion 1 solicita datos simulados, sin conexion a base de datos.
 DATABASES = {}
 
+# Almacenamiento temporal del ejercicio, aislado del caché general.
+CACHES = {
+    'default': {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'},
+    'cuentas': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'soundshop-cuentas-locales',
+        'OPTIONS': {'MAX_ENTRIES': 1000},
+    },
+}
+
 LANGUAGE_CODE = "es-cl"
 TIME_ZONE = "America/Santiago"
 USE_I18N = True

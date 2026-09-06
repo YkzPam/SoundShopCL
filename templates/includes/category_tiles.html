@@ -1,0 +1,21 @@
+{% load static soundshop_extras %}
+<div class="category-grid{% if show_images %} category-grid--collections{% endif %}{% if home_gallery %} category-grid--home-gallery{% endif %}">
+  {% for item in resumen_categorias %}
+    <a href="{% url 'core:detalle_categoria' item.categoria.slug %}" class="category-tile category-tile--{{ item.categoria.slug }}" data-grid-number="0{{ forloop.counter }}" data-motion-surface>
+      <div class="category-tile__top">
+        <span class="category-tile__number">0{{ forloop.counter }}</span>
+        {% include 'includes/sound_marks.html' %}
+        <span class="category-tile__arrow" aria-hidden="true">↗</span>
+      </div>
+      {% if show_images %}
+        <div class="category-tile__thumbnail"><img src="{% static item.imagen %}" alt="{{ item.imagen_alt }}" loading="lazy" width="1024" height="1024"></div>
+      {% endif %}
+      <div class="category-tile__content">
+        <span class="category-tile__intent">{{ item.ruta }}</span>
+        <h3>{{ item.categoria.nombre }}</h3>
+        <p>{{ item.categoria.descripcion }}</p>
+        <div class="category-tile__meta"><span>{{ item.cantidad }} productos{% if show_images %} · {{ item.disponibles }} con stock{% endif %}</span><strong>Desde {{ item.precio_desde|precio_clp }}</strong></div>
+      </div>
+    </a>
+  {% endfor %}
+</div>

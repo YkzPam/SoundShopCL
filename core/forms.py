@@ -28,7 +28,7 @@ class FiltroCatalogoForm(forms.Form):
         min_value=1,
         max_value=2_000_000,
         widget=forms.NumberInput(
-            attrs={"class": CLASE_CAMPO, "placeholder": "Ej. 100000", "step": "1000"}
+            attrs={"class": CLASE_CAMPO, "placeholder": "Ej. 100000", "step": "1"}
         ),
     )
     solo_disponibles = forms.BooleanField(
@@ -81,6 +81,45 @@ class CantidadProductoForm(forms.Form):
 
 class CantidadCarritoForm(forms.Form):
     cantidad = forms.IntegerField(min_value=0, max_value=99)
+
+
+class FichaGestionForm(forms.Form):
+    """Entradas administrativas de una ficha, sin persistencia en E1."""
+
+    nombre = forms.CharField(label="Nombre del producto", min_length=3, max_length=100)
+    marca = forms.CharField(label="Marca", min_length=2, max_length=60)
+    categoria = forms.ChoiceField(label="Categoría")
+    descripcion = forms.CharField(label="Descripción", min_length=20, max_length=600,
+        widget=forms.Textarea(attrs={"rows": 4}))
+    precio = forms.IntegerField(label="Precio de venta (CLP)", min_value=1, max_value=2_000_000,
+        help_text="Pesos enteros, entre $1 y $2.000.000.", widget=forms.NumberInput(attrs={"step": 1}))
+    stock = forms.IntegerField(label="Stock disponible", min_value=0, max_value=9999,
+        help_text="Entre 0 y 9.999 unidades. Cero indica producto agotado.")
+    estado = forms.ChoiceField(label="Estado de publicación",
+        choices=(("activo", "Activo"), ("inactivo", "Inactivo")))
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['categoria'].choices = [(c.slug, c.nombre) for c in obtener_categorias()]
+        for nombre, campo in self.fields.items():
+            campo.widget.attrs['class'] = 'form-control'
+            campo.widget.attrs['aria-describedby'] = f'id_{nombre}_help id_{nombre}_errors'
+
+    def clean(self):
+        datos = super().clean()
+        for nombre in ('nombre', 'marca', 'descripcion'):
+            if nombre in datos:
+                datos[nombre] = ' '.join(datos[nombre].split())
+                if len(datos[nombre]) < self.fields[nombre].min_length:
+                    self.add_error(nombre, f"Ingresa al menos {self.fields[nombre].min_length} caracteres de contenido.")
+        return datos
+
+
+class IniciarSesionForm(forms.Form):
+    correo = forms.EmailField(label="Correo electrónico", max_length=120,
+        widget=forms.EmailInput(attrs={"class": "account-form__input", "autocomplete": "username", "placeholder": "nombre@correo.cl"}))
+    contrasena = forms.CharField(label="Contraseña", max_length=128,
+        widget=forms.PasswordInput(attrs={"class": "account-form__input", "autocomplete": "current-password", "placeholder": "Ingresa tu contraseña"}))
 
 
 class RegistroForm(forms.Form):

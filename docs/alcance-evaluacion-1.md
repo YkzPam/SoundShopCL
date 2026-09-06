@@ -1,27 +1,30 @@
-# 1. Alcance técnico de la Evaluación 1
+# 1. Alcance de SoundShop CL para la Evaluación 1
 
-## 1.1 Caso seleccionado
+## 1.1 Caso y necesidad abordada
 
-SoundShop CL desarrolla la alternativa **Sistema de Sucursal (Punto de Venta / Vitrina)**. El resultado es una tienda web con diez productos distribuidos en cinco categorías: audífonos, tornamesas y vinilos, estudio y creación, instrumentos y sonido en vivo. Incluye portada comercial, búsqueda, fichas detalladas, validación de stock, sesión obligatoria para comprar, carrito y confirmación de pedido. No corresponde a una tarjeta de pago, billetera digital ni servicio financiero.
+SoundShop CL desarrolla la alternativa de tienda del caso semestral Music Pro: una vitrina digital de productos musicales. La primera entrega reúne información de productos, categorías, precios y disponibilidad en una navegación común. El catálogo permite explorar y comparar equipos; una ficha administrativa permite revisar entradas y resultados antes de una futura publicación. No corresponde al proyecto de tarjetas digitales BeatPay.
 
-## 1.2 Límite funcional de esta unidad
+El alcance se limita a la Evaluación 1. El caso completo describe procesos comerciales que se desarrollan en etapas posteriores; esta entrega utiliza Django, plantillas HTML, datos JSON y formularios sin conexión a una base de datos. La aprobación del alcance por el docente debe confirmarse personalmente: este documento no acredita una autorización que no consta en el repositorio.
 
-La pauta de la Evaluación 1 solicita un sitio básico en Django sin conexión a base de datos. El catálogo se almacena en `core/data/catalogo.json`; la vista lo transforma en objetos Python y construye el contexto que recibe cada plantilla. El carrito y el nombre visible de la cuenta utilizan una cookie firmada y permiten comprobar ambos flujos sin crear tablas.
+## 1.2 Funciones incluidas
 
-| Incluido en esta entrega | Reservado para unidades posteriores |
+| Área | Alcance de esta entrega |
 |---|---|
-| Catálogo JSON dinámico | Modelos ORM y migraciones de negocio |
-| Búsqueda, filtros y categorías | Administración persistente de productos |
-| Formularios de cantidad y creación de cuenta de sesión | Usuarios ORM, reingreso con credenciales y recuperación de contraseña |
-| Bloqueo de agregado y confirmación sin sesión activa | Autenticación persistente asociada a una cuenta real |
-| Carrito temporal firmado | Historial real de compras por usuario |
-| Pedido simulado | Pasarela o medio de pago real |
-| Mensajes y control de rutas | Gestión persistente del estado del pedido |
+| Vitrina | Inicio, diez productos, cinco categorías, búsqueda, filtros y detalle |
+| Presentación | Nosotros y ubicación propuesta en Las Condes; no se anuncia un local confirmado |
+| Cuenta | Crear cuenta e iniciar sesión con validación; almacenamiento temporal en memoria |
+| Carrito | Agregar, actualizar y eliminar como invitado, con límites de stock |
+| Pedido | Solicitar cuenta al confirmar; conservar selección al ingresar y generar un comprobante temporal |
+| Gestión | Cargar una ficha del JSON, validar siete campos, mostrar errores o resultado calculado |
+| Interfaz | HTML semántico, DTL, Tailwind compilado, CSS propio, JavaScript y variantes responsive |
+| Evidencia | Diagrama en Excalidraw, selección de pantallas, trazabilidad, pruebas y documentación |
 
-## 1.3 Criterio de seguridad
+## 1.3 Límites explícitos
 
-El formulario de cuenta solicita nombre, correo y contraseña para comprobar la interfaz y sus reglas. Django valida esos valores y descarta el correo y la contraseña al terminar la solicitud; la sesión conserva solo el primer nombre. Las operaciones que cambian el carrito, confirman el pedido o cierran la sesión usan `POST` y token CSRF. El servidor rechaza el agregado y la confirmación cuando no existe una sesión activa. La ruta de retorno del acceso se valida para aceptar únicamente destinos locales. Ningún pedido se registra fuera de la sesión temporal del navegador.
+La gestión no guarda cambios en el JSON ni publica productos. Las cuentas desaparecen al reiniciar el proceso del servidor; la cookie de sesión es firmada, no cifrada, y no contiene la contraseña. El pedido no realiza cobros, reservas comerciales ni descuentos persistentes de inventario. La ficha de gestión es una pantalla de validación local, no un panel de administración protegido por roles.
 
-## 1.4 Resultado observable
+La primera entrega no implementa ORM, modelo entidad-relación, pasarela de pago, facturación, despacho, integración de proveedores ni recuperación de contraseñas. Estas funciones no deben presentarse como terminadas. La configuración local tampoco debe publicarse como un servicio comercial sin una revisión de seguridad.
 
-Una persona puede entrar a la portada, recorrer las cinco categorías, filtrar el catálogo y abrir la vista rápida o una ficha sin registrarse. Al intentar comprar, la interfaz solicita una cuenta de sesión. Después del registro vuelve al producto, muestra el nombre en el menú, permite agregar una cantidad válida, revisar el mini carrito, modificar la selección y confirmar el pedido. Las credenciales inválidas, la ausencia de sesión, las cantidades fuera de rango, los productos agotados y los identificadores inexistentes generan mensajes o redirecciones controladas.
+## 1.4 Entregables y revisión
+
+El [diagrama y su correspondencia con el código](arquitectura-y-flujo.md), los [mockups y pantallas seleccionadas](mockups-prototipo.md) y la implementación forman los entregables principales. La [investigación de referentes](investigacion-referentes.md) documenta una revisión realizada el 6 de septiembre de 2026, sin atribuirle una fecha anterior al desarrollo. La [auditoría](auditoria-rubrica.md) distingue evidencia técnica, publicación pendiente y actividades que requieren la participación del estudiante.

@@ -2,139 +2,38 @@
 {% load static soundshop_extras %}
 
 {% block title %}SoundShop CL | Audio para escuchar y crear{% endblock %}
+{% block body_class %}page-home{% endblock %}
 
 {% block content %}
-<section class="home-hero">
-  <div class="page-shell home-hero__grid">
-    <div class="home-hero__copy">
-      <p class="section-index"><span>SS / 01</span> Selección de audio</p>
-      <h1>Tu próximo sonido, <em>bien elegido.</em></h1>
-      <p class="home-hero__intro">Instrumentos, audífonos y equipos para escuchar, grabar o llevar tu música al escenario.</p>
-      <div class="button-row">
-        <a href="{% url 'core:catalogo' %}" class="button button--primary">Ver catálogo <span aria-hidden="true">↗</span></a>
-        <a href="{% url 'core:categorias' %}" class="button button--quiet">Comprar por categoría</a>
-      </div>
-      <dl class="store-facts">
-        <div><dt>Selección</dt><dd>{{ cantidad_productos }} equipos</dd></div>
-        <div><dt>Cobertura</dt><dd>Todo Chile</dd></div>
-        <div><dt>Stock</dt><dd>Visible en línea</dd></div>
-      </dl>
-    </div>
-
-    <aside class="feature-frame" aria-label="Producto seleccionado">
-      <div class="feature-frame__top"><span>Selección 05</span><span>Estudio / Voz</span></div>
-      <a href="{% url 'core:detalle_producto' 5 %}" class="feature-frame__image">
-        <img src="{% static 'img/productos/microfono-vela-c1.webp' %}" alt="Micrófono de condensador Vela C1" data-parallax="32">
-      </a>
-      <div class="feature-frame__caption">
-        <div><p>Voxline</p><h2>Vela C1</h2></div>
-        <p>Micrófono de condensador · XLR</p>
-        <a href="{% url 'core:detalle_producto' 5 %}" aria-label="Ver ficha del micrófono Vela C1">Ver ficha <span aria-hidden="true">→</span></a>
-      </div>
-    </aside>
+<section class="home-hero" id="inicio">
+  <div class="page-shell home-hero__opening">
+    <p class="section-index"><span>SoundShop CL / 01</span> Música. Audio. Cultura.</p>
+    <div class="home-hero__headline"><h1>Escucha<br><em>distinto.</em><span class="hero-asterisk" aria-hidden="true">✳</span></h1><div><p>Encuentra tu sonido. Instrumentos y equipos para quienes viven la música a su manera.</p><a class="button button--primary" href="{% url 'core:catalogo' %}">Explorar la tienda <span aria-hidden="true">↗</span></a></div></div>
   </div>
-  <a class="scroll-cue" data-scroll-cue href="#categorias-inicio"><span>Explorar la tienda</span><i aria-hidden="true"></i></a>
+  <figure class="home-hero__image">
+    <picture>
+      <source media="(max-width: 760px)" srcset="{% static 'img/productos/guitarra-astra-seven.webp' %}">
+      <img src="{% static 'img/portada-astra-panorama.webp' %}" alt="Guitarra eléctrica Astra Seven en un estudio" width="1942" height="809" fetchpriority="high">
+    </picture>
+    <figcaption>
+      <span>Selección de instrumentos</span>
+      <a href="{% url 'core:detalle_producto' producto_portada.id %}">{{ producto_portada.nombre }} <i aria-hidden="true">↗</i></a>
+      <small>{{ producto_portada.marca }} · {{ producto_portada.precio|precio_clp }} · {% if producto_portada.puede_comprarse %}Disponible{% else %}Agotado{% endif %}</small>
+    </figcaption>
+  </figure>
+
+  <div class="page-shell home-hero__meta"><span>Una selección para escuchar, crear y compartir.</span><span>{{ cantidad_productos }} equipos / {{ resumen_categorias|length }} colecciones</span><a href="#categorias-inicio">Descubrir <span aria-hidden="true">↓</span></a></div>
 </section>
 
-<section class="category-section" aria-labelledby="categorias-inicio">
+<section class="category-section" aria-labelledby="categorias-inicio" data-scroll-scene>
   <div class="page-shell">
     <div class="section-heading">
-      <p class="section-index"><span>SS / 02</span> Cinco rutas para elegir</p>
-      <div><h2 id="categorias-inicio">Comprar por categoría</h2><a href="{% url 'core:categorias' %}">Ver todas <span aria-hidden="true">→</span></a></div>
+      <p class="section-index"><span>01</span> Encuentra tu ruta</p>
+      <div><h2 id="categorias-inicio">Diferentes formas.<br>La misma pasión.</h2><a href="{% url 'core:categorias' %}">Todas las categorías <span aria-hidden="true">↗</span></a></div>
     </div>
 
-    <div class="category-grid">
-      {% for item in resumen_categorias %}
-        <a href="{% url 'core:detalle_categoria' item.categoria.slug %}" class="category-tile category-tile--{{ item.categoria.icono }}" data-grid-number="0{{ forloop.counter }}">
-          <div class="category-tile__top">
-            <span class="category-tile__number">0{{ forloop.counter }}</span>
-            <span class="category-tile__icon" aria-hidden="true">
-              {% include 'includes/category_icon.html' with icono=item.categoria.icono %}
-            </span>
-          </div>
-          <h3>{{ item.categoria.nombre }}</h3>
-          <p>{{ item.categoria.descripcion }}</p>
-          <div class="category-tile__meta"><span>{{ item.cantidad }} productos</span><strong>Desde {{ item.precio_desde|precio_clp }}</strong></div>
-        </a>
-      {% endfor %}
-    </div>
+    {% include 'includes/category_tiles.html' with show_images=True home_gallery=True %}
   </div>
 </section>
 
-<section class="editorial-section" aria-labelledby="editorial-inicio">
-  <div class="page-shell">
-    <div class="section-heading">
-      <p class="section-index"><span>SS / 03</span> Guías de escucha</p>
-      <div><h2 id="editorial-inicio">Elige según cómo vives la música.</h2><p>Rutas breves para encontrar un equipo que encaje con tu espacio, tus hábitos y la forma en que quieres escuchar.</p></div>
-    </div>
-    <div class="editorial-grid">
-      <a href="{% url 'core:detalle_categoria' 'audifonos' %}" class="editorial-card editorial-card--wide">
-        <img src="{% static 'img/productos/audifonos-pulse-x.webp' %}" alt="Audífonos Pulse X ANC" loading="lazy">
-        <div><span>01 / Escucha privada</span><h3>Recupera el detalle sin llevarte el ruido.</h3><p>Audífonos para trabajar, viajar o volver a un disco sin distracciones.</p><strong>Explorar audífonos <i aria-hidden="true">→</i></strong></div>
-      </a>
-      <a href="{% url 'core:detalle_categoria' 'estudio-creacion' %}" class="editorial-card">
-        <img src="{% static 'img/productos/microfono-vela-c1.webp' %}" alt="Micrófono Vela C1" loading="lazy">
-        <div><span>02 / Creación en casa</span><h3>La primera toma empieza con una señal clara.</h3><p>Micrófonos e interfaces para convertir una idea en una grabación.</p><strong>Ver estudio y creación <i aria-hidden="true">→</i></strong></div>
-      </a>
-      <a href="{% url 'core:detalle_categoria' 'tornamesas-vinilos' %}" class="editorial-card">
-        <img src="{% static 'img/productos/tornamesa-orbit-one.webp' %}" alt="Tornamesa Orbit One" loading="lazy">
-        <div><span>03 / Escucha lenta</span><h3>Un lado completo, sin saltar canciones.</h3><p>Tornamesas y cuidado del vinilo para volver al ritual del álbum.</p><strong>Explorar tornamesas <i aria-hidden="true">→</i></strong></div>
-      </a>
-    </div>
-  </div>
-</section>
-
-<section class="featured-section" aria-labelledby="destacados-inicio">
-  <div class="page-shell">
-    <div class="section-heading section-heading--dark">
-      <p class="section-index"><span>SS / 04</span> Recomendados</p>
-      <div><h2 id="destacados-inicio">Equipos destacados</h2><p>Una selección corta para escuchar con detalle, recuperar el vinilo o empezar a grabar.</p></div>
-    </div>
-    <div class="product-grid">
-      {% for producto in productos_destacados %}{% include 'includes/product_card.html' %}{% endfor %}
-    </div>
-  </div>
-</section>
-
-<section class="account-section" id="registro" aria-labelledby="registro-inicio">
-  <div class="page-shell account-section__grid">
-    <div class="account-section__copy">
-      <p class="section-index"><span>SS / 05</span> Tu espacio en SoundShop</p>
-      {% if usuario_tienda %}
-        <h2 id="registro-inicio">Hola, {{ usuario_tienda.nombre }}.</h2>
-        <p>Tu sesión está activa en este navegador. Ya puedes agregar equipos al carrito y confirmar el pedido.</p>
-        <div class="button-row">
-          <a href="{% url 'core:catalogo' %}" class="button button--primary">Explorar productos <span aria-hidden="true">→</span></a>
-          <form method="post" action="{% url 'core:cerrar_sesion' %}">{% csrf_token %}<button type="submit" class="button button--quiet">Cerrar sesión</button></form>
-        </div>
-      {% else %}
-        <h2 id="registro-inicio">Inicia sesión para comprar.</h2>
-        <p>Crea una cuenta de sesión para agregar productos y confirmar el pedido desde este navegador.</p>
-        <ul class="account-benefits">
-          <li><span>01</span><div><strong>Compra protegida</strong><p>Solo una sesión activa puede agregar o confirmar productos.</p></div></li>
-          <li><span>02</span><div><strong>Proceso directo</strong><p>Crea la cuenta sin salir de la tienda.</p></div></li>
-          <li><span>03</span><div><strong>Datos protegidos</strong><p>La contraseña no queda almacenada.</p></div></li>
-        </ul>
-      {% endif %}
-    </div>
-    {% if not usuario_tienda %}
-      <div class="account-section__form">
-        {% include 'includes/registro_form.html' with formulario=registro_formulario %}
-      </div>
-    {% else %}
-      <div class="account-profile-card" aria-label="Cuenta activa">
-        <span class="account-profile-card__icon" aria-hidden="true">{{ usuario_tienda.nombre|first|upper }}</span>
-        <div><p>Cuenta activa</p><strong>{{ usuario_tienda.nombre }}</strong><span>SoundShop CL</span></div>
-      </div>
-    {% endif %}
-  </div>
-</section>
-
-<section class="service-note">
-  <div class="page-shell service-note__inner">
-    <p class="section-index"><span>SS / 06</span> Compra informada</p>
-    <div><h2>Precio, stock y especificaciones a la vista.</h2><p>Cada ficha reúne la información necesaria para comparar. Inicia sesión, agrega equipos al carrito y revisa el total antes de confirmar.</p></div>
-    <a href="{% url 'core:catalogo' %}?solo_disponibles=on" class="button button--light">Ver productos con stock <span aria-hidden="true">→</span></a>
-  </div>
-</section>
 {% endblock %}

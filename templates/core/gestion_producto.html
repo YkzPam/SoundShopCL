@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static soundshop_extras %}
+{% block title %}Gestión de productos | SoundShop CL{% endblock %}
+{% block content %}
+<div class="page-shell management">
+  <header class="management-heading">
+    <p class="section-index"><span>Operación / 01</span> Catálogo</p>
+    <h1>Gestión de <em>productos.</em></h1>
+    <p>Revisa la información comercial y valida cada ficha antes de publicarla.</p>
+    <p class="management-notice">Vista previa: los cambios se validan en esta pantalla y no se publican en la tienda.</p>
+  </header>
+  <div class="management-layout">
+    <aside class="management-products" aria-label="Seleccionar producto">
+      <h2>Productos del catálogo</h2>
+      <p>Selecciona la ficha que se desea revisar.</p>
+      <nav aria-label="Fichas de productos">
+      {% for item in productos_gestion %}
+        <a href="{% url 'core:gestion_producto' item.id %}" {% if item.id == producto_base.id %}aria-current="page"{% endif %}>
+          <img src="{% static item.imagen %}" alt="" width="48" height="48" loading="lazy">
+          <span><strong>{{ item.nombre }}</strong><small>{{ item.precio|precio_clp }} · {{ item.stock }} unidades</small></span>
+        </a>
+      {% endfor %}
+      </nav>
+    </aside>
+    <section class="management-editor" aria-labelledby="ficha-titulo">
+      <div class="management-editor-heading"><div><p>Ficha #{{ producto_base.id|stringformat:'03d' }}</p><h2 id="ficha-titulo">Información comercial</h2></div><a href="{% url 'core:detalle_producto' producto_base.id %}">Ver en tienda ↗</a></div>
+      {% if formulario_gestion.errors %}
+      <div class="management-alert" role="alert"><h3>Revisa los campos indicados</h3><p>No se generó la vista previa. Los datos ingresados se conservan para corregirlos.</p>
+        <ul>{% for field in formulario_gestion %}{% for error in field.errors %}<li><a href="#{{ field.id_for_label }}">{{ field.label }}: {{ error }}</a></li>{% endfor %}{% endfor %}</ul>
+      </div>
+      {% endif %}
+      <form method="post" action="{% url 'core:gestion_producto' producto_base.id %}" novalidate>
+        {% csrf_token %}
+        <div class="management-fields">
+        {% for field in formulario_gestion %}
+          <div class="management-field{% if field.name == 'descripcion' %} management-field--wide{% endif %}">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            <p class="management-help" id="{{ field.id_for_label }}_help">{{ field.help_text }}</p>
+            <div class="management-errors" id="{{ field.id_for_label }}_errors">{% for error in field.errors %}<p>{{ error }}</p>{% endfor %}</div>
+          </div>
+        {% endfor %}
+        </div>
+        <div class="management-actions"><button class="button button--primary" type="submit">Validar ficha <span aria-hidden="true">→</span></button><a href="{% url 'core:gestion_producto' producto_base.id %}">Restablecer datos</a></div>
+      </form>
+      {% if resultado_gestion %}
+      <section class="management-result" aria-labelledby="resultado-titulo">
+        <p role="status">Ficha validada correctamente. Vista previa preparada.</p>
+        <h2 id="resultado-titulo">{{ resultado_gestion.nombre }}</h2>
+        <p>{{ resultado_gestion.marca }} · {{ resultado_gestion.categoria_nombre }}</p>
+        <p>{{ resultado_gestion.descripcion }}</p>
+        <dl><div><dt>Precio de venta</dt><dd>{{ resultado_gestion.precio|precio_clp }}</dd></div><div><dt>Stock</dt><dd>{{ resultado_gestion.stock }} unidades</dd></div><div><dt>Estado resultante</dt><dd>{{ resultado_gestion.disponibilidad }}</dd></div><div><dt>Valor de existencias a precio de venta</dt><dd>{{ resultado_gestion.valor_existencias|precio_clp }}</dd></div></dl>
+      </section>
+      {% endif %}
+    </section>
+  </div>
+</div>
+{% endblock %}

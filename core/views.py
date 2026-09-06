@@ -3,6 +3,7 @@
 import secrets
 
 from django.contrib import messages
+from django.core.cache import caches
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.templatetags.static import static
@@ -18,14 +19,15 @@ from .catalogo import (
     obtener_categoria,
     obtener_producto,
     obtener_productos,
-    productos_destacados,
 )
 from .forms import (
     CantidadCarritoForm,
     CantidadProductoForm,
     FiltroCatalogoForm,
     RegistroForm,
+    IniciarSesionForm,
 )
+from .cuentas import clave_correo, crear_cuenta, verificar_cuenta
 
 
 def _carrito_sesion(request) -> dict[str, int]:
@@ -145,6 +147,7 @@ def _datos_catalogo(request, categoria_forzada: str = "") -> dict[str, object]:
     productos = filtrar_productos(**filtros)
     return {
         "formulario": formulario,
+        "formulario_movil": FiltroCatalogoForm(datos or None, auto_id="mobile_%s"),
         "productos": productos,
         "cantidad_resultados": len(productos),
         "consulta_activa": filtros["consulta"],
@@ -153,10 +156,9 @@ def _datos_catalogo(request, categoria_forzada: str = "") -> dict[str, object]:
 
 def inicio(request):
     contexto = {
-        "productos_destacados": productos_destacados(),
         "resumen_categorias": categorias_con_resumen(),
         "cantidad_productos": len(obtener_productos()),
-        "registro_formulario": RegistroForm(),
+        "producto_portada": obtener_producto(7),
     }
     return render(request, "core/inicio.html", contexto)
 
@@ -165,6 +167,13 @@ def catalogo(request):
     contexto = _datos_catalogo(request)
     contexto["titulo_catalogo"] = "Explora el catálogo"
     return render(request, "core/catalogo.html", contexto)
+
+
+def nosotros(request):
+    return render(request, "core/nosotros.html", {
+        "cantidad_productos": len(obtener_productos()),
+        "cantidad_categorias": len(categorias_con_resumen()),
+    })
 
 
 def buscar(request):
@@ -192,6 +201,10 @@ def detalle_categoria(request, slug: str):
         {
             "categoria_actual": categoria,
             "titulo_catalogo": categoria.nombre,
+            "coleccion_visual": next(
+                (item for item in categorias_con_resumen() if item["categoria"].slug == slug),
+                None,
+            ),
         }
     )
     return render(request, "core/catalogo.html", contexto)
@@ -230,21 +243,6 @@ def agregar_al_carrito(request, producto_id: int):
             return _respuesta_carrito_json(request, mensaje, ok=False, estado=404)
         messages.error(request, mensaje)
         return redirect("core:catalogo")
-    if not _usuario_sesion(request):
-        mensaje = "Inicia sesión para agregar productos al carrito."
-        if _solicitud_ajax(request):
-            siguiente = reverse("core:detalle_producto", args=[producto.id])
-            return _respuesta_carrito_json(
-                request,
-                mensaje,
-                ok=False,
-                estado=401,
-                requiere_sesion=True,
-                registro_url=f'{reverse("core:registro")}?next={siguiente}',
-            )
-        messages.warning(request, mensaje)
-        siguiente = reverse("core:detalle_producto", args=[producto.id])
-        return redirect(f'{reverse("core:registro")}?next={siguiente}')
     if not producto.puede_comprarse:
         mensaje = f"{producto.nombre} se encuentra temporalmente sin stock."
         if _solicitud_ajax(request):
@@ -323,7 +321,7 @@ def eliminar_del_carrito(request, producto_id: int):
 @require_POST
 def confirmar_pedido(request):
     if not _usuario_sesion(request):
-        messages.warning(request, "Inicia sesión antes de confirmar tu pedido.")
+        messages.warning(request, "Inicia sesión o crea una cuenta para continuar con tu pedido. Tu carrito se conserva.")
         return redirect(f'{reverse("core:registro")}?next={reverse("core:carrito")}')
 
     lineas, total, cantidad = calcular_carrito(_carrito_sesion(request))
@@ -350,21 +348,42 @@ def pedido_confirmado(request):
 
 
 def registro(request):
-    formulario = RegistroForm(request.POST or None)
+    # Los POST anteriores sin acción siguen siendo registros válidos.
+    modo = request.POST.get('accion', 'crear') if request.method == 'POST' else request.GET.get('modo', 'ingresar')
+    modo = 'crear' if modo == 'crear' else 'ingresar'
+    formulario = (RegistroForm if modo == 'crear' else IniciarSesionForm)(request.POST if request.method == 'POST' else None)
     siguiente_solicitado = request.POST.get("next", request.GET.get("next", ""))
     siguiente = _destino_seguro(request, siguiente_solicitado, "")
     if request.method == "POST" and formulario.is_valid():
-        nombre = formulario.cleaned_data["nombre"].strip().split()[0]
-        request.session["usuario_tienda"] = {"nombre": nombre}
-        request.session.modified = True
-        messages.success(request, f"Cuenta creada y sesión iniciada. Bienvenido, {nombre}.")
-        if siguiente:
-            return redirect(siguiente)
-        return redirect("core:registro_confirmado")
+        datos = formulario.cleaned_data
+        usuario = None
+        if modo == 'crear':
+            nombre = datos['nombre'].strip().split()[0]
+            if crear_cuenta(nombre, datos['correo'], datos['contrasena']):
+                usuario = {'nombre': nombre}
+            else:
+                formulario.add_error('correo', 'Este correo ya tiene una cuenta. Selecciona Iniciar sesión.')
+        else:
+            limite = 'intentos:' + clave_correo(datos['correo'])
+            intentos = caches['cuentas'].get(limite, 0)
+            if intentos >= 5:
+                formulario.add_error(None, 'Demasiados intentos. Espera cinco minutos antes de volver a ingresar.')
+            else:
+                usuario = verificar_cuenta(datos['correo'], datos['contrasena'])
+                if usuario:
+                    caches['cuentas'].delete(limite)
+                else:
+                    caches['cuentas'].set(limite, intentos + 1, timeout=300)
+                    formulario.add_error(None, 'El correo o la contraseña no coinciden. Revisa tus datos o crea una cuenta.')
+        if usuario:
+            request.session.cycle_key()
+            request.session['usuario_tienda'] = usuario
+            messages.success(request, f"Sesión iniciada. Bienvenido, {usuario['nombre']}.")
+            return redirect(siguiente or reverse('core:registro_confirmado'))
     return render(
         request,
         "core/registro.html",
-        {"registro_formulario": formulario, "siguiente": siguiente},
+        {"registro_formulario": formulario, "siguiente": siguiente, "modo_cuenta": modo},
     )
 
 

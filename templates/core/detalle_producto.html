@@ -29,7 +29,6 @@
       </div>
 
       {% if producto.puede_comprarse %}
-        {% if usuario_tienda %}
           <form method="post" action="{% url 'core:agregar_al_carrito' producto.id %}" class="add-to-cart" data-ajax-cart>
             {% csrf_token %}
             <label><span>Cantidad</span>{{ formulario_cantidad.cantidad }}</label>
@@ -38,13 +37,6 @@
               Agregar al carrito
             </button>
           </form>
-        {% else %}
-          <div class="purchase-lock">
-            <span class="purchase-lock__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8.5 10V7.5a3.5 3.5 0 0 1 7 0V10M12 14v3"/></svg></span>
-            <div><strong>Inicia sesión para comprar</strong><p>La cuenta activa protege el carrito durante esta visita.</p></div>
-            <a href="{% url 'core:registro' %}?next={% url 'core:detalle_producto' producto.id %}" class="button button--primary">Ingresar o crear cuenta</a>
-          </div>
-        {% endif %}
       {% else %}
         <button disabled class="button button--disabled button--full">Producto sin stock</button>
       {% endif %}

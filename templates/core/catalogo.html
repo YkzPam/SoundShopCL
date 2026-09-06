@@ -1,28 +1,35 @@
 {% extends 'base.html' %}
-{% load soundshop_extras %}
+{% load static soundshop_extras %}
 
 {% block title %}{{ titulo_catalogo }} | SoundShop CL{% endblock %}
+{% block body_class %}page-catalog{% if categoria_actual %} page-collection{% endif %}{% endblock %}
 
 {% block content %}
+{% if coleccion_visual %}
+  {% include 'includes/collection_hero.html' %}
+{% else %}
 <header class="catalog-header">
   <div class="page-shell">
-    <nav class="breadcrumbs" aria-label="Migas de pan"><a href="{% url 'core:inicio' %}">Inicio</a><span>/</span><span>Catálogo</span></nav>
+    <nav class="breadcrumbs" aria-label="Migas de pan"><a href="{% url 'core:inicio' %}">Inicio</a><span aria-hidden="true">/</span>{% if categoria_actual %}<a href="{% url 'core:categorias' %}">Categorías</a><span aria-hidden="true">/</span><span aria-current="page">{{ categoria_actual.nombre }}</span>{% else %}<span aria-current="page">Catálogo</span>{% endif %}</nav>
     <p class="section-index"><span>{% if categoria_actual %}Colección{% else %}Catálogo / 2026{% endif %}</span> SoundShop CL</p>
-    <div class="catalog-header__row">
+    <div class="catalog-header__row{% if coleccion_visual %} catalog-header__row--collection{% endif %}">
       <div>
         <h1>{{ titulo_catalogo }}</h1>
         {% if categoria_actual %}<p>{{ categoria_actual.descripcion }}</p>{% else %}<p>Busca por nombre o marca, filtra por precio y revisa cada producto con sus especificaciones completas.</p>{% endif %}
+        <div class="result-count"><strong>{{ cantidad_resultados|stringformat:"02d" }}</strong><span>resultado{{ cantidad_resultados|pluralize }}</span></div>
       </div>
-      <div class="result-count"><strong>{{ cantidad_resultados|stringformat:"02d" }}</strong><span>resultado{{ cantidad_resultados|pluralize }}</span></div>
+      {% if coleccion_visual %}<figure class="collection-visual"><img src="{% static coleccion_visual.imagen %}" alt="{{ coleccion_visual.imagen_alt }}" width="1024" height="1024" fetchpriority="high"><figcaption>{{ coleccion_visual.ruta }}</figcaption></figure>{% endif %}
     </div>
+    {% include 'includes/collection_tabs.html' %}
   </div>
 </header>
+{% endif %}
 
-<section class="page-shell catalog-layout">
+<section class="page-shell catalog-layout" id="seleccion" aria-label="Selección de productos">
   <aside class="catalog-sidebar">
     <details class="filter-mobile" {% if request.GET %}open{% endif %}>
       <summary>Filtrar catálogo <span aria-hidden="true">+</span></summary>
-      <div>{% include 'includes/catalog_filters.html' %}</div>
+      <div>{% include 'includes/catalog_filters.html' with formulario=formulario_movil %}</div>
     </details>
     <div class="filter-desktop">
       <div class="filter-desktop__heading"><h2>Filtrar catálogo</h2>{% if request.GET %}<a href="{% if categoria_actual %}{% url 'core:detalle_categoria' categoria_actual.slug %}{% else %}{% url 'core:catalogo' %}{% endif %}">Limpiar</a>{% endif %}</div>
@@ -31,6 +38,7 @@
   </aside>
 
   <div class="catalog-results">
+    <div class="catalog-toolbar"><h2>{% if categoria_actual %}La selección{% else %}Todos los equipos{% endif %}</h2><span>{{ cantidad_resultados|stringformat:"02d" }} resultado{{ cantidad_resultados|pluralize }}</span></div>
     {% if formulario.errors %}<div class="form-error">Revisa los filtros. El precio debe ser un número mayor que cero.</div>{% endif %}
     {% if productos %}
       <div class="product-grid product-grid--catalog">
@@ -46,4 +54,5 @@
     {% endif %}
   </div>
 </section>
+{% if coleccion_visual %}{% include 'includes/collection_guide.html' %}{% endif %}
 {% endblock %}

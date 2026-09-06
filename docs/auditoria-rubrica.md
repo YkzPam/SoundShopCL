@@ -1,34 +1,38 @@
-# 4. Auditoría de cumplimiento de la pauta
+# 3. Auditoría de la Evaluación 1
 
-## 4.1 Evidencia por indicador
+## 3.1 Criterio de revisión
 
-| N.º | Indicador evaluado | Evidencia dentro del proyecto | Estado |
-|---:|---|---|---|
-| 1 | Atributos, tipos y diagrama según el caso | `core/models.py`, `catalogo.json`, `docs/modelo-datos-y-validaciones.md` y `docs/diagrama-flujo.svg` | Cumplido |
-| 2 | Entradas, salidas y validaciones de formularios | `core/forms.py`, bloqueo de compra sin sesión, límites del carrito y sección 2.2 del documento de datos | Cumplido |
-| 3 | Vistas con ciclos y condiciones coherentes con el flujo | `core/views.py` filtra, calcula, decide estados y prepara colecciones iterables | Cumplido |
-| 4 | Plantillas que muestran variables y operadores del servidor | Plantillas `core`, herencia desde `base.html`, `{% for %}`, `{% if %}`, filtros y `{% url %}` | Cumplido |
-| 5 | Paquetes y librerías externas configuradas | `requirements.txt`, `package.json`, Tailwind CSS compilado y `package-lock.json` | Cumplido |
-| 6 | Módulos Django, estilos y repositorio GitHub | Formularios, sesiones, mensajes, archivos estáticos, CSRF, Tailwind y repositorio Git local con historial segmentado | Pendiente solo la publicación pública |
-| 7 | Proyecto y aplicación creados y registrados | Proyecto `soundshop`, aplicación `core` en `INSTALLED_APPS` y comandos documentados | Cumplido |
-| 8 | Rutas limpias, modulares, semánticas y nombradas | `soundshop/urls.py` incluye `core.urls`; todas las rutas usan `path()` y `name` | Cumplido |
-| 9 | Vistas reciben `request`, crean contexto y renderizan | Funciones de `core/views.py` y helper `_datos_catalogo` | Cumplido |
-| 10 | Validación de sintaxis, rutas y visualización con apoyo de IA | `manage.py check`, treinta pruebas, capturas de `docs/mockups-prototipo.md` y registro de IA | Cumplido |
+La revisión utiliza la escala incluida en `Instrucciones Evaluación 1-20260903.zip`: diez indicadores con un máximo de 10 puntos cada uno, para un total de 100. La tabla siguiente resume los indicadores; no reemplaza su redacción oficial ni asigna una nota docente. Las marcas presentes en la plantilla Excel no constituyen una calificación de SoundShop CL.
 
-## 4.2 Comprobaciones reproducibles
+| N.º | Indicador resumido | Máximo | Evidencia en la entrega | Estado |
+|---|---|---:|---|---|
+| 1 | Atributos y tipos según caso y flujo | 10 | `core/models.py`, JSON y modelo de datos documentado | Evidencia implementada |
+| 2 | Entradas, salidas y validaciones de formularios administrativos | 10 | `FichaGestionForm`, siete campos, errores y resultado; seis pruebas de gestión | Evidencia implementada |
+| 3 | Condiciones y ciclos del servidor vinculados al flujo administrativo | 10 | `core/gestion.py`, validación, estados y recorrido de fichas documentado | Evidencia implementada |
+| 4 | Plantillas administrativas, variables y operadores coherentes con el diagrama | 10 | `gestion_producto.html`, ciclos, condiciones y cálculo de existencias | Evidencia implementada |
+| 5 | Uso de paquetes externos | 10 | `requirements.txt`, `package.json`, lockfile y Tailwind compilado | Evidencia implementada |
+| 6 | Formularios, mensajes, estilos y proyecto en GitHub | 10 | Formularios Django, mensajes, CSS y pruebas; falta verificar publicación pública final | Parcial hasta publicar |
+| 7 | Creación e instalación de proyecto y aplicación Django | 10 | `manage.py`, paquete `soundshop`, app `core` registrada | Evidencia implementada |
+| 8 | Rutas semánticas, nombradas y organizadas | 10 | `soundshop/urls.py`, `core/urls.py`, namespace `core` | Evidencia implementada |
+| 9 | Vistas, solicitudes, contexto y renderizado | 10 | `core/views.py`, `core/gestion.py` y plantillas | Evidencia implementada |
+| 10 | Validación asistida por IA de código, rutas y plantillas | 10 | Registro de apoyo y comprobaciones reproducibles | Evidencia documentada |
+| | Total posible de la escala | **100** | No corresponde a un puntaje obtenido | Pendiente de evaluación |
 
-```powershell
-.\venv\Scripts\python.exe manage.py check
-.\venv\Scripts\python.exe manage.py test --verbosity 2
-npm run build:css
-git status
-git log --oneline
-```
+## 3.2 Entregables adicionales de las instrucciones
 
-El resultado esperado de Django es `System check identified no issues` y treinta pruebas aprobadas. El compilador debe producir `static/css/tailwind.css`. La aplicación debe responder con código HTTP 200 en la portada, catálogo, categorías, productos existentes, registro y carrito. La revisión automatizada del navegador comprueba anchos de 1440, 768, 390 y 320 píxeles sin desbordamiento horizontal ni errores de consola. El recorrido verifica la compra bloqueada para visitantes, el retorno seguro después del registro, el agregado por `POST` y Ajax, el total del mini carrito, la ampliación de imagen, el movimiento de las cinco categorías, el indicador de scroll, el cambio de tema y su persistencia. Con movimiento reducido, el contenido permanece visible y se desactivan las animaciones prescindibles.
+| Requisito | Respaldo | Situación |
+|---|---|---|
+| Diagrama simple | Enlace Excalidraw y archivo editable | Disponible; correspondencia explicada en arquitectura |
+| Mockups o prototipo de interfaz | Selección de vistas y estados en `mockups-prototipo.md` | Disponible; las capturas se identifican como evidencia de implementación |
+| HTML semántico y framework CSS | Plantilla base, vistas DTL y Tailwind compilado | Implementado |
+| Investigación de proyectos similares | `investigacion-referentes.md` con dos fuentes oficiales | Documentada retrospectivamente |
+| Alcance validado por docente | `alcance-evaluacion-1.md` | Aprobación por confirmar con el docente |
+| Sistema integrado y documentación básica | README, rutas, datos y guía de instalación | Disponible |
+| Repositorio público | Enlace real de GitHub y última versión subida | Pendiente |
+| Demostración y comprensión del código | `guion-demostracion.md` | Guion preparado; exposición pendiente |
 
-## 4.3 Límites declarados
+## 3.3 Verificación y límites
 
-La tabla mide la primera evaluación y no afirma funciones que el proyecto todavía no posee. El formulario crea una cuenta de sesión y el servidor la exige antes de agregar o confirmar productos, pero no implementa reingreso con credenciales ni autenticación persistente. Tampoco existe administración persistente, historial real, pasarela de pago ni seguimiento logístico. Esas capacidades requieren base de datos y corresponden al desarrollo posterior del caso semestral.
+Las comprobaciones finales y sus resultados se registran en [Verificación de entrega](verificacion-entrega.md). Las pruebas automáticas no sustituyen la revisión visual, la evaluación del docente ni la explicación del estudiante. No se presenta una estimación numérica como nota garantizada. Para cerrar la entrega se debe verificar el repositorio público desde fuera de la cuenta propietaria, confirmar el alcance aceptado y realizar la demostración solicitada.
 
-El código todavía no posee un remoto de GitHub. La publicación se marcará como cumplida solo después de comprobar una URL pública que contenga la rama `main` y el historial completo; no se considera suficiente que el repositorio exista únicamente en el computador.
+La aplicación sigue sin base de datos. El formulario administrativo valida, pero no guarda ni publica. El carrito admite invitados y exige cuenta solo al confirmar. Las cuentas y los pedidos son temporales; no existe pago real. Estas restricciones deben explicarse con el mismo criterio en la presentación.

@@ -1,23 +1,26 @@
-# 5. Registro del apoyo de inteligencia artificial
+# 6. Registro de apoyo de inteligencia artificial
 
-## 5.1 Tareas asistidas
+## 6.1 Alcance del apoyo
 
-La inteligencia artificial apoyó la lectura comparada de la pauta y la escala de apreciación, la definición del alcance técnico, la propuesta de estructura Django, la revisión de rutas, la detección de errores de plantilla, la generación de pruebas y la evaluación visual responsive. El resultado se comprobó mediante comandos locales y navegación real; no se consideró válida una función solo por haber sido sugerida.
+El desarrollo recibió asistencia de Codex para estructurar Django, revisar rutas y contexto, construir formularios, mejorar la interfaz, elaborar pruebas y ordenar la documentación. El estudiante definió el proyecto de tienda, solicitó cambios y proporcionó las instrucciones y rúbrica. Este registro declara la asistencia; no acredita autoría exclusivamente manual ni sustituye la comprensión exigida durante la evaluación.
 
-## 5.2 Consultas de trabajo representativas
+## 6.2 Actividades y evidencia
 
-- Identificar qué funciones pertenecen a la Evaluación 1 del caso de tienda y cuáles requieren base de datos en unidades posteriores.
-- Proponer un modelo tipado para categorías y productos almacenados en JSON.
-- Revisar que las vistas de Django entreguen contexto y que las plantillas utilicen ciclos, condiciones, variables y URLs nombradas.
-- Crear casos de prueba para búsqueda, filtros, productos agotados, límites de stock, carrito, sesión obligatoria, retornos seguros, registro y confirmación de pedido.
-- Revisar el comportamiento de la interfaz en escritorio, tableta y teléfono sin eliminar funciones.
-- Comprobar el modo oscuro, la persistencia de la preferencia, las animaciones de scroll y la salida para movimiento reducido.
-- Comprobar la vista rápida, el agregado asincrónico, el mini carrito, la ampliación de imagen y los mensajes de error de stock.
+| Actividad asistida | Resultado verificable | Revisión disponible |
+|---|---|---|
+| Tipos y datos del caso | Dataclasses y catálogo JSON | `core/models.py`, `core/data/catalogo.json` |
+| Rutas y renderizado | Vistas con contexto y plantillas compartidas | `core/urls.py`, `core/views.py`, `templates/` |
+| Validación administrativa | Formulario y vista previa sin persistencia | `core/forms.py`, `core/gestion.py`, `core/test_gestion.py` |
+| Carrito y cuenta | Agregado como invitado, acceso al confirmar y retorno local | `core/tests.py`, `core/cuentas.py` |
+| Diseño y responsive | Identidad visual, navegación y estados | CSS, JavaScript y selección de evidencias |
+| Revisión de entrega | Correspondencia entre documentos y comportamiento | Auditoría y registro final de comprobaciones |
 
-## 5.3 Recursos visuales generados
+Las solicitudes abarcaron validación de código, coherencia de rutas, variables disponibles en plantillas, formularios inválidos y resultados esperados. Las pruebas ejecutables permiten contrastar parte de esas propuestas en lugar de aceptar únicamente una descripción generada. El [registro final](verificacion-entrega.md) identifica los comandos y resultados; no equivale a una auditoría de seguridad de producción.
 
-Se crearon diez imágenes originales: audífonos inalámbricos, audífonos de estudio, tornamesa, kit de limpieza de vinilos, micrófono, interfaz de audio, guitarra eléctrica de siete cuerdas, controlador MIDI, parlante activo y mezclador. Las cuatro incorporaciones se generaron como fotografía cuadrada de catálogo con fondo gris frío, equipos en grafito y plata, acentos cobalto o aqua, luz de estudio natural y sin texto, personas, marcas ni logotipos. Las copias finales se optimizaron a 1024 × 1024 píxeles en formato WebP y se guardaron en `static/img/productos`.
+## 6.3 Material visual y fuentes
 
-## 5.4 Verificación humana esperada
+La entrega utiliza imágenes generadas para la identidad de la tienda; la intervención específica en el pie se conserva en [Imagen del pie](imagen-footer.md). Las capturas de interfaz son evidencia del sitio implementado, no supuestos bocetos elaborados antes de programar. La [investigación de referentes](investigacion-referentes.md) identifica fuentes externas oficiales y separa observaciones de decisiones propias.
 
-Antes de entregar, el estudiante debe recorrer la tienda, revisar que los textos coincidan con el caso seleccionado, ejecutar las pruebas, confirmar el historial Git y reemplazar la identidad local por su nombre y correo reales. También debe poder explicar cómo una ruta llama a una vista, cómo se carga el JSON, qué contiene el contexto y de qué forma DTL genera las tarjetas.
+## 6.4 Responsabilidad y límites
+
+Corresponde al estudiante revisar la entrega y poder explicar el flujo de solicitudes, los tipos, las condiciones, los ciclos y las validaciones. No se afirma que haya realizado una defensa oral ni recibido aprobación docente. La asistencia no garantiza puntaje máximo. El sistema conserva el alcance de E1 sin base de datos, pagos reales o gestión persistente; cualquier ampliación requiere una nueva implementación y revisión.

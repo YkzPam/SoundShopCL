@@ -1,0 +1,4 @@
+<nav class="collection-tabs" aria-label="Explorar categorías">
+  <a href="{% url 'core:catalogo' %}" {% if not categoria_actual %}class="is-active" aria-current="page"{% endif %}>Todo el catálogo</a>
+  {% for categoria in categorias_globales %}<a href="{% url 'core:detalle_categoria' categoria.slug %}" {% if categoria_actual.slug == categoria.slug %}class="is-active" aria-current="page"{% endif %}>{{ categoria.nombre }}</a>{% endfor %}
+</nav>

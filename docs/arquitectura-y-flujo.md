@@ -1,35 +1,41 @@
-# 3. Arquitectura y flujo de navegación
+# 2. Arquitectura y correspondencia del flujo
 
-## 3.1 Recorrido de una solicitud
+## 2.1 Organización de la aplicación
 
-```text
-Navegador
-   ↓ solicitud HTTP
-soundshop/urls.py
-   ↓ include("core.urls")
-core/urls.py
-   ↓ selecciona una vista por ruta
-core/views.py
-   ↓ consulta y valida
-core/catalogo.py + core/forms.py + catalogo.json
-   ↓ construye un diccionario de contexto
-templates/*.html
-   ↓ DTL procesa variables, ciclos y condiciones
-Respuesta HTML + CSS + JavaScript
-```
+La solicitud entra por `soundshop/urls.py`, que incluye las rutas nombradas de `core/urls.py`. La vista consulta funciones de `core/catalogo.py`, valida formularios cuando corresponde y entrega un diccionario de contexto a una plantilla DTL. Los datos iniciales proceden de `core/data/catalogo.json`; `core/models.py` describe sus tipos con dataclasses, sin tablas ni migraciones.
 
-La configuración principal registra la aplicación `core`, la carpeta global de plantillas, los archivos estáticos, las sesiones firmadas y el sistema de mensajes. `core.urls` mantiene las rutas de negocio separadas de `soundshop.urls`. Cada ruta posee un atributo `name`, por lo que los enlaces se generan con `{% url %}` y no dependen de direcciones escritas manualmente.
+La plantilla `templates/base.html` comparte navegación y pie de página. Las vistas específicas y los componentes de `templates/includes/` evitan duplicar la estructura. Tailwind compilado, `static/css/identity.css` y los refinamientos cargados en la base complementan el HTML; `static/js/main.js` añade interacciones sin reemplazar la validación del servidor.
 
-## 3.2 Flujo del usuario
+## 2.2 Diagrama simplificado
 
-La portada ofrece entradas al catálogo completo, cinco categorías, tres guías editoriales y el acceso de cuenta. El catálogo acepta búsqueda y filtros; si encuentra productos, genera una tarjeta por elemento. La vista rápida reutiliza los datos enviados por Django. Una persona sin sesión puede consultar la fotografía, el precio, el stock y las especificaciones, pero ve un bloque de acceso en lugar del formulario de compra. El registro valida nombre, correo, contraseña, confirmación y aceptación de condiciones; conserva únicamente el nombre visible en la cookie firmada y regresa a una ruta local segura cuando la compra inició desde una ficha.
+El diagrama se consulta en [Excalidraw](https://excalidraw.com/#json=1MN8Hxbolx-qeb1thQvVD,qJzWBc68wzA_RRld-BPexA). El repositorio conserva un [archivo editable](diagrama-flujo.excalidraw). Se trata de un resumen de navegación y decisiones principales, no de un diagrama de cada condición interna. Las validaciones de campos y los estados vacíos se agrupan en sus procesos para mantener una lectura simple.
 
-Con la sesión activa, la vista rápida y la ficha habilitan la cantidad. El servidor vuelve a comprobar la cuenta, el stock y el límite solicitado antes de modificar el carrito. Una solicitud Ajax recibe el resumen necesario para actualizar el contador, la confirmación y el mini carrito; el flujo HTML tradicional redirige al carrito. La vista completa recalcula subtotales y total en cada solicitud. La confirmación exige nuevamente la sesión, vacía el carrito y entrega una salida verificable.
+## 2.3 Recorrido del cliente
 
-Los errores no terminan en una página rota. Un producto inexistente vuelve al catálogo, una categoría inválida vuelve al listado y una cantidad fuera de rango mantiene al usuario en una página conocida con un mensaje explicativo. Una compra anónima lleva al acceso sin alterar el carrito. El registro señala el campo exacto cuando la contraseña es débil, no coincide o faltan datos obligatorios; una dirección externa enviada como retorno se descarta.
+El visitante explora Inicio, Productos o Categorías, abre una ficha y agrega productos al carrito sin cuenta. Puede cambiar cantidades o eliminar líneas. Al confirmar el pedido, el servidor comprueba la sesión: si no existe, solicita ingreso o registro; tras completar el acceso se conserva el carrito y el visitante vuelve para confirmar. El acceso no obliga a agregar nuevamente los productos. Una sesión válida y un carrito con contenido permiten generar el pedido temporal.
 
-## 3.3 Recursos visuales
+| Proceso | Ruta o código | Resultado |
+|---|---|---|
+| Explorar y filtrar | `/productos/`, `FiltroCatalogoForm` | Listado o mensajes de validación |
+| Revisar producto | `/productos/<id>/` | Datos, especificaciones y disponibilidad |
+| Agregar o editar | `agregar_al_carrito`, `actualizar_carrito`, `eliminar_del_carrito` | Carrito de invitado actualizado mediante POST |
+| Revisar selección | `/carrito/` | Cantidades, subtotales y total |
+| Comprobar acceso | `confirmar_pedido` | Retorno a Cuenta si falta sesión |
+| Ingresar o registrar | `/registro/`, `core/cuentas.py` | Sesión local y regreso seguro |
+| Confirmar | `/pedido/confirmado/` | Código y resumen temporal, sin cobro |
 
-Tailwind CSS se compila localmente desde `static/css/input.css`. `static/css/main.css` aplica la paleta azul noche, cobalto, gris frío y aqua, junto con la tipografía moderna y los componentes responsive propios de SoundShop CL. El JavaScript controla el menú móvil, el tema, las entradas por scroll, el paralaje, la inclinación de producto, la vista rápida, el mini carrito, la confirmación de agregado, la ampliación de imágenes y la copia del código de pedido. El catálogo, el registro y el carrito completo continúan funcionando sin JavaScript porque las operaciones principales se resuelven en Django; los paneles dinámicos actúan como una mejora progresiva.
+## 2.4 Recorrido administrativo
 
-El diagrama completo está disponible como [SVG editable](diagrama-flujo.svg) y como [PNG listo para insertar en la entrega](diagrama-flujo.png).
+| Paso del flujo | Implementación | Correspondencia observable |
+|---|---|---|
+| Seleccionar ficha | `/gestion/productos/` y `/gestion/productos/<id>/` | Ciclo de productos y datos iniciales del JSON |
+| Ingresar datos | `FichaGestionForm` en `core/forms.py` | Nombre, marca, categoría, descripción, precio, stock y estado |
+| Validar datos | `request.method == 'POST'` y `formulario.is_valid()` | Decisión entre error y resultado |
+| Corregir errores | `templates/core/gestion_producto.html` | Mismo formulario con valores y errores por campo |
+| Mostrar resultado | `core/gestion.py` | Datos limpios, valor de existencias y disponibilidad |
+
+Los nodos de ingreso, error y resultado representan estados de una misma pantalla, no páginas independientes. El ciclo de selección permite revisar otra ficha. La operación `precio * stock` calcula valor de existencias a precio de venta; las condiciones distinguen Inactivo, Disponible y Agotado. La validación no altera el catálogo original ni acredita permisos de administrador.
+
+## 2.5 Reglas transversales
+
+Las operaciones de carrito usan POST y protección CSRF. Los identificadores inválidos producen redirecciones controladas. El servidor rechaza cantidades fuera de rango y no confirma carritos vacíos. Los retornos de Cuenta solo admiten destinos locales. Estos controles se respaldan en `core/tests.py` y `core/test_gestion.py`, junto con la [matriz de validaciones](modelo-datos-y-validaciones.md).

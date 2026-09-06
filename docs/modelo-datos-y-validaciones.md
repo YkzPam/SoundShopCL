@@ -40,12 +40,14 @@ La propiedad calculada `puede_comprarse` devuelve `True` cuando el stock es mayo
 | Precio máximo | `precio_maximo` | Entero entre 1 y 2.000.000 | Productos con precio igual o inferior |
 | Disponibilidad | `solo_disponibles` | Valor booleano del formulario | Exclusión de productos con stock cero |
 | Orden | `orden` | Una alternativa de la lista definida | Resultado por destacados, nombre o precio |
-| Agregar | Sesión activa y `cantidad` | Cuenta temporal válida; entero desde 1 hasta el stock | Nueva línea o incremento del carrito |
+| Agregar | `cantidad`, sin exigir cuenta | Entero desde 1 hasta el stock; revisión acumulada del carrito | Nueva línea o incremento del carrito |
 | Actualizar | `cantidad` | Entero entre 0 y 99, con segunda revisión de stock | Cantidad modificada; cero elimina la línea |
 | Confirmar | Sesión activa y carrito firmado | Cuenta temporal válida y al menos una línea | Código, fecha, total y cantidad del pedido temporal |
-| Crear cuenta | `nombre`, `correo`, `contrasena`, `confirmar_contrasena`, `acepta_terminos` | Nombre mínimo de 2 caracteres, correo válido, clave mínima de 8 caracteres con letra y número, coincidencia y aceptación obligatoria | Nombre visible guardado en la sesión; correo y contraseña descartados |
+| Crear cuenta | `nombre`, `correo`, `contrasena`, `confirmar_contrasena`, `acepta_terminos` | Nombre mínimo de 2 caracteres, correo válido, clave mínima de 8 caracteres con letra y número, coincidencia y aceptación obligatoria | Nombre en sesión; identificador derivado del correo y hash de contraseña en memoria temporal |
 
 ## 2.3 Salidas del servidor
+
+La ficha administrativa de `/gestion/productos/` permite cargar un producto del JSON, validar nombre, marca, categoría, descripción, precio, stock y estado, y obtener una vista previa. Calcula el valor de existencias a precio de venta y distingue disponible, agotado e inactivo. Sus reglas, casos de error y alcance sin persistencia están en [Indicador 2: formularios](indicador-2-formularios.md).
 
 Las vistas construyen diccionarios de contexto con productos, categorías, cantidades, subtotales y totales. Django renderiza esas variables con `{{ variable }}`. Los ciclos generan tarjetas y especificaciones; las condiciones cambian los estados de stock, mensajes, carrito vacío y confirmación. Los precios se presentan con el filtro propio `precio_clp`, que transforma `89990` en `$89.990` sin alterar el valor numérico original.
 
@@ -53,7 +55,7 @@ Las vistas construyen diccionarios de contexto con productos, categorías, canti
 
 - Un identificador de producto desconocido redirige al catálogo y muestra una advertencia.
 - Una categoría desconocida redirige al listado de categorías.
-- Una persona sin sesión puede explorar, pero no agregar productos ni confirmar el pedido.
+- Una persona sin sesión puede explorar y modificar el carrito; para confirmar el pedido debe ingresar o crear una cuenta.
 - Un producto con stock cero no puede agregarse.
 - Una cantidad superior al stock conserva intacto el carrito.
 - Las operaciones de agregar, actualizar, eliminar y confirmar rechazan solicitudes `GET`.
@@ -62,3 +64,7 @@ Las vistas construyen diccionarios de contexto con productos, categorías, canti
 - La confirmación debe coincidir con la contraseña y las condiciones deben aceptarse.
 - La pantalla de cuenta creada no se muestra si no existe un nombre de sesión válido.
 - Un parámetro `next` externo se descarta; el retorno posterior al acceso solo acepta rutas de la propia tienda.
+
+## 2.5 Acceso temporal y datos administrativos
+
+El ingreso valida correo y contraseña contra la caché local de cuentas. El registro rechaza correos ya utilizados mientras exista la cuenta en memoria. La contraseña se almacena como hash en el servidor y no viaja en la cookie de sesión. Reiniciar el proceso elimina las cuentas. Las siete entradas administrativas, sus límites y las salidas calculadas se especifican en [Formularios administrativos](indicador-2-formularios.md); la ficha no persiste cambios.

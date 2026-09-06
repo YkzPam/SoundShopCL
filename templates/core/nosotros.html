@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Nosotros | SoundShop CL{% endblock %}
+{% block body_class %}page-about{% endblock %}
+{% block content %}
+<section class="about-cover page-shell" aria-labelledby="nosotros-titulo" data-scroll-scene>
+  <nav class="breadcrumbs" aria-label="Migas de pan"><a href="{% url 'core:inicio' %}">Inicio</a><span aria-hidden="true">/</span><span aria-current="page">Nosotros</span></nav>
+  <div class="about-cover__heading"><p class="section-index"><span>Nosotros / SoundShop CL</span> Hecha para la música</p><h1 id="nosotros-titulo">Una forma de<br><em>sentir el sonido.</em></h1></div>
+  <div class="about-cover__grid">
+    <div class="about-composition" data-motion-surface>
+      <span class="about-composition__letter" aria-hidden="true">S.</span>
+      <figure class="about-composition__main"><img src="{% static 'img/productos/microfono-vela-c1.webp' %}" alt="Micrófono Vela C1 de la selección de SoundShop CL" width="1024" height="1024"></figure>
+      <figure class="about-composition__detail"><img src="{% static 'img/productos/controlador-keyline-49.webp' %}" alt="Controlador Keyline 49 para creación musical" width="1024" height="1024" loading="lazy"></figure>
+      <span class="about-composition__caption">{% include 'includes/sound_marks.html' %} Escuchar. Crear. Compartir.</span>
+    </div>
+    <div class="about-story">
+      <p class="section-index"><span>01</span> La tienda</p>
+      <h2>Un lugar para<br><em>encontrar tu sonido.</em></h2>
+      <p>SoundShop CL es una tienda de instrumentos y equipos de audio para quienes disfrutan escuchar, tocar y crear. Reúne una selección para el hogar, el estudio y el escenario en un mismo lugar.</p>
+      <p>La propuesta parte de algo concreto: conocer un equipo antes de elegirlo. Cada ficha presenta sus características, precio en pesos chilenos y disponibilidad. Puedes armar tu carrito libremente e iniciar sesión cuando quieras continuar con el pedido.</p>
+      <div class="about-facts"><div><strong>{{ cantidad_categorias|stringformat:"02d" }}</strong><span>categorías para explorar</span></div><div><strong>{{ cantidad_productos|stringformat:"02d" }}</strong><span>equipos en el catálogo</span></div></div>
+    </div>
+  </div>
+</section>
+<section class="about-beliefs" aria-labelledby="formas-musica">
+  <div class="page-shell about-beliefs__grid">
+    <div class="about-beliefs__heading"><p class="section-index"><span>02</span> Lo que nos reúne</p><h2 id="formas-musica">La misma pasión.<br><em>Distintas formas<br>de vivirla.</em></h2><p>No hace falta estar sobre un escenario para que la música tenga un lugar propio.</p></div>
+    <div class="about-beliefs__list">
+      <article><span>01 / Escuchar</span><h3>Volver a ese disco.</h3><p>Audífonos, tornamesas y accesorios para dar espacio a la escucha y al cuidado de una colección.</p><a href="{% url 'core:detalle_categoria' 'tornamesas-vinilos' %}">Descubrir tornamesas y vinilos <span aria-hidden="true">↗</span></a></article>
+      <article><span>02 / Crear</span><h3>Darle forma a una idea.</h3><p>Instrumentos, micrófonos e interfaces para practicar, registrar una primera toma y seguir creando.</p><a href="{% url 'core:detalle_categoria' 'estudio-creacion' %}">Explorar estudio y creación <span aria-hidden="true">↗</span></a></article>
+      <article><span>03 / Compartir</span><h3>Hacer que se escuche.</h3><p>Equipos de sonido para reunir a otras personas alrededor de un ensayo o una presentación.</p><a href="{% url 'core:detalle_categoria' 'sonido-en-vivo' %}">Conocer sonido en vivo <span aria-hidden="true">↗</span></a></article>
+    </div>
+  </div>
+</section>
+{% include 'includes/store_location.html' %}
+<section class="about-outro page-shell" aria-labelledby="continuar-explorando"><p class="section-index"><span>La siguiente nota</span> La eliges tú</p><h2 id="continuar-explorando">¿Por dónde<br><em>empezamos?</em></h2><a href="{% url 'core:categorias' %}" class="button button--primary">Encuentra tu categoría <span aria-hidden="true">↗</span></a></section>
+{% endblock %}

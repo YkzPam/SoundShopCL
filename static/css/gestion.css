@@ -1,0 +1,48 @@
+.management { padding-block: 48px 80px; }
+.management-heading h1 { font-size: clamp(2.5rem,5vw,4.7rem); line-height: 1.04; letter-spacing: -.055em; margin: 24px 0; }
+.management-heading h1 em { font-family: Georgia,serif; font-weight: 400; color: #8a2848; }
+.management-heading > p { max-width: 780px; }
+.management-notice { padding: 14px 18px; margin-block: 24px 34px; background: #f0e4d9; border-left: 3px solid #8a2848; border-radius: 4px; font-size: .85rem; }
+.management-layout { display: grid; grid-template-columns: 270px minmax(0,1fr); gap: 30px; align-items: start; }
+.management-layout > * { min-width: 0; }
+.management-products h2 { font-size: 1.15rem; }
+.management-products > p { font-size: .8rem; margin-block: 8px 20px; }
+.management-products nav { display: grid; gap: 7px; }
+.management-products a { display: flex; gap: 12px; align-items: center; padding: 10px; border-radius: 12px; border: 1px solid transparent; }
+.management-products a[aria-current],.management-products a:hover { border-color: #b78492; background: #f1e4dc; }
+.management-products img { width: 48px; height: 48px; object-fit: cover; border-radius: 7px; }
+.management-products strong,.management-products small { display: block; }
+.management-products strong { font-size: .87rem; }
+.management-products small { font-size: .7rem; margin-top: 4px; }
+.management-editor { padding: clamp(20px,3vw,36px); border: 1px solid #ddc6bd; border-radius: 18px; background: #fffdf9; }
+.management-editor-heading { display: flex; justify-content: space-between; gap: 16px; align-items: center; margin-bottom: 28px; }
+.management-editor-heading p { font-size: .7rem; text-transform: uppercase; letter-spacing: .08em; }
+.management-editor-heading h2 { font-size: 1.6rem; margin-top: 7px; }
+.management-editor-heading a { font-size: .8rem; text-decoration: underline; }
+.management-fields { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 20px; }
+.management-field--wide { grid-column: 1/-1; }
+.management-field label { display: block; font-size: .85rem; font-weight: 650; margin-bottom: 8px; }
+.management .form-control { width: 100%; min-width: 0; }
+.management textarea { resize: vertical; min-height: 110px; }
+.management-help { font-size: .73rem; margin-top: 6px; }
+.management-errors,.management-alert { color: #9b153c; }
+.management-errors p { margin-top: 6px; font-size: .8rem; }
+.management-alert { padding: 18px; border: 1px solid #c2778a; border-radius: 10px; margin-bottom: 24px; }
+.management-alert h3 { font-size: 1rem; }
+.management-alert p,.management-alert li { font-size: .83rem; }
+.management-alert ul { margin: 10px 0 0; padding-left: 18px; list-style: disc; }
+.management-alert a { text-decoration: underline; }
+.management-actions { display: flex; gap: 24px; align-items: center; flex-wrap: wrap; margin-top: 26px; }
+.management-actions > a { font-size: .8rem; text-decoration: underline; }
+.management-result { margin-top: 30px; padding: 24px; background: #f5ebe2; border-radius: 12px; }
+.management-result [role=status] { font-size: .78rem; font-weight: 650; margin-bottom: 16px; }
+.management-result h2 { font-size: 1.75rem; }
+.management-result > p { margin-block: 10px; }
+.management-result dl { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 20px; margin-top: 24px; }
+.management-result dt { font-size: .75rem; }
+.management-result dd { margin: 6px 0 0; font-size: 1.1rem; font-weight: 650; overflow-wrap: anywhere; }
+html[data-theme=dark] .management-heading h1 em,html[data-theme=dark] .management-errors,html[data-theme=dark] .management-alert { color: #f0b6c5; }
+html[data-theme=dark] .management-editor { background: #29171e; border-color: #63444e; }
+html[data-theme=dark] .management-notice,html[data-theme=dark] .management-result,html[data-theme=dark] .management-products a[aria-current],html[data-theme=dark] .management-products a:hover { background: #39212b; }
+@media(max-width: 900px) { .management-layout { grid-template-columns: 1fr; } .management-products nav { display: flex; overflow-x: auto; padding-bottom: 8px; } .management-products a { min-width: 220px; } }
+@media(max-width: 560px) { .management-fields,.management-result dl { grid-template-columns: 1fr; } .management-editor-heading { align-items: start; flex-direction: column; } .management { padding-top: 28px; } }

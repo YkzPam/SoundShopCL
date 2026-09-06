@@ -1,0 +1,9 @@
+<section class="collection-guide page-shell" aria-labelledby="guia-coleccion">
+  <div class="collection-guide__heading"><p class="section-index"><span>Antes de elegir</span> {{ categoria_actual.nombre }}</p><h2 id="guia-coleccion">{{ coleccion_visual.guia_titulo }}</h2><p>Conoce la selección y revisa la ficha de cada equipo para encontrar lo que necesitas.</p></div>
+  <div class="collection-guide__items">
+    {% for titulo, texto in coleccion_visual.guia %}
+      <article class="collection-guide__item"><span class="collection-guide__number">0{{ forloop.counter }}</span><div><h3>{{ titulo }}</h3><p>{{ texto }}</p></div></article>
+    {% endfor %}
+    <a href="{% url 'core:categorias' %}" class="text-link">Explorar otra categoría <span aria-hidden="true">↗</span></a>
+  </div>
+</section>
