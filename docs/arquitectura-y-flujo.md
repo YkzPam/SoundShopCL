@@ -8,7 +8,9 @@ La plantilla `templates/base.html` comparte navegación y pie de página. Las vi
 
 ## 2.2 Diagrama simplificado
 
-El diagrama se consulta en [Excalidraw](https://excalidraw.com/#json=1MN8Hxbolx-qeb1thQvVD,qJzWBc68wzA_RRld-BPexA). El repositorio conserva un [archivo editable](diagrama-flujo.excalidraw). Se trata de un resumen de navegación y decisiones principales, no de un diagrama de cada condición interna. Las validaciones de campos y los estados vacíos se agrupan en sus procesos para mantener una lectura simple.
+El diagrama se consulta en [Excalidraw](https://excalidraw.com/#json=5k4AdvqFxTW7Augb5Dje6,N09tmaInLWdoyR_nV9ib3Q). El repositorio conserva el [archivo editable](diagrama-flujo.excalidraw), la [imagen PNG](diagrama-flujo.png) y el [SVG](diagrama-flujo.svg). Se trata de un resumen de navegación y decisiones principales, no de cada condición interna. Las validaciones de campos y los estados vacíos se agrupan en sus procesos para mantener una lectura simple.
+
+El paso «Validar stock y cantidad y agregar al carrito» agrupa la operación de agregado. «Revisar carrito y continuar pedido» representa la revisión y el intento de confirmación: solo entonces se comprueba la sesión. Después de ingresar o registrarse, la flecha vuelve a revisar el carrito conservado; no repite el agregado. El diagrama mantiene dos decisiones, incluida la validación administrativa.
 
 ## 2.3 Recorrido del cliente
 

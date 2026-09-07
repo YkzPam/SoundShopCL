@@ -1,5 +1,13 @@
 # 8. Registro de verificación de entrega
 
+## Revisión documental de cierre: 7 de septiembre de 2026
+
+Se corrigieron dos rótulos en la escena original de Excalidraw, sin agregar decisiones: el agregado incluye validar stock y cantidad; la revisión del carrito precede al intento de confirmar. El acceso regresa al carrito conservado. El enlace vigente se encuentra en [Arquitectura y flujo](arquitectura-y-flujo.md). El editable, el SVG y el PNG proceden de esa escena corregida. El PNG se verificó visualmente y su SHA-256 coincide con el descargado en el computador: `6eef7996e26f95c84ba36ce3fc21f97b70b8257f6b375511f93ca3915d7bc438`.
+
+Se incorporó una lámina de mockups esquemáticos en SVG y PNG, inspeccionada visualmente. Se identifica como documentación retrospectiva y se distingue de las capturas reales. La preparación de la entrega separa los archivos terminados de la aprobación del docente, la demostración y el envío por la plataforma de la asignatura. No se cambió la lógica de Django ni se agregó persistencia. Los registros de versiones anteriores que siguen describen comprobaciones históricas, no el identificador de la revisión actual.
+
+La revisión de cierre recorrió 17 documentos Markdown sin enlaces locales rotos. Desde la carpeta del proyecto, `manage.py test` ejecutó las 50 pruebas y todas aprobaron en 6,964 segundos. Se comprobó que el enlace antiguo ya no figura en la documentación y que la flecha de retorno del editable llega al nodo de revisión del carrito. Se mantuvieron las capturas finales de la versión visual publicada, ya que este cierre no modificó la interfaz.
+
 ## 8.1 Comprobaciones del 6 de septiembre de 2026
 
 | Comprobación ejecutada | Resultado |

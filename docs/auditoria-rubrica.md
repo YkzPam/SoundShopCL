@@ -23,7 +23,7 @@ La revisión utiliza la escala incluida en `Instrucciones Evaluación 1-20260903
 | Requisito | Respaldo | Situación |
 |---|---|---|
 | Diagrama simple | Enlace Excalidraw y archivo editable | Disponible; correspondencia explicada en arquitectura |
-| Mockups o prototipo de interfaz | Selección de vistas y estados en `mockups-prototipo.md` | Disponible; las capturas se identifican como evidencia de implementación |
+| Mockups o prototipo de interfaz | Lámina `mockups-esquematicos.svg`, selección de vistas y estados en `mockups-prototipo.md` | Disponible; bocetos retrospectivos separados de capturas reales |
 | HTML semántico y framework CSS | Plantilla base, vistas DTL y Tailwind compilado | Implementado |
 | Investigación de proyectos similares | `investigacion-referentes.md` con dos fuentes oficiales | Documentada retrospectivamente |
 | Alcance validado por docente | `alcance-evaluacion-1.md` | Aprobación por confirmar con el docente |
@@ -36,3 +36,9 @@ La revisión utiliza la escala incluida en `Instrucciones Evaluación 1-20260903
 Las comprobaciones finales y sus resultados se registran en [Verificación de entrega](verificacion-entrega.md). Las pruebas automáticas no sustituyen la revisión visual, la evaluación del docente ni la explicación del estudiante. No se presenta una estimación numérica como nota garantizada. El repositorio público se verificó sin sesión mediante una solicitud HTTP 200. Restan la confirmación del alcance aceptado y la demostración solicitada al estudiante. La rama remota se contrastó con la revisión local.
 
 La aplicación sigue sin base de datos. El formulario administrativo valida, pero no guarda ni publica. El carrito admite invitados y exige cuenta solo al confirmar. Las cuentas y los pedidos son temporales; no existe pago real. Estas restricciones deben explicarse con el mismo criterio en la presentación.
+
+## 3.4 Corrección de correspondencia y condiciones externas
+
+Se corrigió el diagrama en Excalidraw: la validación de stock agrupa el agregado y el nodo siguiente representa revisar el carrito y continuar el pedido. El retorno de ingreso o registro llega a ese nodo, conservando la selección. La decisión administrativa y la decisión de sesión permanecen como las dos bifurcaciones principales. No se modificó la aplicación para hacerla coincidir con un diagrama incorrecto.
+
+Los bocetos y la investigación documentan el trabajo actual de forma retrospectiva. No acreditan el orden previo al desarrollo indicado por el docente. La aprobación del alcance, la comprensión personal del código, la ejecución en cada computador y la entrega por el canal de la asignatura se detallan en [Preparación de entrega](preparacion-entrega.md). Su cumplimiento no se marca como realizado sin evidencia del estudiante o del docente.

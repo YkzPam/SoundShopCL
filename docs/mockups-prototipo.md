@@ -6,6 +6,8 @@ La aplicación navegable constituye el prototipo implementado de la Evaluación 
 
 ## 7.2 Vistas principales
 
+La [lámina de mockups esquemáticos en PNG](mockups-esquematicos.png), también disponible en [SVG ampliable](mockups-esquematicos.svg), representa seis composiciones: Inicio, catálogo y categorías, detalle, Cuenta, carrito y Gestión. Es un boceto simplificado del diseño vigente, elaborado después de la implementación; no es una captura ni evidencia de planificación previa. Para revisar la apariencia real, se utilizan las imágenes de la tabla siguiente.
+
 | Vista | Ruta | Escritorio claro | Móvil claro |
 |---|---|---|---|
 | Inicio | `/` | [1440 px](evidencias/final-inicio-light-1440.png) | [390 px](evidencias/final-inicio-light-390.png) |

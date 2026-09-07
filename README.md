@@ -12,7 +12,7 @@ La entrega usa Django 5.2 LTS, plantillas DTL, datos JSON, Tailwind CSS y JavaSc
 
 ## Diagrama de flujo de la Evaluación 1
 
-El diagrama se puede revisar directamente en [Excalidraw, mediante este enlace compartido](https://excalidraw.com/#json=1MN8Hxbolx-qeb1thQvVD,qJzWBc68wzA_RRld-BPexA). La carpeta `docs` contiene la [imagen PNG exportada desde Excalidraw](docs/diagrama-flujo.png), la [versión SVG](docs/diagrama-flujo.svg) y el [archivo editable de Excalidraw](docs/diagrama-flujo.excalidraw). La imagen conserva la composición vertical original; no es una recreación del diagrama.
+El diagrama se puede revisar directamente en [Excalidraw, mediante este enlace compartido](https://excalidraw.com/#json=5k4AdvqFxTW7Augb5Dje6,N09tmaInLWdoyR_nV9ib3Q). La carpeta `docs` contiene la [imagen PNG exportada desde Excalidraw](docs/diagrama-flujo.png), la [versión SVG](docs/diagrama-flujo.svg) y el [archivo editable de Excalidraw](docs/diagrama-flujo.excalidraw). La imagen conserva la composición vertical original; no es una recreación del diagrama.
 
 ## Funciones incluidas
 
@@ -144,12 +144,14 @@ SoundShopCL/
 
 ## Documentación académica
 
+- [Preparación y condiciones de entrega](docs/preparacion-entrega.md)
+- [Lámina de mockups esquemáticos del diseño actual](docs/mockups-esquematicos.svg)
 - [Verificación final de la entrega](docs/verificacion-entrega.md)
 - [Investigación de tiendas similares](docs/investigacion-referentes.md)
 - [Alcance de la Evaluación 1](docs/alcance-evaluacion-1.md)
 - [Modelo de datos, entradas y validaciones](docs/modelo-datos-y-validaciones.md)
 - [Arquitectura y flujo de navegación](docs/arquitectura-y-flujo.md)
-- Diagrama de flujo: [abrir en Excalidraw](https://excalidraw.com/#json=1MN8Hxbolx-qeb1thQvVD,qJzWBc68wzA_RRld-BPexA), [descargar el archivo editable](docs/diagrama-flujo.excalidraw) o [consultar la vista previa](docs/diagrama-flujo.png)
+- Diagrama de flujo: [abrir en Excalidraw](https://excalidraw.com/#json=5k4AdvqFxTW7Augb5Dje6,N09tmaInLWdoyR_nV9ib3Q), [descargar el archivo editable](docs/diagrama-flujo.excalidraw) o [consultar la vista previa](docs/diagrama-flujo.png)
 - [Mockups y evidencia del prototipo](docs/mockups-prototipo.md)
 - [Auditoría de los diez indicadores](docs/auditoria-rubrica.md)
 - [Registro del apoyo de inteligencia artificial](docs/uso-inteligencia-artificial.md)
