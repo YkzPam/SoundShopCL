@@ -30,7 +30,7 @@ La suite de Django contrasta solicitudes y validaciones, incluido el carrito de 
 
 ## 8.3 Cierre de publicación y presentación
 
-El proyecto se publicó en [YkzPam/SoundShopCL](https://github.com/YkzPam/SoundShopCL). La primera subida de esta revisión se identificó con `a72e359`; la rama remota coincidió con la local y el repositorio respondió HTTP 200 sin sesión. Se incorporó después un cierre documental y el editable extraído de la escena incrustada en el SVG original de Excalidraw, para conservar las mismas flechas lisas del PNG. El PNG del proyecto coincide por SHA-256 con el exportado desde Excalidraw.
+El proyecto se publicó en [YkzPam/SoundShopCL-Entrega-Evaluacion-1](https://github.com/YkzPam/SoundShopCL-Entrega-Evaluacion-1). La primera subida de esta revisión se identificó con `a72e359`; la rama remota coincidió con la local y el repositorio respondió HTTP 200 sin sesión. Se incorporó después un cierre documental y el editable extraído de la escena incrustada en el SVG original de Excalidraw, para conservar las mismas flechas lisas del PNG. El PNG del proyecto coincide por SHA-256 con el exportado desde Excalidraw.
 
 Una clonación independiente de la publicación `2194be7` completó `manage.py check` sin problemas y las 50 pruebas en 7,005 segundos. Se utilizó el entorno Python ya instalado, pero el código se obtuvo desde GitHub; no constituye una instalación de dependencias desde cero en otro computador.
 
