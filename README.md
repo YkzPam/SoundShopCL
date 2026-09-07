@@ -1,6 +1,6 @@
 # SoundShop CL
 
-Repositorio público de la entrega: [YkzPam/SoundShopCL-Entrega-Evaluacion-1](https://github.com/YkzPam/SoundShopCL-Entrega-Evaluacion-1). La documentación, el diagrama original y las capturas están incluidos en la carpeta `docs`.
+Repositorio público de la entrega: [YkzPam/SoundShopCL](https://github.com/YkzPam/SoundShopCL). La documentación, el diagrama original y las capturas están incluidos en la carpeta `docs`.
 
 La identidad visual vigente utiliza marfil, negro, dorado suave y violeta. La descripción del sistema y las pruebas del rediseño se encuentran en [Identidad visual](docs/identidad-visual.md); la selección final de capturas está en [Prototipo de interfaz](docs/mockups-prototipo.md), con el prefijo `final-`.
 
@@ -41,7 +41,7 @@ La interfaz utiliza negro `#121212`, marfil `#F4F0E8`, dorado `#B89B5E`, violeta
 
 ### 1. Abrir el proyecto
 
-En Visual Studio Code, se selecciona **Archivo > Abrir carpeta** y se abre la carpeta `SoundShopCL-Entrega-Evaluacion-1`. La carpeta local y el repositorio de GitHub utilizan este mismo nombre. Al descargar mediante Download ZIP, GitHub añade el sufijo `-main` al archivo y a la carpeta. El repositorio ya contiene recomendaciones, tareas y una configuración de depuración dentro de `.vscode`.
+En Visual Studio Code, se selecciona **Archivo > Abrir carpeta** y se abre la carpeta `SoundShopCL`. La carpeta local y el repositorio de GitHub utilizan este mismo nombre. Al descargar mediante Download ZIP, GitHub añade el sufijo `-main` al archivo y a la carpeta. El repositorio ya contiene recomendaciones, tareas y una configuración de depuración dentro de `.vscode`.
 
 ### 2. Crear y activar el entorno virtual
 
@@ -122,7 +122,7 @@ Las operaciones que alteran el carrito aceptan únicamente solicitudes `POST` y 
 ## Estructura del proyecto
 
 ```text
-SoundShopCL-Entrega-Evaluacion-1/
+SoundShopCL/
 ├── .vscode/                  Configuración y tareas del editor
 ├── core/
 │   ├── data/catalogo.json    Datos simulados
@@ -159,11 +159,11 @@ SoundShopCL-Entrega-Evaluacion-1/
 
 ## Git y publicación en GitHub
 
-El repositorio público está en [GitHub](https://github.com/YkzPam/SoundShopCL-Entrega-Evaluacion-1), utiliza la rama `main` y conserva el historial del proyecto. Para obtener la entrega en otro computador:
+El repositorio público está en [GitHub](https://github.com/YkzPam/SoundShopCL), utiliza la rama `main` y conserva el historial del proyecto. Para obtener la entrega en otro computador:
 
 ```powershell
-git clone https://github.com/YkzPam/SoundShopCL-Entrega-Evaluacion-1.git SoundShopCL-Entrega-Evaluacion-1
-cd SoundShopCL-Entrega-Evaluacion-1
+git clone https://github.com/YkzPam/SoundShopCL.git SoundShopCL
+cd SoundShopCL
 python -m venv venv
 .\venv\Scripts\python.exe -m pip install -r requirements.txt
 .\venv\Scripts\python.exe manage.py check

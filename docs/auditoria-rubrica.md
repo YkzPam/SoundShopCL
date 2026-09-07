@@ -28,7 +28,7 @@ La revisión utiliza la escala incluida en `Instrucciones Evaluación 1-20260903
 | Investigación de proyectos similares | `investigacion-referentes.md` con dos fuentes oficiales | Documentada retrospectivamente |
 | Alcance validado por docente | `alcance-evaluacion-1.md` | Aprobación por confirmar con el docente |
 | Sistema integrado y documentación básica | README, rutas, datos y guía de instalación | Disponible |
-| Repositorio público | [YkzPam/SoundShopCL-Entrega-Evaluacion-1](https://github.com/YkzPam/SoundShopCL-Entrega-Evaluacion-1), rama main | Publicado y accesible sin sesión |
+| Repositorio público | [YkzPam/SoundShopCL](https://github.com/YkzPam/SoundShopCL), rama main | Publicado y accesible sin sesión |
 | Demostración y comprensión del código | `guion-demostracion.md` | Guion preparado; exposición pendiente |
 
 ## 3.3 Verificación y límites
