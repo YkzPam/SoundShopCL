@@ -41,7 +41,7 @@ La interfaz utiliza negro `#121212`, marfil `#F4F0E8`, dorado `#B89B5E`, violeta
 
 ### 1. Abrir el proyecto
 
-En Visual Studio Code, se selecciona **Archivo > Abrir carpeta** y se abre la carpeta `SoundShopCL`. El repositorio ya contiene recomendaciones, tareas y una configuración de depuración dentro de `.vscode`.
+En Visual Studio Code, se selecciona **Archivo > Abrir carpeta** y se abre la carpeta `SoundShopCL-Entrega-Evaluacion-1`. Este nombre identifica la entrega local; el repositorio de GitHub conserva el nombre `SoundShopCL`. El repositorio ya contiene recomendaciones, tareas y una configuración de depuración dentro de `.vscode`.
 
 ### 2. Crear y activar el entorno virtual
 
@@ -122,7 +122,7 @@ Las operaciones que alteran el carrito aceptan únicamente solicitudes `POST` y 
 ## Estructura del proyecto
 
 ```text
-SoundShopCL/
+SoundShopCL-Entrega-Evaluacion-1/
 ├── .vscode/                  Configuración y tareas del editor
 ├── core/
 │   ├── data/catalogo.json    Datos simulados
@@ -162,8 +162,8 @@ SoundShopCL/
 El repositorio público está en [GitHub](https://github.com/YkzPam/SoundShopCL), utiliza la rama `main` y conserva el historial del proyecto. Para obtener la entrega en otro computador:
 
 ```powershell
-git clone https://github.com/YkzPam/SoundShopCL.git
-cd SoundShopCL
+git clone https://github.com/YkzPam/SoundShopCL.git SoundShopCL-Entrega-Evaluacion-1
+cd SoundShopCL-Entrega-Evaluacion-1
 python -m venv venv
 .\venv\Scripts\python.exe -m pip install -r requirements.txt
 .\venv\Scripts\python.exe manage.py check
