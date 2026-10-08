@@ -4,7 +4,7 @@
 
 La segunda evaluación continúa el mismo caso de tienda musical de E1. Su desarrollo se concentra en SQLite, modelos relacionados, migraciones, diagrama, Django Admin y datos ficticios. El correo del docente exige demostrar las cuatro cargas de Faker y explicar el código presencialmente. Las diez tablas propias y las diez migraciones de `core` corresponden a la exigencia de clase confirmada por el estudiante; no se atribuye esa cantidad al texto de la rúbrica.
 
-La rama `main` conserva la Evaluación 1 en el commit `381abd52a831058e2032d6c5d5eaefcf32cd8499`. La segunda entrega se publica en `evaluacion-2`, sin modificar `main`. El diseño de la tienda se conserva y sus consultas pasan a utilizar SQLite. No se desarrollan pagos, una API, un administrador propio ni cuentas permanentes de clientes.
+La rama `evaluacion1` conserva la Evaluación 1 en el commit `381abd52a831058e2032d6c5d5eaefcf32cd8499`. La segunda entrega se publica en `evaluacion-2`, sin modificar `evaluacion1`. El diseño de la tienda se conserva y sus consultas pasan a utilizar SQLite. No se desarrollan pagos, una API, un administrador propio ni cuentas permanentes de clientes.
 
 ## 2. Configuración y reproducción en otro computador
 
@@ -143,7 +143,7 @@ Antes de la clase corresponde practicar por qué un producto tiene claves forán
 
 ## 11. Publicación y entrega
 
-La publicación de E2 utiliza la rama `evaluacion-2` del repositorio [YkzPam/SoundShopCL](https://github.com/YkzPam/SoundShopCL). La rama `main` permanece en E1. Para identificar la versión entregada, consultar el hash completo del último commit de la rama publicada; no utilizar el hash de E1 ni un commit que solo exista localmente.
+La publicación de E2 utiliza la rama `evaluacion-2` del repositorio [YkzPam/SoundShopCL](https://github.com/YkzPam/SoundShopCL). La rama `evaluacion1` permanece en E1. Para identificar la versión entregada, consultar el hash completo del último commit de la rama publicada; no utilizar el hash de E1 ni un commit que solo exista localmente.
 
 La entrega al docente incluye el enlace de GitHub a E2 y el hash de ese commit. La imagen PNG del diagrama debe adjuntarse según las instrucciones de la plataforma. El enlace a un commit identifica exactamente el código revisado, incluso si después se añaden otros cambios. Publicar el repositorio no equivale a enviar la tarea de AAI ni a cumplir la asistencia y la defensa presencial.
 

@@ -81,7 +81,7 @@ La guía de E2 incluye los resultados de las cuatro cargas locales y un recorrid
 
 ## 5. Continuidad de la Evaluación 1 y publicación
 
-La primera entrega se conserva intacta en la rama [main](https://github.com/YkzPam/SoundShopCL/tree/main), en el commit `381abd52a831058e2032d6c5d5eaefcf32cd8499`. La segunda entrega utiliza la rama [evaluacion-2](https://github.com/YkzPam/SoundShopCL/tree/evaluacion-2). Sus documentos iniciales permanecen como antecedentes; las instrucciones vigentes para ejecutar E2 son las de este README y la guía de E2.
+La primera entrega se conserva intacta en la rama [evaluacion1](https://github.com/YkzPam/SoundShopCL/tree/evaluacion1), en el commit `381abd52a831058e2032d6c5d5eaefcf32cd8499`. La segunda entrega utiliza la rama [evaluacion-2](https://github.com/YkzPam/SoundShopCL/tree/evaluacion-2). Sus documentos iniciales permanecen como antecedentes; las instrucciones vigentes para ejecutar E2 son las de este README y la guía de E2.
 
 - [Análisis inicial del caso tienda](docs/01-analisis-tienda.md).
 - [Diagrama de flujo del cliente](docs/diagrama-flujo.excalidraw) y [flujo administrativo de E1](docs/diagrama-administrador.excalidraw).
