@@ -1,8 +1,16 @@
 {
   "version": "2.0.0",
   "tasks": [
-    {"label": "E1: revisar configuración", "type": "process", "command": "${workspaceFolder}/venv/Scripts/python.exe", "args": ["manage.py", "check"], "problemMatcher": []},
-    {"label": "E1: ejecutar pruebas", "type": "process", "command": "${workspaceFolder}/venv/Scripts/python.exe", "args": ["manage.py", "test", "core", "--verbosity", "2"], "problemMatcher": [], "group": "test"},
-    {"label": "E1: abrir tienda", "type": "process", "command": "${workspaceFolder}/venv/Scripts/python.exe", "args": ["manage.py", "runserver", "127.0.0.1:8000", "--noreload"], "isBackground": true, "problemMatcher": []}
+    {"label": "E2: revisar configuración", "type": "process", "command": "${workspaceFolder}/venv/Scripts/python.exe", "args": ["manage.py", "check"], "problemMatcher": []},
+    {"label": "E2: aplicar migraciones", "type": "process", "command": "${workspaceFolder}/venv/Scripts/python.exe", "args": ["manage.py", "migrate"], "problemMatcher": []},
+    {"label": "E2: ver historial de migraciones", "type": "process", "command": "${workspaceFolder}/venv/Scripts/python.exe", "args": ["manage.py", "showmigrations", "core"], "problemMatcher": []},
+    {"label": "E2: cargar catálogo inicial", "type": "process", "command": "${workspaceFolder}/venv/Scripts/python.exe", "args": ["manage.py", "cargar_catalogo"], "problemMatcher": []},
+    {"label": "E2: crear administrador privado", "type": "process", "command": "${workspaceFolder}/venv/Scripts/python.exe", "args": ["manage.py", "createsuperuser"], "problemMatcher": []},
+    {"label": "E2: ejecutar pruebas", "type": "process", "command": "${workspaceFolder}/venv/Scripts/python.exe", "args": ["manage.py", "test", "core", "--verbosity", "2"], "problemMatcher": [], "group": "test"},
+    {"label": "E2: generar clientes con Faker", "type": "process", "command": "${workspaceFolder}/venv/Scripts/python.exe", "args": ["manage.py", "generar_clientes", "--cantidad", "${input:cantidadClientes}"], "problemMatcher": []},
+    {"label": "E2: abrir tienda y Admin", "type": "process", "command": "${workspaceFolder}/venv/Scripts/python.exe", "args": ["manage.py", "runserver", "127.0.0.1:8000", "--noreload"], "isBackground": true, "problemMatcher": []}
+  ],
+  "inputs": [
+    {"id": "cantidadClientes", "type": "pickString", "description": "Cantidad de clientes ficticios que se agregarán", "options": ["100", "1000", "100000", "1000000"], "default": "100"}
   ]
 }

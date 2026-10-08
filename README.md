@@ -1,70 +1,93 @@
-# SoundShop CL — Evaluación 1 corregida
+# SoundShop CL — Tienda musical
 
-Tienda musical con Django, HTML, Bootstrap, CSS y JavaScript. La entrega se limita a las fases 1 y 3 de la guía: análisis, diagrama, prototipo HTML e integración inicial con rutas, vistas, datos JSON y plantillas. No corresponde a un sistema de tarjetas ni a una tienda de producción.
+Proyecto individual de una tienda de equipos musicales desarrollado con Django. La Evaluación 2 continúa el trabajo de la Evaluación 1 y agrega SQLite, diez modelos propios, diez migraciones de `core`, un diagrama de base de datos, Django Admin y generación de clientes ficticios con Faker. La interfaz de la tienda se conserva; no se implementan los contenidos de la Evaluación 3.
 
-## 1. Ejecutar desde Visual Studio Code
+## 1. Ejecución desde Visual Studio Code
 
-Descargar el ZIP de GitHub, extraerlo y abrir **la carpeta que contiene `manage.py`** en Visual Studio Code. No abrir solamente un archivo HTML de las plantillas: esas páginas necesitan el servidor de Django.
+Extraer la descarga de GitHub y abrir en Visual Studio Code la carpeta que contiene `manage.py`. Las plantillas HTML de Django no se ejecutan directamente al hacer doble clic.
 
-En la terminal integrada, con Python 3.12 o superior disponible:
+Con Python 3.12 o superior instalado, ejecutar en la terminal integrada:
 
 ```powershell
 python -m venv venv
 .\venv\Scripts\python.exe -m pip install -r requirements.txt
 .\venv\Scripts\python.exe manage.py check
-.\venv\Scripts\python.exe manage.py test core
+.\venv\Scripts\python.exe manage.py migrate
+.\venv\Scripts\python.exe manage.py cargar_catalogo
+.\venv\Scripts\python.exe manage.py createsuperuser
 .\venv\Scripts\python.exe manage.py runserver
 ```
 
-Abrir <http://127.0.0.1:8000/>. No ejecutar `migrate`, no crear una base de datos ni instalar Node o Tailwind. Bootstrap y el JavaScript están incluidos dentro de `static/`; no requieren internet para visualizar la tienda después de instalar Django.
+El asistente de `createsuperuser` solicita un nombre de usuario, correo y contraseña elegidos por el propietario. La contraseña no se muestra mientras se escribe. No existe una contraseña administrativa pública ni una cuenta administrativa incluida en la descarga.
 
-Las tareas de `.vscode/tasks.json` también permiten revisar configuración, ejecutar pruebas y abrir el servidor desde **Terminal → Ejecutar tarea**. Primero se debe crear `venv` e instalar las dependencias.
+- Tienda: <http://127.0.0.1:8000/>.
+- Django Admin: <http://127.0.0.1:8000/admin/>.
 
-## 2. Accesos para mostrar el recorrido
+También se pueden utilizar las tareas de **Terminal → Ejecutar tarea**. Sus nombres comienzan con **E2:**; permiten revisar la configuración, aplicar migraciones, cargar el catálogo, crear el administrador, probar la aplicación y elegir la cantidad de clientes ficticios. Primero debe existir el entorno `venv` con las dependencias instaladas.
 
-El acceso de administrador utiliza un identificador y una contraseña entregados únicamente al propietario. El repositorio conserva verificadores criptográficos, no las credenciales legibles. **El mismo acceso funciona en cualquier computador que descargue el proyecto y ejecute Django**; no hay que copiar un archivo privado desde este equipo. La sesión se cierra al reiniciar el servidor porque la clave de firma se genera al iniciar cada proceso. Este prototipo local no es una autenticación de producción.
+Bootstrap, las imágenes, el CSS y el JavaScript están incluidos en `static/`. La tienda no necesita Node ni una compilación de estilos. Las animaciones requieren ejecutar Django, cargar la página en el navegador y tener permitidas las animaciones en las preferencias de accesibilidad del dispositivo.
 
-Para recorrer el área de cliente existe una cuenta de prueba en `core/data/usuarios.json`. Sus datos son públicos y no deben utilizarse con información personal. El formulario de registro valida los datos, pero no crea una cuenta permanente.
+## 2. Datos y acceso administrativo
 
-El enlace **Panel de administración** abre `/gestion/`. Si no existe una sesión administrativa válida, muestra el ingreso identificado como **Panel de administración** en `/gestion/ingresar/`; ese acceso no acepta cuentas de cliente. El panel tiene dos secciones: productos y usuarios. Sus formularios muestran errores o una vista previa validada. **No guardan cambios en el JSON.** Se puede añadir al carrito como invitado; para continuar se requiere iniciar sesión. No existe cobro ni pedido persistente.
+La aplicación utiliza `db.sqlite3`, creado por las migraciones. Este archivo y el entorno virtual no se publican en GitHub: cada computador crea su propia base y su propio administrador siguiendo el apartado anterior. Iniciar sesión en GitHub no inicia sesión en Django Admin.
 
-## 3. Entregables
+El catálogo público consulta la base de datos. Los cambios guardados en los productos desde Django Admin se muestran al volver a cargar la tienda. `core/data/catalogo.json` se conserva como fuente del catálogo inicial; editar ese JSON no sustituye la gestión de registros en SQLite. La carga inicial puede repetirse sin sobrescribir los productos ya editados.
 
-- [Análisis del caso tienda e investigación](docs/01-analisis-tienda.md).
-- [Diagrama editable en Excalidraw](docs/diagrama-flujo.excalidraw), [vista SVG](docs/diagrama-flujo.svg) y [copia PNG](docs/diagrama-flujo.png).
-- [Flujo del administrador en Excalidraw](docs/diagrama-administrador.excalidraw), [vista SVG](docs/diagrama-administrador.svg) y [copia PNG](docs/diagrama-administrador.png).
-- [Prototipo HTML navegable](prototipo-html/inicio.html). Abrir el archivo local para visualizar las maquetas; sus formularios no procesan datos.
-- [Mockups de las principales interfaces](docs/mockups/index.html). Bocetos de distribución, separados de las capturas de la aplicación.
-- [Atributos, tipos y operaciones de los formularios](docs/02-datos-y-validaciones.md).
-- [Pasos de la corrección adaptados a la tienda](docs/03-pasos-correccion.md).
-- [Correspondencia con los diez indicadores](docs/04-rubrica.md).
-- [Pruebas, límites y apoyo de IA](docs/05-verificacion.md).
+El enlace **Panel de administración** abre Django Admin. El acceso exige un usuario activo con permisos administrativos. Los diez modelos de la tienda están registrados con opciones de consulta; productos y clientes incluyen búsqueda, filtros y paginación.
 
-Para editar los diagramas: abrir <https://excalidraw.com/>, usar **Abrir** e importar el archivo `.excalidraw` correspondiente. El enlace compartido de la versión anterior no representa esta corrección y se retiró de la documentación.
+La cuenta y el carrito de cliente conservan el recorrido simulado de la primera entrega. El registro de la tienda no crea una cuenta permanente y el carrito no genera ventas ni cobros. El modelo `Cliente` almacena datos comerciales; no es una cuenta de acceso de Django. Las boletas y compras de esta evaluación se administran desde Django Admin.
 
-## 4. Archivos principales
+## 3. Archivos de la Evaluación 2
 
 ```text
 SoundShopCL/
 ├── manage.py
 ├── requirements.txt
-├── soundshop/          Configuración y rutas principales
+├── .vscode/tasks.json
+├── soundshop/
+│   ├── settings.py              Configuración de SQLite
+│   └── urls.py                  Entrada a Django Admin
 ├── core/
-│   ├── urls.py         Rutas con path() y name
-│   ├── views.py        Petición, condiciones, contexto y render()
-│   ├── forms.py        Formularios de Django
-│   ├── data/           Catálogo y usuario de prueba en JSON
-│   ├── templates/      HTML y lenguaje de plantillas DTL
-│   └── tests.py        Pruebas sin base de datos
-├── static/             Bootstrap local, imágenes, CSS y JavaScript
-├── prototipo-html/     Maquetas estáticas de la versión corregida
-└── docs/               Análisis, diagrama, mockups y evidencias
+│   ├── models.py                Diez modelos de la tienda
+│   ├── admin.py                 Registro y opciones de Django Admin
+│   ├── migrations/              Diez cambios generados por Django
+│   ├── management/commands/
+│   │   ├── cargar_catalogo.py    Catálogo y registros relacionados
+│   │   └── generar_clientes.py   Faker con cantidad verificable
+│   ├── views.py                 Consulta del catálogo para la tienda
+│   ├── templates/               Interfaz conservada
+│   └── tests.py                 Verificación de modelos y Admin
+├── static/                      Imágenes, estilos y animaciones locales
+└── docs/evaluacion-2/            Guía y diagrama de base de datos
 ```
 
-`core/models.py` conserva el archivo inicial de `startapp`; no define modelos de base de datos. Las sesiones temporales utilizan cookies firmadas para recordar el rol y la selección del carrito. La clave de firma no se publica en GitHub: se genera al iniciar el servidor.
+## 4. Diagramas, pruebas y defensa
 
-## 5. Cambios respecto de la entrega anterior
+- [Guía de E2: modelos, migraciones, Admin, Faker y rúbrica](docs/evaluacion-2/README.md).
+- [Diagrama de base de datos en PNG](docs/evaluacion-2/diagrama-base-datos.png), [SVG](docs/evaluacion-2/diagrama-base-datos.svg) y [editable de Excalidraw](docs/evaluacion-2/diagrama-base-datos.excalidraw).
+- [Correspondencia del esquema con los modelos](docs/evaluacion-2/esquema.json).
 
-Se reconstruyó la base de Django siguiendo los pasos de inicialización de la corrección. Se retiraron las cuentas en caché, el mantenimiento distribuido entre módulos, las operaciones AJAX del carrito, el mapa y las numerosas capas CSS. Se conservaron diez productos musicales, imágenes acotadas, un panel sencillo, modo claro/oscuro y efectos discretos de aparición y hover.
+El diagrama contiene solamente las diez tablas propias, sus atributos, claves y relaciones. Las tablas internas de usuarios, sesiones y migraciones de Django no se cuentan entre las diez tablas de la tienda.
 
-El repositorio contiene un prototipo local, no un sitio desplegado en GitHub Pages. Una descarga debe ejecutarse con Django según el apartado 1. La revisión técnica no garantiza una calificación: el docente evalúa la entrega y la explicación del estudiante.
+Para ejecutar las pruebas y revisar el historial:
+
+```powershell
+.\venv\Scripts\python.exe manage.py test core --verbosity 2
+.\venv\Scripts\python.exe manage.py showmigrations core
+.\venv\Scripts\python.exe manage.py makemigrations core --check --dry-run
+```
+
+La guía de E2 incluye los resultados de las cuatro cargas locales y un recorrido para explicar el código. Esas pruebas no sustituyen las cargas y la defensa presencial con el docente. La calificación depende de esa demostración y de la revisión de la entrega.
+
+## 5. Continuidad de la Evaluación 1 y publicación
+
+La primera entrega se conserva intacta en la rama [main](https://github.com/YkzPam/SoundShopCL/tree/main), en el commit `381abd52a831058e2032d6c5d5eaefcf32cd8499`. La segunda entrega utiliza la rama [evaluacion-2](https://github.com/YkzPam/SoundShopCL/tree/evaluacion-2). Sus documentos iniciales permanecen como antecedentes; las instrucciones vigentes para ejecutar E2 son las de este README y la guía de E2.
+
+- [Análisis inicial del caso tienda](docs/01-analisis-tienda.md).
+- [Diagrama de flujo del cliente](docs/diagrama-flujo.excalidraw) y [flujo administrativo de E1](docs/diagrama-administrador.excalidraw).
+- [Mockups de E1](docs/mockups/index.html) y [prototipo HTML de E1](prototipo-html/inicio.html).
+- [Correspondencia histórica con la rúbrica de E1](docs/04-rubrica.md).
+
+Para entregar E2, publicar el código actualizado y las migraciones en el mismo repositorio, verificar el último commit e informar su hash. Adjuntar también la imagen del diagrama de base de datos en la plataforma indicada por el docente. GitHub conserva el código; no ejecuta este servidor Django como una página de GitHub Pages.
+
+El proyecto se limita al desarrollo y la demostración local. No incluye pagos reales, autenticación permanente de clientes, despliegue de producción ni un administrador propio para la Evaluación 3.

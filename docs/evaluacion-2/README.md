@@ -1,0 +1,160 @@
+# Evaluación 2 — Base de datos y Django Admin de SoundShop CL
+
+## 1. Alcance de la entrega
+
+La segunda evaluación continúa el mismo caso de tienda musical de E1. Su desarrollo se concentra en SQLite, modelos relacionados, migraciones, diagrama, Django Admin y datos ficticios. El correo del docente exige demostrar las cuatro cargas de Faker y explicar el código presencialmente. Las diez tablas propias y las diez migraciones de `core` corresponden a la exigencia de clase confirmada por el estudiante; no se atribuye esa cantidad al texto de la rúbrica.
+
+La rama `main` conserva la Evaluación 1 en el commit `381abd52a831058e2032d6c5d5eaefcf32cd8499`. La segunda entrega se publica en `evaluacion-2`, sin modificar `main`. El diseño de la tienda se conserva y sus consultas pasan a utilizar SQLite. No se desarrollan pagos, una API, un administrador propio ni cuentas permanentes de clientes.
+
+## 2. Configuración y reproducción en otro computador
+
+Los pasos de instalación, migración, catálogo y creación del administrador se encuentran en el [README principal](../../README.md). La configuración utiliza `django.db.backends.sqlite3` y, por defecto, el archivo `db.sqlite3` en la carpeta de `manage.py`. La aplicación `core` está registrada en `INSTALLED_APPS` y la ruta `/admin/` utiliza el administrador incluido en Django.
+
+La base local no se distribuye en GitHub. Al descargar el proyecto se deben ejecutar `migrate`, `cargar_catalogo` y `createsuperuser`. Este último paso crea un usuario administrativo en la nueva base; no utiliza la cuenta de GitHub ni la cuenta simulada del cliente. La extensión SQLite DB Viewer permite abrir `db.sqlite3` desde VS Code para revisar las tablas y los registros, pero no sustituye al motor SQLite utilizado por Django.
+
+## 3. Modelos y relaciones de la tienda
+
+| N.º | Modelo | Tabla propia | Función |
+| --- | --- | --- | --- |
+| 1 | Categoria | core_categoria | Clasifica los equipos musicales. |
+| 2 | Marca | core_marca | Identifica la marca del equipo. |
+| 3 | Proveedor | core_proveedor | Almacena los datos de los proveedores. |
+| 4 | Sucursal | core_sucursal | Identifica el punto de venta. |
+| 5 | Cliente | core_cliente | Conserva nombre y datos de contacto comerciales. |
+| 6 | Producto | core_producto | Almacena código, descripción, precio, stock e imagen. |
+| 7 | Boleta | core_boleta | Identifica una venta registrada en Admin. |
+| 8 | DetalleBoleta | core_detalleboleta | Relaciona boleta y producto con cantidad y precio histórico. |
+| 9 | CompraProveedor | core_compraproveedor | Identifica una compra al proveedor. |
+| 10 | DetalleCompra | core_detallecompra | Relaciona compra y producto con cantidad y costo histórico. |
+
+Los nombres y códigos utilizan campos de texto; los precios utilizan `DecimalField(max_digits=10, decimal_places=2)`; el stock y las cantidades utilizan enteros positivos; las fechas utilizan `DateField`; el estado activo utiliza `BooleanField`. Django incorpora la clave primaria `id` a cada modelo. El código de producto y el correo del cliente son únicos. La imagen conserva una ruta relativa a `static/`; no se agrega una gestión de archivos subidos.
+
+Un producto pertenece a una categoría, una marca y un proveedor mediante `ForeignKey`. Cada boleta pertenece a un cliente y una sucursal. Cada compra pertenece a un proveedor y una sucursal. Las relaciones de muchos productos con muchas boletas y compras utilizan las tablas de detalle mediante `ManyToManyField(..., through=...)`; no se crean tablas intermedias adicionales.
+
+`PROTECT` evita borrar registros que todavía están referenciados. `CASCADE` elimina los detalles cuando se elimina su documento principal. Cada detalle conserva el precio o costo de ese momento, sin depender de futuros cambios en el precio de catálogo. Su propiedad `subtotal` multiplica cantidad por precio; no es una columna adicional. El stock no se descuenta automáticamente y las boletas no se generan desde el carrito.
+
+## 4. Diagrama de base de datos
+
+El esquema representa las diez tablas propias, atributos, tipos, claves primarias, campos únicos y claves foráneas. Las líneas muestran las relaciones uno a muchos; las tablas de detalle representan las relaciones muchos a muchos. No se agregan párrafos ni títulos externos dentro del diagrama.
+
+- [Imagen PNG para adjuntar en la plataforma](diagrama-base-datos.png).
+- [SVG para ampliar sin perder nitidez](diagrama-base-datos.svg).
+- [Archivo editable de Excalidraw](diagrama-base-datos.excalidraw).
+- [Descripción del esquema utilizada para comprobar correspondencia](esquema.json).
+
+Para abrir el editable, ingresar a <https://excalidraw.com/> y utilizar **Abrir**. Las tablas internas de Django, como `auth_user`, `django_session` y `django_migrations`, existen en la base, pero no se cuentan entre las diez tablas propias.
+
+## 5. Historial de migraciones
+
+| Archivo | Cambio de estructura |
+| --- | --- |
+| 0001_categorias_y_marcas | Crea categorías y marcas. |
+| 0002_proveedores | Crea proveedores. |
+| 0003_sucursales | Crea sucursales. |
+| 0004_clientes | Crea clientes. |
+| 0005_productos | Crea productos y sus relaciones; inicialmente utiliza precio entero. |
+| 0006_boletas | Crea boletas, relacionadas con cliente y sucursal. |
+| 0007_detalle_boletas | Crea el detalle y la relación muchos a muchos de boleta y producto. |
+| 0008_compras_proveedores | Crea las compras, relacionadas con proveedor y sucursal. |
+| 0009_detalle_compras | Crea el detalle y la relación muchos a muchos de compra y producto. |
+| 0010_producto_activo_precios_decimal | Añade producto activo y cambia los tres campos de precio a DecimalField. |
+
+Las migraciones fueron generadas por Django a medida que se incorporaron o modificaron los modelos. No son diez archivos vacíos. `makemigrations` registra el cambio en archivos Python; `migrate` aplica esos archivos a SQLite. La décima migración conserva un cambio real posterior al modelo inicial y permite explicar cómo se modifica una estructura existente.
+
+```powershell
+.\venv\Scripts\python.exe manage.py showmigrations core
+.\venv\Scripts\python.exe manage.py makemigrations core --check --dry-run
+```
+
+En el historial, `[X]` identifica una migración aplicada. La comprobación sin escritura debe indicar que no existen cambios pendientes. Para realizar una modificación futura se cambia el modelo, se genera otra migración y se aplica; no se borran ni se reescriben las migraciones que ya fueron utilizadas.
+
+## 6. Administración y demostración del CRUD
+
+`core/admin.py` registra los diez modelos mediante `@admin.register`. `list_display` determina las columnas; `search_fields` define la búsqueda; `list_filter` agrega filtros; `ordering` ordena; `list_per_page` limita los registros por página; `fieldsets` agrupa los campos de producto. La cabecera y los títulos identifican SoundShop CL. Son opciones del administrador nativo, no páginas CRUD propias.
+
+Los detalles pueden completarse en el formulario de la boleta o compra mediante `TabularInline`. Los campos con `autocomplete_fields` buscan registros sin mostrar un selector con todos los clientes o productos. `readonly_fields` muestra el identificador y el subtotal sin permitir su edición. Esas opciones están concentradas en `admin.py`.
+
+Para la demostración presencial se ingresa a `/admin/` con la cuenta creada mediante `createsuperuser`. En **Productos**, se crea un registro nuevo con código no utilizado, nombre, descripción, precio mayor que cero, stock y las tres relaciones existentes. Se guarda y se consulta desde el listado y desde SQLite. Se busca por código, se aplica un filtro, se modifica el nombre o precio y se comprueba el valor guardado al abrir nuevamente el registro.
+
+La eliminación debe demostrarse con ese producto nuevo, sin asociarlo a una boleta ni compra. Si se intenta eliminar un equipo utilizado en un detalle, `PROTECT` impedirá el borrado: es una regla del modelo, no un fallo del administrador. Las validaciones rechazan códigos repetidos, precios no positivos y cantidades no positivas. Después de guardar un cambio en un producto activo, el catálogo público lo muestra al recargar la página.
+
+## 7. Catálogo inicial y generación con Faker
+
+`cargar_catalogo` utiliza los diez productos del JSON existente como datos iniciales. Incorpora categorías, marcas, proveedor, sucursal y documentos relacionados, además de tres clientes ficticios con Faker. `get_or_create` busca un registro y lo crea solo si no existe; repetir el comando no sobrescribe los registros que fueron modificados en Admin. Los contactos `example.test` y el sector de la sucursal son datos de prueba, no una tienda física confirmada.
+
+`generar_clientes` recibe la cantidad solicitada. Faker con configuración `es_CL` produce nombres y teléfonos; cada correo ficticio recibe un prefijo de carga y un número para evitar duplicados. El bucle prepara lotes de hasta mil objetos. `bulk_create` guarda cada lote sin mantener un millón de objetos en memoria. `transaction.atomic` revierte la carga completa si ocurre un error durante la inserción.
+
+El comando consulta la cantidad antes y después, cuenta los registros del prefijo y recupera el primero y el último. Solo informa **VERIFICADO** cuando la diferencia y el número almacenado coinciden con lo solicitado. La carga es acumulativa: agregar mil clientes no reemplaza los registros que ya existían. Los clientes ficticios no se convierten en usuarios de acceso a Django.
+
+Para separar las cargas grandes de la tienda, ejecutar en la misma terminal de VS Code:
+
+```powershell
+New-Item -ItemType Directory -Path work -Force | Out-Null
+$env:SOUNDSHOP_DB = "work/demostracion.sqlite3"
+.\venv\Scripts\python.exe manage.py migrate
+.\venv\Scripts\python.exe manage.py generar_clientes --cantidad 100
+.\venv\Scripts\python.exe manage.py generar_clientes --cantidad 1000
+.\venv\Scripts\python.exe manage.py generar_clientes --cantidad 100000
+.\venv\Scripts\python.exe manage.py generar_clientes --cantidad 1000000
+.\venv\Scripts\python.exe manage.py shell -c "from core.models import Cliente; print(Cliente.objects.count())"
+Remove-Item Env:SOUNDSHOP_DB
+```
+
+La variable `SOUNDSHOP_DB` selecciona otro archivo SQLite durante esa terminal. Al retirarla, los comandos vuelven a utilizar `db.sqlite3`. No se borra ninguna de las dos bases. Para ver el archivo de demostración en Django Admin, se mantiene la variable, se crea un administrador en esa base y se inicia el servidor desde la misma terminal.
+
+## 8. Verificaciones locales del 8 de octubre de 2026
+
+Las cuatro cargas se ejecutaron en `work/cargas.sqlite3`, separada de la base del catálogo. El comando verificó las inserciones y una consulta posterior, en otro proceso, confirmó 1.101.100 clientes acumulados. El historial de esa base tiene las diez migraciones aplicadas. SQLite devolvió integridad `ok` y ninguna infracción de claves foráneas en ambas bases.
+
+| Carga solicitada | Registros antes | Registros después | Tiempo local informado |
+| --- | ---: | ---: | ---: |
+| 100 | 0 | 100 | 0,02 s |
+| 1.000 | 100 | 1.100 | 0,17 s |
+| 100.000 | 1.100 | 101.100 | 16,26 s |
+| 1.000.000 | 101.100 | 1.101.100 | 165,16 s |
+
+Los tiempos corresponden a esas ejecuciones locales; no son valores garantizados en otro computador. Estas cargas no se realizaron con el docente. La base principal conserva diez productos y tres clientes comerciales de prueba. Los archivos SQLite y la carpeta `work/` están excluidos de Git.
+
+Las diecisiete pruebas automáticas pasaron. Comprueban SQLite, tablas y migraciones, registro de modelos, correspondencia del esquema, acceso administrativo, creación, consulta, filtros, modificación y eliminación de productos, validaciones, relaciones, repetición del catálogo, una carga pequeña de Faker y respuesta de las páginas conservadas. El CRUD completo se prueba con productos; no se afirma que se haya repetido manualmente con cada uno de los diez modelos.
+
+Los tests crean su administrador únicamente en la base temporal de pruebas. La contraseña de ese usuario no sirve para ingresar a la tienda real y no constituye una credencial administrativa distribuida. `self.client.get` y `self.client.post` simulan solicitudes; las comprobaciones comparan la respuesta y los registros almacenados. No son una grabación de interacción en el navegador.
+
+## 9. Correspondencia con los diez indicadores de la rúbrica
+
+| N.º | Indicador resumido | Máximo | Evidencia del proyecto | Comprobación pendiente ante el docente |
+| --- | --- | ---: | --- | --- |
+| 1 | Conexión y configuración de la base | 10 | SQLite en settings.py; conexión e integridad verificadas. | Identificar la base y explicar la configuración. |
+| 2 | Modelos, atributos, tipos, claves y relaciones | 10 | Diez modelos en models.py y diagrama correspondiente. | Explicar campos, claves y decisiones de relaciones. |
+| 3 | Migraciones, diagrama y datos Faker almacenados | 10 | Diez migraciones, esquema y cuatro cargas locales verificadas. | Ejecutar las cargas y explicar el historial. |
+| 4 | Acceso y modelos registrados en Admin | 10 | Diez registros en admin.py; pruebas de acceso y listados. | Crear la cuenta privada e ingresar en la demostración. |
+| 5 | Presentación y usabilidad del administrador | 10 | Columnas, búsqueda, filtros, grupos, paginación y títulos. | Mostrar su uso y explicar la configuración. |
+| 6 | Creación de registros desde Admin | 10 | Prueba de creación y consulta del producto persistido. | Crear un registro y verificarlo presencialmente. |
+| 7 | Consulta y verificación de datos | 10 | Listados, búsquedas, filtros y consultas SQLite. | Buscar y mostrar información almacenada. |
+| 8 | Modificación y persistencia desde Admin | 10 | Prueba de edición, nueva consulta y cambio visible en catálogo. | Modificar y comprobar el registro nuevamente. |
+| 9 | Eliminación y persistencia desde Admin | 10 | Prueba de borrado de producto y protección de registros relacionados. | Eliminar un registro sin referencias y verificarlo. |
+| 10 | Demostración y explicación de Django Admin | 10 | Recorrido y explicación de archivos en esta guía. | Defensa presencial del estudiante. |
+| | Máximo posible | 100 | Cobertura técnica local; no es una calificación asignada. | La puntuación la determina el docente. |
+
+## 10. Preparación de la explicación del código
+
+La defensa debe poder ubicar cada parte: `settings.py` configura la base y la aplicación; `models.py` define las tablas y relaciones; `migrations/` conserva los cambios de estructura; `admin.py` habilita y configura la gestión; los comandos cargan y comprueban datos ficticios. `views.py` consulta productos para la interfaz conservada. El CRUD de E2 lo resuelve Django Admin, sin construir formularios ni vistas administrativas propias.
+
+Antes de la clase corresponde practicar por qué un producto tiene claves foráneas, qué diferencia existe entre `makemigrations` y `migrate`, qué se conserva en un precio histórico y por qué un registro protegido no se elimina. También debe explicarse la diferencia entre `Cliente` y el usuario administrativo, cómo funciona el bucle de Faker y cómo se comprueba que una inserción quedó en SQLite. Una ejecución correcta no prueba, por sí sola, que el estudiante pueda explicar esas decisiones.
+
+## 11. Publicación y entrega
+
+La publicación de E2 utiliza la rama `evaluacion-2` del repositorio [YkzPam/SoundShopCL](https://github.com/YkzPam/SoundShopCL). La rama `main` permanece en E1. Para identificar la versión entregada, consultar el hash completo del último commit de la rama publicada; no utilizar el hash de E1 ni un commit que solo exista localmente.
+
+La entrega al docente incluye el enlace de GitHub a E2 y el hash de ese commit. La imagen PNG del diagrama debe adjuntarse según las instrucciones de la plataforma. El enlace a un commit identifica exactamente el código revisado, incluso si después se añaden otros cambios. Publicar el repositorio no equivale a enviar la tarea de AAI ni a cumplir la asistencia y la defensa presencial.
+
+## 12. Material de referencia utilizado
+
+La guía se contrastó con *E2 Evaluacion_inv_Caso_Semestral_Music_pro_U2 Backend (2).pdf* y *E2 Escala_Apreciacion_U2 Backend (1).xlsx*, entregados por el docente, más el correo y la exigencia de clase confirmada de diez tablas y diez migraciones. El PDF de trece páginas explicita filtros, búsquedas, personalización y las cuatro cargas en sus páginas 9 a 11. Las marcas de ejemplo de la planilla no se interpretan como una nota obtenida por este proyecto.
+
+Café y Código. (s. f.). *django-examples* [Repositorio de código]. GitHub. https://github.com/cafeycodigo/django-examples
+
+El ZIP del repositorio del docente se utilizó como referencia de SQLite, modelos, opciones de ModelAdmin, migraciones y seeding. No se copian sus otras aplicaciones ni se instala todo su conjunto de dependencias. El proyecto mantiene las versiones compatibles declaradas en su propio archivo requirements.txt.
+
+*Ejercicios de Migraciones, Modelos y Administrador en Django*. (s. f.). AAI INACAP, Unidad 2 de Framework back end [Material del curso con acceso institucional]. https://aai.inacap.cl/mod/page/view.php?id=2336194
+
+Se verificó el contenido escrito de ese apartado y sus pasos de entorno, aplicación, modelos y migraciones. Los dos videos enlazados se abrieron en Chrome: YouTube indicó que no había subtítulos, la exportación de transcripción no encontró texto y los paneles de transcripción quedaron vacíos. No se considera revisada su explicación audiovisual completa. Esa revisión requiere un archivo o una transcripción accesible; no se afirma haber reproducido todas las clases.

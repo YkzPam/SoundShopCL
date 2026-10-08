@@ -1,0 +1,433 @@
+[
+  {
+    "tabla": "core_categoria",
+    "modelo": "Categoria",
+    "campos": [
+      {
+        "columna": "id",
+        "tipo": "integer",
+        "pk": true,
+        "unique": true,
+        "fk": null
+      },
+      {
+        "columna": "nombre",
+        "tipo": "varchar(80)",
+        "pk": false,
+        "unique": true,
+        "fk": null
+      },
+      {
+        "columna": "slug",
+        "tipo": "varchar(80)",
+        "pk": false,
+        "unique": true,
+        "fk": null
+      },
+      {
+        "columna": "descripcion",
+        "tipo": "text",
+        "pk": false,
+        "unique": false,
+        "fk": null
+      }
+    ]
+  },
+  {
+    "tabla": "core_marca",
+    "modelo": "Marca",
+    "campos": [
+      {
+        "columna": "id",
+        "tipo": "integer",
+        "pk": true,
+        "unique": true,
+        "fk": null
+      },
+      {
+        "columna": "nombre",
+        "tipo": "varchar(80)",
+        "pk": false,
+        "unique": true,
+        "fk": null
+      },
+      {
+        "columna": "pais",
+        "tipo": "varchar(60)",
+        "pk": false,
+        "unique": false,
+        "fk": null
+      }
+    ]
+  },
+  {
+    "tabla": "core_proveedor",
+    "modelo": "Proveedor",
+    "campos": [
+      {
+        "columna": "id",
+        "tipo": "integer",
+        "pk": true,
+        "unique": true,
+        "fk": null
+      },
+      {
+        "columna": "nombre",
+        "tipo": "varchar(120)",
+        "pk": false,
+        "unique": false,
+        "fk": null
+      },
+      {
+        "columna": "correo",
+        "tipo": "varchar(254)",
+        "pk": false,
+        "unique": false,
+        "fk": null
+      },
+      {
+        "columna": "telefono",
+        "tipo": "varchar(20)",
+        "pk": false,
+        "unique": false,
+        "fk": null
+      },
+      {
+        "columna": "activo",
+        "tipo": "bool",
+        "pk": false,
+        "unique": false,
+        "fk": null
+      }
+    ]
+  },
+  {
+    "tabla": "core_sucursal",
+    "modelo": "Sucursal",
+    "campos": [
+      {
+        "columna": "id",
+        "tipo": "integer",
+        "pk": true,
+        "unique": true,
+        "fk": null
+      },
+      {
+        "columna": "nombre",
+        "tipo": "varchar(80)",
+        "pk": false,
+        "unique": false,
+        "fk": null
+      },
+      {
+        "columna": "direccion",
+        "tipo": "varchar(180)",
+        "pk": false,
+        "unique": false,
+        "fk": null
+      },
+      {
+        "columna": "comuna",
+        "tipo": "varchar(60)",
+        "pk": false,
+        "unique": false,
+        "fk": null
+      },
+      {
+        "columna": "activo",
+        "tipo": "bool",
+        "pk": false,
+        "unique": false,
+        "fk": null
+      }
+    ]
+  },
+  {
+    "tabla": "core_cliente",
+    "modelo": "Cliente",
+    "campos": [
+      {
+        "columna": "id",
+        "tipo": "integer",
+        "pk": true,
+        "unique": true,
+        "fk": null
+      },
+      {
+        "columna": "nombre",
+        "tipo": "varchar(100)",
+        "pk": false,
+        "unique": false,
+        "fk": null
+      },
+      {
+        "columna": "correo",
+        "tipo": "varchar(254)",
+        "pk": false,
+        "unique": true,
+        "fk": null
+      },
+      {
+        "columna": "telefono",
+        "tipo": "varchar(20)",
+        "pk": false,
+        "unique": false,
+        "fk": null
+      },
+      {
+        "columna": "activo",
+        "tipo": "bool",
+        "pk": false,
+        "unique": false,
+        "fk": null
+      }
+    ]
+  },
+  {
+    "tabla": "core_producto",
+    "modelo": "Producto",
+    "campos": [
+      {
+        "columna": "id",
+        "tipo": "integer",
+        "pk": true,
+        "unique": true,
+        "fk": null
+      },
+      {
+        "columna": "codigo",
+        "tipo": "varchar(30)",
+        "pk": false,
+        "unique": true,
+        "fk": null
+      },
+      {
+        "columna": "nombre",
+        "tipo": "varchar(80)",
+        "pk": false,
+        "unique": false,
+        "fk": null
+      },
+      {
+        "columna": "descripcion",
+        "tipo": "text",
+        "pk": false,
+        "unique": false,
+        "fk": null
+      },
+      {
+        "columna": "precio",
+        "tipo": "decimal",
+        "pk": false,
+        "unique": false,
+        "fk": null
+      },
+      {
+        "columna": "stock",
+        "tipo": "integer unsigned",
+        "pk": false,
+        "unique": false,
+        "fk": null
+      },
+      {
+        "columna": "categoria_id",
+        "tipo": "bigint",
+        "pk": false,
+        "unique": false,
+        "fk": "categoria"
+      },
+      {
+        "columna": "marca_id",
+        "tipo": "bigint",
+        "pk": false,
+        "unique": false,
+        "fk": "marca"
+      },
+      {
+        "columna": "proveedor_id",
+        "tipo": "bigint",
+        "pk": false,
+        "unique": false,
+        "fk": "proveedor"
+      },
+      {
+        "columna": "imagen",
+        "tipo": "varchar(200)",
+        "pk": false,
+        "unique": false,
+        "fk": null
+      },
+      {
+        "columna": "activo",
+        "tipo": "bool",
+        "pk": false,
+        "unique": false,
+        "fk": null
+      }
+    ]
+  },
+  {
+    "tabla": "core_boleta",
+    "modelo": "Boleta",
+    "campos": [
+      {
+        "columna": "id",
+        "tipo": "integer",
+        "pk": true,
+        "unique": true,
+        "fk": null
+      },
+      {
+        "columna": "numero",
+        "tipo": "integer unsigned",
+        "pk": false,
+        "unique": true,
+        "fk": null
+      },
+      {
+        "columna": "fecha",
+        "tipo": "date",
+        "pk": false,
+        "unique": false,
+        "fk": null
+      },
+      {
+        "columna": "cliente_id",
+        "tipo": "bigint",
+        "pk": false,
+        "unique": false,
+        "fk": "cliente"
+      },
+      {
+        "columna": "sucursal_id",
+        "tipo": "bigint",
+        "pk": false,
+        "unique": false,
+        "fk": "sucursal"
+      }
+    ]
+  },
+  {
+    "tabla": "core_detalleboleta",
+    "modelo": "DetalleBoleta",
+    "campos": [
+      {
+        "columna": "id",
+        "tipo": "integer",
+        "pk": true,
+        "unique": true,
+        "fk": null
+      },
+      {
+        "columna": "boleta_id",
+        "tipo": "bigint",
+        "pk": false,
+        "unique": false,
+        "fk": "boleta"
+      },
+      {
+        "columna": "producto_id",
+        "tipo": "bigint",
+        "pk": false,
+        "unique": false,
+        "fk": "producto"
+      },
+      {
+        "columna": "cantidad",
+        "tipo": "integer unsigned",
+        "pk": false,
+        "unique": false,
+        "fk": null
+      },
+      {
+        "columna": "precio_unitario",
+        "tipo": "decimal",
+        "pk": false,
+        "unique": false,
+        "fk": null
+      }
+    ]
+  },
+  {
+    "tabla": "core_compraproveedor",
+    "modelo": "CompraProveedor",
+    "campos": [
+      {
+        "columna": "id",
+        "tipo": "integer",
+        "pk": true,
+        "unique": true,
+        "fk": null
+      },
+      {
+        "columna": "numero",
+        "tipo": "integer unsigned",
+        "pk": false,
+        "unique": true,
+        "fk": null
+      },
+      {
+        "columna": "fecha",
+        "tipo": "date",
+        "pk": false,
+        "unique": false,
+        "fk": null
+      },
+      {
+        "columna": "proveedor_id",
+        "tipo": "bigint",
+        "pk": false,
+        "unique": false,
+        "fk": "proveedor"
+      },
+      {
+        "columna": "sucursal_id",
+        "tipo": "bigint",
+        "pk": false,
+        "unique": false,
+        "fk": "sucursal"
+      }
+    ]
+  },
+  {
+    "tabla": "core_detallecompra",
+    "modelo": "DetalleCompra",
+    "campos": [
+      {
+        "columna": "id",
+        "tipo": "integer",
+        "pk": true,
+        "unique": true,
+        "fk": null
+      },
+      {
+        "columna": "compra_id",
+        "tipo": "bigint",
+        "pk": false,
+        "unique": false,
+        "fk": "compraproveedor"
+      },
+      {
+        "columna": "producto_id",
+        "tipo": "bigint",
+        "pk": false,
+        "unique": false,
+        "fk": "producto"
+      },
+      {
+        "columna": "cantidad",
+        "tipo": "integer unsigned",
+        "pk": false,
+        "unique": false,
+        "fk": null
+      },
+      {
+        "columna": "precio_costo",
+        "tipo": "decimal",
+        "pk": false,
+        "unique": false,
+        "fk": null
+      }
+    ]
+  }
+]

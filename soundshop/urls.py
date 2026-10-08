@@ -1,4 +1,7 @@
+from django.contrib import admin
 from django.urls import include, path
 
-# El caso utiliza su propio panel, no el administrador de base de datos.
-urlpatterns = [path("", include("core.urls"))]
+urlpatterns = [
+    path("admin/", admin.site.urls),
+    path("", include("core.urls")),
+]
