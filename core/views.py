@@ -84,7 +84,9 @@ def nosotros(request):
 
 
 @sensitive_post_parameters("clave")
-def login(request):
+def login(request, acceso_admin=False):
+    if acceso_admin and request.method == "GET" and admin_autorizado(request):
+        return redirect("core:gestion")
     formulario = LoginForm(request.POST if request.method == "POST" else None)
     if request.method == "POST" and formulario.is_valid():
         usuario_encontrado = None
@@ -94,7 +96,7 @@ def login(request):
                 and check_password(correo, settings.SOUNDSHOP_ADMIN_USERNAME_HASH)
                 and check_password(clave, settings.SOUNDSHOP_ADMIN_PASSWORD_HASH)):
             usuario_encontrado = {"nombre": "Administrador", "rol": "administrador"}
-        else:
+        elif not acceso_admin:
             for usuario in leer_json("usuarios.json"):
                 if (usuario["rol"] == "cliente" and usuario["correo"] == correo
                         and usuario.get("clave_demo") == clave and usuario["activo"]):
@@ -114,7 +116,9 @@ def login(request):
             messages.success(request, "Sesión iniciada.")
             return redirect("core:cliente")
         formulario.add_error(None, "El correo o la contraseña no son correctos.")
-    return render(request, "core/login.html", {"formulario": formulario, "titulo": "Iniciar sesión"})
+    return render(request, "core/login.html", {
+        "formulario": formulario, "acceso_admin": acceso_admin,
+        "titulo": "Panel de administración" if acceso_admin else "Iniciar sesión"})
 
 
 def registro(request):
@@ -200,9 +204,9 @@ def confirmar(request):
 
 def gestion(request):
     if not admin_autorizado(request):
-        return redirect("core:login")
+        return redirect("core:login_admin")
     datos = leer_json("catalogo.json")
-    contexto = {"titulo": "Administración", "total_productos": len(datos["productos"]),
+    contexto = {"titulo": "Panel de administración", "total_productos": len(datos["productos"]),
                 "total_usuarios": len(usuarios_disponibles(request)),
                 "sin_stock": len([p for p in datos["productos"] if p["stock"] == 0])}
     return render(request, "core/gestion.html", contexto)
@@ -210,14 +214,14 @@ def gestion(request):
 
 def gestion_productos(request):
     if not admin_autorizado(request):
-        return redirect("core:login")
+        return redirect("core:login_admin")
     return render(request, "core/gestion_productos.html", {
         "productos": leer_json("catalogo.json")["productos"], "titulo": "Administrar productos"})
 
 
 def producto_formulario(request, producto_id=None):
     if not admin_autorizado(request):
-        return redirect("core:login")
+        return redirect("core:login_admin")
     datos = leer_json("catalogo.json")
     producto = obtener_producto(producto_id) if producto_id is not None else None
     formulario = ProductoForm(request.POST if request.method == "POST" else None,
@@ -233,7 +237,7 @@ def producto_formulario(request, producto_id=None):
 
 def gestion_usuarios(request):
     if not admin_autorizado(request):
-        return redirect("core:login")
+        return redirect("core:login_admin")
     formulario = UsuarioForm(request.POST if request.method == "POST" else None)
     resultado = None
     usuarios = usuarios_disponibles(request)

@@ -26,7 +26,7 @@ El acceso de administrador utiliza un identificador y una contraseña entregados
 
 Para recorrer el área de cliente existe una cuenta de prueba en `core/data/usuarios.json`. Sus datos son públicos y no deben utilizarse con información personal. El formulario de registro valida los datos, pero no crea una cuenta permanente.
 
-El panel `/gestion/` tiene dos secciones: productos y usuarios. Sus formularios muestran errores o una vista previa validada. **No guardan cambios en el JSON.** Se puede añadir al carrito como invitado; para continuar se requiere iniciar sesión. No existe cobro ni pedido persistente.
+El enlace **Panel de administración** abre `/gestion/`. Si no existe una sesión administrativa válida, muestra el ingreso identificado como **Panel de administración** en `/gestion/ingresar/`; ese acceso no acepta cuentas de cliente. El panel tiene dos secciones: productos y usuarios. Sus formularios muestran errores o una vista previa validada. **No guardan cambios en el JSON.** Se puede añadir al carrito como invitado; para continuar se requiere iniciar sesión. No existe cobro ni pedido persistente.
 
 ## 3. Entregables
 

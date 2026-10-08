@@ -60,6 +60,30 @@ class TiendaTests(SimpleTestCase):
     def test_login_administrador(self):
         self.assertRedirects(self.entrar_admin(), reverse("core:gestion"))
 
+    def test_acceso_admin_identificado(self):
+        respuesta = self.client.get(reverse("core:login_admin"))
+        self.assertContains(respuesta, "<h1>Panel de administración</h1>", html=True)
+        self.assertContains(respuesta, "Entrar al panel")
+        self.assertNotContains(respuesta, "Ver formulario de registro")
+        respuesta_cliente = self.client.get(reverse("core:login"))
+        self.assertContains(respuesta_cliente, "<h1>Iniciar sesión</h1>", html=True)
+        self.assertContains(respuesta_cliente, "Ver formulario de registro")
+
+    def test_acceso_admin_acepta_credenciales_privadas(self):
+        respuesta = self.client.post(reverse("core:login_admin"), {
+            "correo": ADMIN_USUARIO_PRUEBA, "clave": ADMIN_CLAVE_PRUEBA})
+        self.assertRedirects(respuesta, reverse("core:gestion"))
+
+    def test_acceso_admin_rechaza_cuenta_cliente(self):
+        respuesta = self.client.post(reverse("core:login_admin"), {
+            "correo": "cliente@soundshop.example", "clave": "Demo1234"})
+        self.assertContains(respuesta, "no son correctos")
+        self.assertNotIn("rol", self.client.session)
+
+    def test_admin_con_sesion_abre_panel_directamente(self):
+        self.entrar_admin()
+        self.assertRedirects(self.client.get(reverse("core:login_admin")), reverse("core:gestion"))
+
     def test_login_incorrecto(self):
         respuesta = self.client.post(reverse("core:login"), {
             "correo": ADMIN_USUARIO_PRUEBA, "clave": "incorrecta"})
@@ -79,15 +103,15 @@ class TiendaTests(SimpleTestCase):
 
     def test_restriccion_admin(self):
         for nombre in ["gestion", "gestion_productos", "gestion_usuarios", "producto_nuevo"]:
-            self.assertRedirects(self.client.get(reverse("core:" + nombre)), reverse("core:login"))
+            self.assertRedirects(self.client.get(reverse("core:" + nombre)), reverse("core:login_admin"))
         self.client.post(reverse("core:login"), {"correo": "cliente@soundshop.example", "clave": "Demo1234"})
-        self.assertRedirects(self.client.get(reverse("core:gestion")), reverse("core:login"))
+        self.assertRedirects(self.client.get(reverse("core:gestion")), reverse("core:login_admin"))
 
     def test_rol_sin_verificacion_no_abre_admin(self):
         sesion = self.client.session
         sesion["rol"] = "administrador"
         sesion.save()
-        self.assertRedirects(self.client.get(reverse("core:gestion")), reverse("core:login"))
+        self.assertRedirects(self.client.get(reverse("core:gestion")), reverse("core:login_admin"))
 
     def test_login_no_muestra_claves_publicas(self):
         respuesta = self.client.get(reverse("core:login"))
