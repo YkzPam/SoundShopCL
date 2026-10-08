@@ -7,7 +7,7 @@ La rúbrica asigna un máximo de diez puntos por indicador, con cien puntos tota
 | N.º | Máximo | Requerimiento | Evidencia de la versión corregida | Estado técnico local |
 | --- | ---: | --- | --- | --- |
 | 1 | 10 | Atributos y tipos según caso y flujo | JSON, diagrama y `02-datos-y-validaciones.md` | Implementado para tienda |
-| 2 | 10 | Entrada/salida y validaciones administrativas | `forms.py`, formularios de productos y usuarios, pruebas de datos válidos e inválidos | Implementado; salida de ejemplo |
+| 2 | 10 | Entrada/salida y validaciones administrativas | `forms.py`, formularios de productos y usuarios, pruebas de datos válidos e inválidos | Implementado; vista previa sin persistencia |
 | 3 | 10 | Condiciones y bucles en vistas según flujo | `views.py`: acceso por rol, búsqueda, stock y carrito | Implementado |
 | 4 | 10 | HTML administrativo con variables y operadores | Tablas, estados y vistas previas en `core/templates/core/` | Implementado |
 | 5 | 10 | Paquetes y librerías externos | Django en `requirements.txt`; Bootstrap 5.3.8 local y licencia | Implementado sin compilación |

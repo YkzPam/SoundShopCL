@@ -1,15 +1,25 @@
 """Pruebas pequeñas del recorrido de la tienda, sin acceso a BD."""
 from pathlib import Path
+from django.contrib.auth.hashers import make_password
 from django.conf import settings
-from django.test import Client, SimpleTestCase
+from django.test import Client, SimpleTestCase, override_settings
 from django.urls import reverse
 from .views import DATA_DIR
 
 
+ADMIN_USUARIO_PRUEBA = "admin-pruebas@soundshop.local"
+ADMIN_CLAVE_PRUEBA = "ClaveUnicaSoloParaTests2026"
+
+
+@override_settings(
+    SOUNDSHOP_ADMIN_ENABLED=True,
+    SOUNDSHOP_ADMIN_USERNAME_HASH=make_password(ADMIN_USUARIO_PRUEBA),
+    SOUNDSHOP_ADMIN_PASSWORD_HASH=make_password(ADMIN_CLAVE_PRUEBA),
+)
 class TiendaTests(SimpleTestCase):
     def entrar_admin(self):
         return self.client.post(reverse("core:login"), {
-            "correo": "admin@soundshop.example", "clave": "Demo1234"})
+            "correo": ADMIN_USUARIO_PRUEBA, "clave": ADMIN_CLAVE_PRUEBA})
 
     def datos_producto(self):
         return {"nombre": "Equipo de prueba", "marca": "Marca ejemplo", "categoria": "audifonos",
@@ -52,8 +62,14 @@ class TiendaTests(SimpleTestCase):
 
     def test_login_incorrecto(self):
         respuesta = self.client.post(reverse("core:login"), {
-            "correo": "admin@soundshop.example", "clave": "incorrecta"})
+            "correo": ADMIN_USUARIO_PRUEBA, "clave": "incorrecta"})
         self.assertContains(respuesta, "no son correctos")
+        self.assertNotIn("rol", self.client.session)
+
+    def test_antiguo_admin_publico_no_ingresa(self):
+        respuesta = self.client.post(reverse("core:login"), {
+            "correo": "admin@soundshop.example", "clave": "Demo1234"})
+        self.assertEqual(respuesta.status_code, 200)
         self.assertNotIn("rol", self.client.session)
 
     def test_login_vacio(self):
@@ -66,6 +82,31 @@ class TiendaTests(SimpleTestCase):
             self.assertRedirects(self.client.get(reverse("core:" + nombre)), reverse("core:login"))
         self.client.post(reverse("core:login"), {"correo": "cliente@soundshop.example", "clave": "Demo1234"})
         self.assertRedirects(self.client.get(reverse("core:gestion")), reverse("core:login"))
+
+    def test_rol_sin_verificacion_no_abre_admin(self):
+        sesion = self.client.session
+        sesion["rol"] = "administrador"
+        sesion.save()
+        self.assertRedirects(self.client.get(reverse("core:gestion")), reverse("core:login"))
+
+    def test_login_no_muestra_claves_publicas(self):
+        respuesta = self.client.get(reverse("core:login"))
+        self.assertNotContains(respuesta, "Demo1234")
+        self.assertNotContains(respuesta, "admin@soundshop.example")
+        self.assertNotContains(respuesta, "Evaluación 1")
+
+    def test_paginas_sin_rotulos_academicos(self):
+        rutas_publicas = ["inicio", "catalogo", "categorias", "nosotros",
+                          "login", "registro", "carrito"]
+        for nombre in rutas_publicas:
+            with self.subTest(pagina=nombre):
+                contenido = self.client.get(reverse("core:" + nombre)).content.decode()
+                self.assertNotRegex(contenido, r"Evaluaci[oó]n 1|de ejemplo|Demo1234")
+        self.entrar_admin()
+        for nombre in ["gestion", "gestion_productos", "gestion_usuarios", "producto_nuevo"]:
+            with self.subTest(pagina=nombre):
+                contenido = self.client.get(reverse("core:" + nombre)).content.decode()
+                self.assertNotRegex(contenido, r"Evaluaci[oó]n 1|de ejemplo|Demo1234")
 
     def test_paginas_admin(self):
         self.entrar_admin()
@@ -151,6 +192,7 @@ class TiendaTests(SimpleTestCase):
         self.entrar_admin()
         self.client.post(reverse("core:salir"))
         self.assertNotIn("rol", self.client.session)
+        self.assertNotIn("admin_revision", self.client.session)
 
     def test_sin_base_de_datos(self):
         self.assertEqual(settings.DATABASES["default"]["ENGINE"], "django.db.backends.dummy")

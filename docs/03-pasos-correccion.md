@@ -8,7 +8,7 @@ El prototipo HTML de esta carpeta es una reconstrucción de la interfaz corregid
 
 ## 3.2 Entorno e inicialización del proyecto
 
-El flujo general se complementa con `diagrama-administrador.excalidraw`. Ese diagrama muestra el acceso de ejemplo, el rol, el panel, los listados de productos y usuarios, el formulario seleccionado, la decisión de validación y el retorno con errores o con una vista previa. La aplicación no almacena la salida administrativa.
+El flujo general se complementa con `diagrama-administrador.excalidraw`. Ese diagrama muestra el ingreso, el rol, el panel, los listados de productos y usuarios, el formulario seleccionado, la decisión de validación y el retorno con errores o con una vista previa. La aplicación no almacena la salida administrativa.
 
 Antes de modificar el proyecto se conservó la versión anterior mediante un ZIP de archivos versionados, un respaldo de sus carpetas y un paquete recuperable del historial Git. Para esta corrección se volvió a generar el esqueleto con `python -m django startproject soundshop .` y `python manage.py startapp core`. Se reutilizó el entorno virtual existente, que ya tenía Django 5.2.17; no se afirma haber creado nuevamente ese entorno.
 

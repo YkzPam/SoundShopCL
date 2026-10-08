@@ -1,4 +1,3 @@
 [
-  {"id": 1, "nombre": "Cliente de ejemplo", "correo": "cliente@soundshop.example", "rol": "cliente", "activo": true, "clave_demo": "Demo1234"},
-  {"id": 2, "nombre": "Administrador de ejemplo", "correo": "admin@soundshop.example", "rol": "administrador", "activo": true, "clave_demo": "Demo1234"}
+  {"id": 1, "nombre": "Cliente", "correo": "cliente@soundshop.example", "rol": "cliente", "activo": true, "clave_demo": "Demo1234"}
 ]

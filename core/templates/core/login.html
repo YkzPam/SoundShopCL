@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block contenido %}
-<section class="acceso reveal"><p class="eyebrow">Cuenta / SoundShop CL</p><h1>Iniciar sesión</h1><p>Acceso de ejemplo para recorrer el área de cliente o la administración.</p>
+<section class="acceso reveal"><p class="eyebrow">Cuenta / SoundShop CL</p><h1>Iniciar sesión</h1><p>Ingresa a tu cuenta para continuar.</p>
 <form method="post" novalidate>{% csrf_token %}{% include 'core/formulario.html' %}<button class="btn btn-primary w-100" type="submit">Ingresar</button></form>
 <p class="mt-3">¿Sin cuenta? <a href="{% url 'core:registro' %}">Ver formulario de registro</a></p>
-<details class="ayuda mt-4"><summary>Datos para probar la evaluación</summary><p class="mt-3 mb-2">Cliente: <code>cliente@soundshop.example</code><br>Administrador: <code>admin@soundshop.example</code><br>Contraseña para ambos: <code>Demo1234</code></p><small>Credenciales ficticias y públicas. No corresponde a autenticación de producción.</small></details></section>
+</section>
 {% endblock %}

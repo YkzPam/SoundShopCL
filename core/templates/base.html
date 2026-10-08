@@ -36,6 +36,6 @@
     {% for mensaje in messages %}<div class="alert {% if mensaje.tags == 'error' %}alert-danger{% else %}alert-{{ mensaje.tags }}{% endif %}" role="status">{{ mensaje }}</div>{% endfor %}
     {% block contenido %}{% endblock %}
   </main>
-  <footer class="site-footer"><div class="container d-flex flex-wrap justify-content-between gap-3 py-4"><span>SoundShop CL · Música, audio y tecnología</span><a href="{% url 'core:nosotros' %}">Sobre la tienda</a><a href="{% url 'core:gestion' %}">Administración</a><small>Evaluación 1 · Datos de ejemplo</small></div></footer>
+  <footer class="site-footer"><div class="container d-flex flex-wrap justify-content-between gap-3 py-4"><span>SoundShop CL · Música, audio y tecnología</span><a href="{% url 'core:nosotros' %}">Sobre la tienda</a><a href="{% url 'core:gestion' %}">Administración</a></div></footer>
 </body>
 </html>

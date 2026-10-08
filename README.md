@@ -20,16 +20,13 @@ Abrir <http://127.0.0.1:8000/>. No ejecutar `migrate`, no crear una base de dato
 
 Las tareas de `.vscode/tasks.json` también permiten revisar configuración, ejecutar pruebas y abrir el servidor desde **Terminal → Ejecutar tarea**. Primero se debe crear `venv` e instalar las dependencias.
 
-## 2. Accesos ficticios
+## 2. Accesos para mostrar el recorrido
 
-| Rol de ejemplo | Correo | Contraseña pública de demostración |
-| --- | --- | --- |
-| Cliente | cliente@soundshop.example | Demo1234 |
-| Administrador | admin@soundshop.example | Demo1234 |
+El acceso de administrador utiliza un identificador y una contraseña entregados únicamente al propietario. El repositorio conserva verificadores criptográficos, no las credenciales legibles. **El mismo acceso funciona en cualquier computador que descargue el proyecto y ejecute Django**; no hay que copiar un archivo privado desde este equipo. La sesión se cierra al reiniciar el servidor porque la clave de firma se genera al iniciar cada proceso. Este prototipo local no es una autenticación de producción.
 
-Estos datos son públicos y ficticios. El acceso sólo permite representar la bifurcación por rol de la guía. No es autenticación para una tienda real. El formulario de registro valida los datos, pero no crea una cuenta permanente; sólo las dos cuentas del JSON permiten probar el acceso.
+Para recorrer el área de cliente existe una cuenta de prueba en `core/data/usuarios.json`. Sus datos son públicos y no deben utilizarse con información personal. El formulario de registro valida los datos, pero no crea una cuenta permanente.
 
-El panel `/gestion/` tiene dos secciones: productos y usuarios. Sus formularios muestran errores o una vista previa validada. **No guardan cambios en el JSON.** Se puede añadir al carrito como invitado; para confirmar la simulación se requiere acceso de ejemplo. No existe cobro ni pedido persistente.
+El panel `/gestion/` tiene dos secciones: productos y usuarios. Sus formularios muestran errores o una vista previa validada. **No guardan cambios en el JSON.** Se puede añadir al carrito como invitado; para continuar se requiere iniciar sesión. No existe cobro ni pedido persistente.
 
 ## 3. Entregables
 
@@ -56,7 +53,7 @@ SoundShopCL/
 │   ├── urls.py         Rutas con path() y name
 │   ├── views.py        Petición, condiciones, contexto y render()
 │   ├── forms.py        Formularios de Django
-│   ├── data/           Catálogo y usuarios ficticios en JSON
+│   ├── data/           Catálogo y usuario de prueba en JSON
 │   ├── templates/      HTML y lenguaje de plantillas DTL
 │   └── tests.py        Pruebas sin base de datos
 ├── static/             Bootstrap local, imágenes, CSS y JavaScript
@@ -64,7 +61,7 @@ SoundShopCL/
 └── docs/               Análisis, diagrama, mockups y evidencias
 ```
 
-`core/models.py` conserva el archivo inicial de `startapp`; no define modelos de base de datos. Las sesiones temporales utilizan cookies firmadas para recordar el rol de ejemplo y la selección del carrito. La clave de desarrollo incluida no debe usarse en producción.
+`core/models.py` conserva el archivo inicial de `startapp`; no define modelos de base de datos. Las sesiones temporales utilizan cookies firmadas para recordar el rol y la selección del carrito. La clave de firma no se publica en GitHub: se genera al iniciar el servidor.
 
 ## 5. Cambios respecto de la entrega anterior
 

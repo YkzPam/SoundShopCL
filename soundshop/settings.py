@@ -1,8 +1,16 @@
-"""Configuración inicial de la Evaluación 1: datos de ejemplo, sin BD."""
+"""Configuración de la tienda sin base de datos."""
+import secrets
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-SECRET_KEY = "django-insecure-soundshop-e1-solo-desarrollo"
+# La clave de firma cambia al iniciar el servidor: no queda una clave pública
+# capaz de fabricar sesiones de administrador en un proyecto descargado.
+SECRET_KEY = secrets.token_urlsafe(48)
+# Verificadores, no credenciales legibles. El mismo acceso funciona en otra copia
+# del proyecto sin distribuir la contraseña ni una configuración privada.
+SOUNDSHOP_ADMIN_USERNAME_HASH = "pbkdf2_sha256$1000000$CbVgiSs5nJl0nsfOTpY9e3$uWXtlAe2yNLRU2HjN2ejvAxroS+/PBIwOGpygBmfe84="
+SOUNDSHOP_ADMIN_PASSWORD_HASH = "pbkdf2_sha256$1000000$Okl8tBnr4owAoOv8mKHbyt$8D+Api5GFFQlgQimm2tvyC6cwjQz44CJ0EkMJVuiI5U="
+SOUNDSHOP_ADMIN_ENABLED = True
 DEBUG = True
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "testserver"]
 
@@ -34,7 +42,7 @@ WSGI_APPLICATION = "soundshop.wsgi.application"
 # La guía deja la conexión y persistencia para otra evaluación.
 DATABASES = {}
 SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
-SESSION_COOKIE_NAME = "soundshop_e1"
+SESSION_COOKIE_NAME = "soundshop_session_v2"
 MESSAGE_STORAGE = "django.contrib.messages.storage.cookie.CookieStorage"
 LANGUAGE_CODE = "es-cl"
 TIME_ZONE = "America/Santiago"

@@ -1,13 +1,17 @@
 """Petición, JSON, condiciones y contexto para HTML.
 
 La cuenta y el carrito son temporales. Los formularios administrativos validan
-y muestran una salida de ejemplo, pero no escriben archivos ni base de datos.
+y muestran una vista previa, pero no escriben archivos ni base de datos.
 """
 import json
+import hashlib
 from pathlib import Path
+from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth.hashers import check_password
 from django.http import Http404
 from django.shortcuts import redirect, render
+from django.views.decorators.debug import sensitive_post_parameters
 from .forms import LoginForm, ProductoForm, RegistroForm, UsuarioForm
 
 DATA_DIR = Path(__file__).resolve().parent / "data"
@@ -16,6 +20,20 @@ DATA_DIR = Path(__file__).resolve().parent / "data"
 def leer_json(nombre):
     with (DATA_DIR / nombre).open(encoding="utf-8") as archivo:
         return json.load(archivo)
+
+
+def usuarios_disponibles(request):
+    usuarios = leer_json("usuarios.json")
+    usuarios.append({"nombre": "Administrador", "correo": request.session.get("admin_email", ""),
+                     "rol": "administrador", "activo": True})
+    return usuarios
+
+
+def admin_autorizado(request):
+    return (settings.SOUNDSHOP_ADMIN_ENABLED
+            and request.session.get("rol") == "administrador"
+            and request.session.get("admin_revision") ==
+            hashlib.sha256(settings.SOUNDSHOP_ADMIN_PASSWORD_HASH.encode()).hexdigest())
 
 
 def obtener_producto(producto_id):
@@ -65,23 +83,37 @@ def nosotros(request):
     return render(request, "core/nosotros.html", {"titulo": "Nosotros"})
 
 
+@sensitive_post_parameters("clave")
 def login(request):
     formulario = LoginForm(request.POST if request.method == "POST" else None)
     if request.method == "POST" and formulario.is_valid():
         usuario_encontrado = None
-        for usuario in leer_json("usuarios.json"):
-            if (usuario["correo"] == formulario.cleaned_data["correo"].lower()
-                    and usuario["clave_demo"] == formulario.cleaned_data["clave"] and usuario["activo"]):
-                usuario_encontrado = usuario
-                break
+        correo = formulario.cleaned_data["correo"].lower()
+        clave = formulario.cleaned_data["clave"]
+        if (settings.SOUNDSHOP_ADMIN_ENABLED
+                and check_password(correo, settings.SOUNDSHOP_ADMIN_USERNAME_HASH)
+                and check_password(clave, settings.SOUNDSHOP_ADMIN_PASSWORD_HASH)):
+            usuario_encontrado = {"nombre": "Administrador", "rol": "administrador"}
+        else:
+            for usuario in leer_json("usuarios.json"):
+                if (usuario["rol"] == "cliente" and usuario["correo"] == correo
+                        and usuario.get("clave_demo") == clave and usuario["activo"]):
+                    usuario_encontrado = usuario
+                    break
         if usuario_encontrado:
             request.session["nombre"] = usuario_encontrado["nombre"]
             request.session["rol"] = usuario_encontrado["rol"]
-            messages.success(request, "Acceso de ejemplo correcto.")
             if usuario_encontrado["rol"] == "administrador":
+                request.session["admin_email"] = correo
+                request.session["admin_revision"] = hashlib.sha256(
+                    settings.SOUNDSHOP_ADMIN_PASSWORD_HASH.encode()).hexdigest()
+                messages.success(request, "Bienvenido al panel de administración.")
                 return redirect("core:gestion")
+            request.session.pop("admin_email", None)
+            request.session.pop("admin_revision", None)
+            messages.success(request, "Sesión iniciada.")
             return redirect("core:cliente")
-        formulario.add_error(None, "El correo o la contraseña de ejemplo no son correctos.")
+        formulario.add_error(None, "El correo o la contraseña no son correctos.")
     return render(request, "core/login.html", {"formulario": formulario, "titulo": "Iniciar sesión"})
 
 
@@ -90,9 +122,10 @@ def registro(request):
     resultado = None
     if request.method == "POST" and formulario.is_valid():
         correo = formulario.cleaned_data["correo"].lower()
-        existe = any(u["correo"] == correo for u in leer_json("usuarios.json"))
+        existe = (any(u["correo"] == correo for u in leer_json("usuarios.json"))
+                  or check_password(correo, settings.SOUNDSHOP_ADMIN_USERNAME_HASH))
         if existe:
-            formulario.add_error("correo", "Ese correo ya está en los datos de ejemplo.")
+            formulario.add_error("correo", "Ese correo no está disponible.")
         else:
             resultado = {"nombre": formulario.cleaned_data["nombre"], "correo": correo}
             messages.success(request, "Datos de registro validados. No se creó una cuenta permanente.")
@@ -104,7 +137,9 @@ def salir(request):
     if request.method == "POST":
         request.session.pop("rol", None)
         request.session.pop("nombre", None)
-        messages.success(request, "Se cerró el acceso de ejemplo.")
+        request.session.pop("admin_email", None)
+        request.session.pop("admin_revision", None)
+        messages.success(request, "Sesión cerrada.")
     return redirect("core:inicio")
 
 
@@ -154,7 +189,7 @@ def confirmar(request):
     if request.method != "POST":
         return redirect("core:carrito")
     if not request.session.get("rol"):
-        messages.info(request, "Para continuar debe iniciar sesión con una cuenta de ejemplo.")
+        messages.info(request, "Para continuar debe iniciar sesión.")
         return redirect("core:login")
     if not request.session.get("carrito"):
         messages.warning(request, "El carrito está vacío.")
@@ -164,24 +199,24 @@ def confirmar(request):
 
 
 def gestion(request):
-    if request.session.get("rol") != "administrador":
+    if not admin_autorizado(request):
         return redirect("core:login")
     datos = leer_json("catalogo.json")
     contexto = {"titulo": "Administración", "total_productos": len(datos["productos"]),
-                "total_usuarios": len(leer_json("usuarios.json")),
+                "total_usuarios": len(usuarios_disponibles(request)),
                 "sin_stock": len([p for p in datos["productos"] if p["stock"] == 0])}
     return render(request, "core/gestion.html", contexto)
 
 
 def gestion_productos(request):
-    if request.session.get("rol") != "administrador":
+    if not admin_autorizado(request):
         return redirect("core:login")
     return render(request, "core/gestion_productos.html", {
         "productos": leer_json("catalogo.json")["productos"], "titulo": "Administrar productos"})
 
 
 def producto_formulario(request, producto_id=None):
-    if request.session.get("rol") != "administrador":
+    if not admin_autorizado(request):
         return redirect("core:login")
     datos = leer_json("catalogo.json")
     producto = obtener_producto(producto_id) if producto_id is not None else None
@@ -197,14 +232,14 @@ def producto_formulario(request, producto_id=None):
 
 
 def gestion_usuarios(request):
-    if request.session.get("rol") != "administrador":
+    if not admin_autorizado(request):
         return redirect("core:login")
     formulario = UsuarioForm(request.POST if request.method == "POST" else None)
     resultado = None
-    usuarios = leer_json("usuarios.json")
+    usuarios = usuarios_disponibles(request)
     if request.method == "POST" and formulario.is_valid():
         if any(u["correo"] == formulario.cleaned_data["correo"].lower() for u in usuarios):
-            formulario.add_error("correo", "El correo ya está en los datos de ejemplo.")
+            formulario.add_error("correo", "El correo ya está registrado.")
         else:
             resultado = formulario.cleaned_data
             messages.success(request, "Usuario validado para vista previa. No se guardaron cambios.")

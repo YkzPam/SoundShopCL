@@ -4,7 +4,7 @@
 
 SoundShop CL representa una tienda que necesita presentar su catálogo musical de forma ordenada y permitir la consulta de precios y disponibilidad. La administración requiere revisar los productos y usuarios del caso sin depender de una interfaz recargada. El desarrollo de la Evaluación 1 utiliza datos ficticios para mostrar esos recorridos y validar formularios; no establece que exista una empresa operativa, entrevistas a clientes ni resultados de ventas reales.
 
-El visitante consulta productos, categorías y fichas, selecciona equipos y revisa un carrito temporal. El cliente de ejemplo confirma la selección sin pagar. El administrador de ejemplo revisa productos y usuarios, completa sus formularios y visualiza la salida de la validación. El registro no almacena una cuenta; la implementación persistente corresponde a una etapa posterior.
+El visitante consulta productos, categorías y fichas, selecciona equipos y revisa un carrito temporal. El cliente de prueba confirma la selección sin pagar. El administrador revisa productos y usuarios, completa sus formularios y visualiza la salida de la validación. El registro no almacena una cuenta; la implementación persistente corresponde a una etapa posterior.
 
 ## 1.2 Referentes de tiendas musicales
 
@@ -12,7 +12,7 @@ La revisión de Audiomusica identifica una búsqueda de productos, un acceso a c
 
 | Referente consultado el 8 de octubre de 2026 | Elemento observado | Adaptación en SoundShop CL |
 | --- | --- | --- |
-| Audiomusica | Búsqueda y acceso a cuenta | Catálogo con búsqueda simple e inicio de sesión de ejemplo |
+| Audiomusica | Búsqueda y acceso a cuenta | Catálogo con búsqueda simple e inicio de sesión por rol |
 | Thomann | Categorías de instrumentos y audio | Cinco categorías, con descripción y acceso al catálogo filtrado |
 
 La propuesta de negocio es vender instrumentos, equipos de audio y accesorios mediante un catálogo digital. Un producto presenta nombre, marca, descripción, precio y stock. En esta entrega esos atributos se representan con JSON; no existe un modelo comercial validado ni conexión a un proveedor, bodega o sistema de pagos.
