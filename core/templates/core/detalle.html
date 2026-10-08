@@ -1,0 +1,11 @@
+{% extends 'base.html' %}{% load static %}
+{% block contenido %}
+<a href="{% url 'core:catalogo' %}">← Volver a productos</a>
+<article class="row align-items-center g-4 mt-3">
+  <div class="col-md-6 reveal"><img class="detalle-imagen" src="{% static producto.imagen %}" alt="{{ producto.nombre }}" width="600" height="450"></div>
+  <div class="col-md-6 reveal"><p class="eyebrow">{{ producto.marca }}</p><h1 class="titulo-producto">{{ producto.nombre }}</h1><p>{{ producto.descripcion }}</p><p class="h3 my-4">${{ producto.precio|floatformat:'0g' }}</p>
+    {% if producto.stock > 0 %}<p>{{ producto.stock }} unidades disponibles</p><form action="{% url 'core:agregar_carrito' producto.id %}" method="post">{% csrf_token %}<button class="btn btn-primary" type="submit">Añadir al carrito</button></form>{% else %}<p class="alert alert-secondary">Producto sin stock</p>{% endif %}
+    <p class="small text-body-secondary mt-3">Se puede agregar sin iniciar sesión. La confirmación requiere acceso de ejemplo.</p>
+  </div>
+</article>
+{% endblock %}

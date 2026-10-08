@@ -1,8 +1,4 @@
-"""Rutas principales del proyecto SoundShop CL."""
-
 from django.urls import include, path
 
-
-urlpatterns = [
-    path("", include("core.urls")),
-]
+# El caso utiliza su propio panel, no el administrador de base de datos.
+urlpatterns = [path("", include("core.urls"))]

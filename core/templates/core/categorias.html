@@ -1,0 +1,7 @@
+{% extends 'base.html' %}{% load static %}
+{% block contenido %}
+<div class="cabecera"><p class="eyebrow">Por forma de escuchar</p><h1>Categorías</h1><p>El equipo adecuado para cada momento musical.</p></div>
+<div class="row g-4">
+{% for categoria in categorias %}<article class="col-md-6 reveal"><a class="categoria-fila" href="{% url 'core:catalogo' %}?categoria={{ categoria.slug }}"><img src="{% static categoria.imagen %}" alt="" loading="lazy" width="160" height="140"><div><h2 class="h4">{{ categoria.nombre }}</h2><p class="mb-2">{{ categoria.descripcion }}</p><small>{{ categoria.cantidad }} productos →</small></div></a></article>{% endfor %}
+</div>
+{% endblock %}

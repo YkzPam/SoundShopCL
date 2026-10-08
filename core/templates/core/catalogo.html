@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block contenido %}
+<div class="cabecera"><p class="eyebrow">El catálogo</p><h1>Productos</h1><p>Audio e instrumentos para distintas formas de disfrutar la música.</p></div>
+<form method="get" class="row g-3 align-items-end mb-5" role="search">
+  <div class="col-md-5"><label for="q" class="form-label">Buscar nombre o marca</label><input class="form-control" type="search" id="q" name="q" value="{{ busqueda }}" maxlength="100"></div>
+  <div class="col-md-4"><label for="categoria" class="form-label">Categoría</label><select class="form-select" id="categoria" name="categoria"><option value="">Todas</option>{% for categoria in categorias %}<option value="{{ categoria.slug }}" {% if categoria_actual == categoria.slug %}selected{% endif %}>{{ categoria.nombre }}</option>{% endfor %}</select></div>
+  <div class="col-md-3"><button class="btn btn-primary" type="submit">Buscar</button> <a class="btn btn-outline-primary" href="{% url 'core:catalogo' %}">Limpiar</a></div>
+</form>
+<p class="text-body-secondary">{{ productos|length }} producto{{ productos|length|pluralize:'s' }}</p>
+{% include 'core/productos_lista.html' %}
+{% endblock %}

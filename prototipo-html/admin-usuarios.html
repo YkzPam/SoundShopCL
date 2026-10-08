@@ -1,0 +1,80 @@
+
+<!doctype html>
+<html lang="es" data-bs-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Administrar usuarios · SoundShop CL</title>
+  <link rel="icon" href="../static/img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../static/vendor/bootstrap/bootstrap.min.css">
+  <link rel="stylesheet" href="../static/css/tienda.css">
+  <script src="../static/vendor/bootstrap/bootstrap.bundle.min.js" defer></script>
+  <script src="../static/js/tienda.js" defer></script>
+</head>
+<body>
+  <a class="visually-hidden-focusable" href="#contenido">Saltar al contenido</a>
+  <header class="site-header">
+    <nav class="navbar navbar-expand-lg container" aria-label="Navegación principal">
+      <a class="navbar-brand" href="inicio.html"><span class="marca-disco" aria-hidden="true">◎</span> soundshop <small>CL</small></a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu" aria-controls="menu" aria-expanded="false" aria-label="Abrir navegación"><span class="navbar-toggler-icon"></span></button>
+      <div class="collapse navbar-collapse" id="menu">
+        <div class="navbar-nav ms-auto gap-lg-2">
+          <a class="nav-link" href="inicio.html">Inicio</a>
+          <a class="nav-link" href="productos.html">Productos</a>
+          <a class="nav-link" href="categorias.html">Categorías</a>
+          <a class="nav-link" href="nosotros.html">Nosotros</a>
+          <a class="nav-link" href="carrito.html">Carrito</a>
+          <a class="nav-link" href="administracion.html">Administración</a>
+          <a class="nav-link" href="cliente.html">Mi cuenta</a>
+        </div>
+        <button class="tema ms-lg-3" type="button" id="cambiar-tema" aria-label="Cambiar a modo oscuro">◐</button>
+      </div>
+    </nav>
+  </header>
+  <main id="contenido" class="container py-4 py-md-5"><p class="small text-body-secondary">Prototipo HTML reconstruido de la versión corregida. Los formularios no procesan datos. <a href="administracion.html">Ver maqueta administrativa</a></p>
+
+
+<nav class="admin-menu mb-4" aria-label="Administración"><a href="administracion.html">Resumen</a><a href="admin-productos.html">Productos</a><a href="admin-usuarios.html">Usuarios</a><a href="inicio.html">Ver tienda ↗</a></nav>
+<p class="small text-body-secondary">Panel de ejemplo de la Evaluación 1. Los formularios validan y muestran una vista previa; no guardan cambios.</p>
+<h1 class="h2">Usuarios de ejemplo</h1><div class="table-responsive mb-4"><table class="table"><caption>Usuarios leídos desde usuarios.json</caption><thead><tr><th scope="col">Nombre</th><th scope="col">Correo</th><th scope="col">Rol</th><th scope="col">Estado</th></tr></thead><tbody><tr><td>Cliente de ejemplo</td><td>cliente@soundshop.example</td><td>Cliente</td><td>Activo</td></tr><tr><td>Administrador de ejemplo</td><td>admin@soundshop.example</td><td>Administrador</td><td>Activo</td></tr></tbody></table></div>
+<section class="form-admin"><h2 class="h4">Validar un usuario nuevo</h2><form onsubmit="event.preventDefault(); alert('Maqueta HTML: el procesamiento de este formulario se prueba con Django.');">
+
+  <div class="mb-3">
+    <label for="id_nombre">Nombre:</label>
+    <input type="text" name="nombre" maxlength="80" minlength="3" class="form-control" required id="id_nombre">
+
+
+  </div>
+
+  <div class="mb-3">
+    <label for="id_correo">Correo:</label>
+    <input type="email" name="correo" maxlength="120" class="form-control" required id="id_correo">
+
+
+  </div>
+
+  <div class="mb-3">
+    <label for="id_rol">Rol:</label>
+    <select name="rol" class="form-select" id="id_rol">
+  <option value="cliente">Cliente</option>
+
+  <option value="administrador">Administrador</option>
+
+</select>
+
+
+  </div>
+
+  <div class="mb-3">
+    <label for="id_activo">Usuario activo:</label>
+    <input type="checkbox" name="activo" class="form-check-input" id="id_activo" checked>
+
+
+  </div>
+
+<button class="btn btn-primary">Validar y ver resultado</button></form></section>
+
+  </main>
+  <footer class="site-footer"><div class="container d-flex flex-wrap justify-content-between gap-3 py-4"><span>SoundShop CL · Música, audio y tecnología</span><a href="nosotros.html">Sobre la tienda</a><small>Evaluación 1 · Maqueta HTML estática</small></div></footer>
+</body>
+</html>

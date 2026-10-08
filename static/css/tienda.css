@@ -1,0 +1,80 @@
+/* Una hoja propia y Bootstrap local: sin Node ni compilación. */
+:root { --papel:#f4f0e8; --tinta:#121212; --detalle:#4b2e5a; --oro:#b89b5e; --superficie:#fff; --linea:#d5cfc5; }
+[data-bs-theme="dark"] { --papel:#121212; --tinta:#f8f6f2; --detalle:#d8bee4; --superficie:#1e1c20; --linea:#444049; }
+body { background:var(--papel); color:var(--tinta); font-family:Arial,Helvetica,sans-serif; line-height:1.65; }
+a { color:inherit; text-underline-offset:4px; }
+a:hover { color:var(--detalle); }
+h1,h2,h3 { letter-spacing:-.045em; line-height:1.15; }
+h1 { font-size:clamp(2.5rem,5vw,4.5rem); font-weight:500; margin-bottom:1.2rem; }
+h2 { font-size:clamp(1.65rem,3vw,2.4rem); font-weight:500; }
+.container { max-width:1140px; }
+.site-header { border-bottom:1px solid var(--linea); background:var(--papel); }
+.navbar { min-height:78px; }
+.navbar-brand { font-size:1.5rem; font-weight:700; letter-spacing:-.07em; color:var(--tinta); }
+.navbar-brand small { font-size:.7rem; letter-spacing:.08em; }
+.marca-disco { display:inline-block; color:var(--oro); font-size:2rem; vertical-align:middle; margin-right:.4rem; }
+.navbar-brand:hover .marca-disco { transform:rotate(90deg); }
+.nav-link { color:var(--tinta); font-size:.9rem; }
+.nav-link[aria-current="page"] { color:var(--detalle); text-decoration:underline; }
+.tema { border:0; background:transparent; color:var(--tinta); font-size:1.4rem; padding:.4rem; }
+.hero { padding:1.5rem 0; }
+.hero .lead { max-width:420px; }
+.hero-imagen { width:100%; height:300px; object-fit:cover; object-position:65% center; }
+.eyebrow { color:var(--detalle); font-size:.7rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; }
+.producto-imagen { display:block; overflow:hidden; background:#ddd; }
+.producto-imagen img { display:block; width:100%; height:190px; object-fit:cover; }
+.producto-imagen:hover img { transform:scale(1.035); }
+.producto-imagen + div h3 a { text-decoration:none; }
+.detalle-imagen { width:100%; max-height:380px; object-fit:contain; }
+.titulo-producto { font-size:clamp(2rem,4vw,3.4rem); }
+.categoria-fila { display:flex; align-items:center; gap:1.4rem; text-decoration:none; padding:1rem 0; border-bottom:1px solid var(--linea); }
+.categoria-fila img { width:130px; height:120px; object-fit:cover; flex-shrink:0; }
+.categoria-fila p { font-size:.9rem; }
+.categoria-fila:hover { transform:translateY(-3px); }
+.cabecera { margin-bottom:2rem; max-width:750px; }
+.franja { padding:2rem; background:var(--superficie); border-top:2px solid var(--oro); height:100%; }
+.lectura { max-width:760px; margin:0 auto; }
+.nosotros-imagen { width:100%; height:280px; object-fit:cover; margin-top:1rem; }
+.acceso { max-width:480px; margin:1rem auto 2rem; }
+.acceso h1 { font-size:2.8rem; }
+.ayuda { border-top:1px solid var(--linea); padding-top:1rem; font-size:.9rem; }
+.form-admin { max-width:640px; }
+.form-control,.form-select { border-radius:3px; padding:.7rem; border-color:var(--linea); background-color:var(--superficie); color:var(--tinta); }
+.form-control:focus,.form-select:focus { border-color:var(--oro); box-shadow:0 0 0 3px #b89b5e33; }
+label { font-weight:600; font-size:.9rem; margin-bottom:.4rem; }
+.errores { color:#a42836; font-size:.9rem; margin-top:.4rem; }
+[data-bs-theme="dark"] .errores { color:#ffb2bc; }
+.errorlist { list-style:none; padding:0; margin:0; }
+.btn { border-radius:3px; padding:.7rem 1.2rem; font-weight:600; font-size:.9rem; }
+.btn-primary { --bs-btn-bg:#4b2e5a; --bs-btn-border-color:#4b2e5a; --bs-btn-hover-bg:#654078; --bs-btn-hover-border-color:#654078; --bs-btn-active-bg:#654078; --bs-btn-active-border-color:#654078; }
+[data-bs-theme="dark"] .btn-primary { --bs-btn-bg:#d8bee4; --bs-btn-border-color:#d8bee4; --bs-btn-color:#121212; --bs-btn-hover-bg:#eddbf5; --bs-btn-hover-color:#121212; --bs-btn-hover-border-color:#eddbf5; }
+.btn-outline-primary { --bs-btn-color:var(--tinta); --bs-btn-border-color:var(--linea); --bs-btn-hover-color:var(--papel); --bs-btn-hover-bg:var(--tinta); --bs-btn-hover-border-color:var(--tinta); --bs-btn-active-bg:var(--tinta); --bs-btn-active-border-color:var(--tinta); }
+.btn:hover { transform:translateY(-2px); }
+.admin-menu { display:flex; gap:1.3rem; flex-wrap:wrap; padding-bottom:1rem; border-bottom:1px solid var(--linea); }
+.admin-menu a { font-size:.9rem; font-weight:600; }
+.resultado { padding:1.5rem; border-left:3px solid var(--oro); background:var(--superficie); }
+.table { --bs-table-bg:transparent; --bs-table-color:var(--tinta); --bs-table-border-color:var(--linea); }
+.site-footer { margin-top:3rem; border-top:1px solid var(--linea); font-size:.85rem; }
+code { overflow-wrap:anywhere; }
+a,button,.marca-disco,img,.categoria-fila { transition:transform .3s ease,color .2s ease,background-color .2s ease; }
+/* El contenido sólo se oculta cuando JS configura el observador. */
+.reveal { opacity:1; transform:none; }
+.reveal.pendiente { opacity:0; transform:translateY(16px); }
+.reveal { transition:opacity .6s ease,transform .6s ease; }
+@media(max-width:767px) {
+  .navbar { min-height:70px; }
+  h1 { font-size:2.8rem; }
+  .hero-imagen { height:220px; }
+  .producto-imagen img { height:150px; }
+  .categoria-fila { gap:1rem; }
+  .categoria-fila img { width:100px; height:100px; }
+  .franja { padding:1.5rem; }
+  .acceso h1 { font-size:2.3rem; }
+  .table { min-width:540px; }
+  .nosotros-imagen { height:210px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  *,*::before,*::after { transition:none!important; animation:none!important; scroll-behavior:auto!important; }
+  .reveal.pendiente { opacity:1; transform:none; }
+  .btn:hover,.categoria-fila:hover,.producto-imagen:hover img,.navbar-brand:hover .marca-disco { transform:none; }
+}

@@ -1,0 +1,41 @@
+{% load static %}
+<!doctype html>
+<html lang="es" data-bs-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ titulo }} · SoundShop CL</title>
+  <link rel="icon" href="{% static 'img/favicon.svg' %}" type="image/svg+xml">
+  <link rel="stylesheet" href="{% static 'vendor/bootstrap/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/tienda.css' %}">
+  <script src="{% static 'vendor/bootstrap/bootstrap.bundle.min.js' %}" defer></script>
+  <script src="{% static 'js/tienda.js' %}" defer></script>
+  <noscript><style>.navbar-collapse{display:block!important}.navbar-toggler{display:none}</style></noscript>
+</head>
+<body>
+  <a class="visually-hidden-focusable" href="#contenido">Saltar al contenido</a>
+  <header class="site-header">
+    <nav class="navbar navbar-expand-lg container" aria-label="Navegación principal">
+      <a class="navbar-brand" href="{% url 'core:inicio' %}"><span class="marca-disco" aria-hidden="true">◎</span> soundshop <small>CL</small></a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu" aria-controls="menu" aria-expanded="false" aria-label="Abrir navegación"><span class="navbar-toggler-icon"></span></button>
+      <div class="collapse navbar-collapse" id="menu">
+        <div class="navbar-nav ms-auto gap-lg-2">
+          <a class="nav-link" href="{% url 'core:inicio' %}">Inicio</a>
+          <a class="nav-link" href="{% url 'core:catalogo' %}">Productos</a>
+          <a class="nav-link" href="{% url 'core:categorias' %}">Categorías</a>
+          <a class="nav-link" href="{% url 'core:nosotros' %}">Nosotros</a>
+          <a class="nav-link" href="{% url 'core:carrito' %}">Carrito</a>
+          {% if request.session.rol == 'administrador' %}<a class="nav-link" href="{% url 'core:gestion' %}">Administración</a>{% endif %}
+          {% if request.session.rol %}<a class="nav-link" href="{% url 'core:cliente' %}">Mi cuenta</a>{% else %}<a class="nav-link" href="{% url 'core:login' %}">Iniciar sesión</a>{% endif %}
+        </div>
+        <button class="tema ms-lg-3" type="button" id="cambiar-tema" aria-label="Cambiar a modo oscuro">◐</button>
+      </div>
+    </nav>
+  </header>
+  <main id="contenido" class="container py-4 py-md-5">
+    {% for mensaje in messages %}<div class="alert {% if mensaje.tags == 'error' %}alert-danger{% else %}alert-{{ mensaje.tags }}{% endif %}" role="status">{{ mensaje }}</div>{% endfor %}
+    {% block contenido %}{% endblock %}
+  </main>
+  <footer class="site-footer"><div class="container d-flex flex-wrap justify-content-between gap-3 py-4"><span>SoundShop CL · Música, audio y tecnología</span><a href="{% url 'core:nosotros' %}">Sobre la tienda</a><a href="{% url 'core:gestion' %}">Administración</a><small>Evaluación 1 · Datos de ejemplo</small></div></footer>
+</body>
+</html>

@@ -1,0 +1,5 @@
+{% extends 'base.html' %}
+{% block contenido %}
+{% include 'core/admin_menu.html' %}<div class="d-flex flex-wrap justify-content-between gap-3 align-items-center mb-4"><h1 class="h2">Productos de la tienda</h1><a class="btn btn-primary" href="{% url 'core:producto_nuevo' %}">Nuevo producto</a></div>
+<div class="table-responsive"><table class="table align-middle"><caption>Catálogo leído desde catalogo.json</caption><thead><tr><th scope="col">Nombre</th><th scope="col">Precio</th><th scope="col">Stock</th><th scope="col">Estado</th><th scope="col">Acción</th></tr></thead><tbody>{% for producto in productos %}<tr><td>{{ producto.nombre }}<small class="d-block text-body-secondary">{{ producto.marca }}</small></td><td>${{ producto.precio|floatformat:'0g' }}</td><td>{{ producto.stock }}</td><td>{% if producto.stock > 0 %}Disponible{% else %}Sin stock{% endif %}</td><td><a class="btn btn-sm btn-outline-primary" href="{% url 'core:producto_editar' producto.id %}">Editar ficha <span class="visually-hidden">{{ producto.nombre }}</span></a></td></tr>{% endfor %}</tbody></table></div>
+{% endblock %}

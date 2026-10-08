@@ -1,7 +1,0 @@
-@import "tailwindcss";
-@source "../../templates/**/*.html";
-@source "../../core/**/*.py";
-
-@theme {
-  --font-sans: "Segoe UI", Arial, sans-serif;
-}

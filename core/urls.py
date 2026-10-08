@@ -1,30 +1,24 @@
-"""Rutas semanticas y nombradas de la tienda."""
-
 from django.urls import path
-
 from . import views
-from . import gestion
-
 
 app_name = "core"
-
 urlpatterns = [
-    path("gestion/productos/", gestion.ficha_producto, name="gestion_productos"),
-    path("gestion/productos/<int:producto_id>/", gestion.ficha_producto, name="gestion_producto"),
     path("", views.inicio, name="inicio"),
-    path("nosotros/", views.nosotros, name="nosotros"),
     path("productos/", views.catalogo, name="catalogo"),
     path("productos/<int:producto_id>/", views.detalle_producto, name="detalle_producto"),
     path("categorias/", views.categorias, name="categorias"),
-    path("categorias/<slug:slug>/", views.detalle_categoria, name="detalle_categoria"),
-    path("buscar/", views.buscar, name="buscar"),
-    path("carrito/", views.carrito, name="carrito"),
-    path("carrito/agregar/<int:producto_id>/", views.agregar_al_carrito, name="agregar_al_carrito"),
-    path("carrito/actualizar/<int:producto_id>/", views.actualizar_carrito, name="actualizar_carrito"),
-    path("carrito/eliminar/<int:producto_id>/", views.eliminar_del_carrito, name="eliminar_del_carrito"),
-    path("carrito/confirmar/", views.confirmar_pedido, name="confirmar_pedido"),
-    path("pedido/confirmado/", views.pedido_confirmado, name="pedido_confirmado"),
+    path("nosotros/", views.nosotros, name="nosotros"),
+    path("login/", views.login, name="login"),
     path("registro/", views.registro, name="registro"),
-    path("registro/confirmado/", views.registro_confirmado, name="registro_confirmado"),
-    path("cuenta/salir/", views.cerrar_sesion, name="cerrar_sesion"),
+    path("cuenta/", views.cliente, name="cliente"),
+    path("cuenta/salir/", views.salir, name="salir"),
+    path("carrito/", views.carrito, name="carrito"),
+    path("carrito/agregar/<int:producto_id>/", views.agregar_carrito, name="agregar_carrito"),
+    path("carrito/quitar/<int:producto_id>/", views.quitar_carrito, name="quitar_carrito"),
+    path("carrito/confirmar/", views.confirmar, name="confirmar"),
+    path("gestion/", views.gestion, name="gestion"),
+    path("gestion/productos/", views.gestion_productos, name="gestion_productos"),
+    path("gestion/productos/nuevo/", views.producto_formulario, name="producto_nuevo"),
+    path("gestion/productos/<int:producto_id>/", views.producto_formulario, name="producto_editar"),
+    path("gestion/usuarios/", views.gestion_usuarios, name="gestion_usuarios"),
 ]

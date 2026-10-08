@@ -1,0 +1,44 @@
+
+<!doctype html>
+<html lang="es" data-bs-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mi cuenta · SoundShop CL</title>
+  <link rel="icon" href="../static/img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../static/vendor/bootstrap/bootstrap.min.css">
+  <link rel="stylesheet" href="../static/css/tienda.css">
+  <script src="../static/vendor/bootstrap/bootstrap.bundle.min.js" defer></script>
+  <script src="../static/js/tienda.js" defer></script>
+</head>
+<body>
+  <a class="visually-hidden-focusable" href="#contenido">Saltar al contenido</a>
+  <header class="site-header">
+    <nav class="navbar navbar-expand-lg container" aria-label="Navegación principal">
+      <a class="navbar-brand" href="inicio.html"><span class="marca-disco" aria-hidden="true">◎</span> soundshop <small>CL</small></a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu" aria-controls="menu" aria-expanded="false" aria-label="Abrir navegación"><span class="navbar-toggler-icon"></span></button>
+      <div class="collapse navbar-collapse" id="menu">
+        <div class="navbar-nav ms-auto gap-lg-2">
+          <a class="nav-link" href="inicio.html">Inicio</a>
+          <a class="nav-link" href="productos.html">Productos</a>
+          <a class="nav-link" href="categorias.html">Categorías</a>
+          <a class="nav-link" href="nosotros.html">Nosotros</a>
+          <a class="nav-link" href="carrito.html">Carrito</a>
+
+          <a class="nav-link" href="cliente.html">Mi cuenta</a>
+        </div>
+        <button class="tema ms-lg-3" type="button" id="cambiar-tema" aria-label="Cambiar a modo oscuro">◐</button>
+      </div>
+    </nav>
+  </header>
+  <main id="contenido" class="container py-4 py-md-5"><p class="small text-body-secondary">Prototipo HTML reconstruido de la versión corregida. Los formularios no procesan datos. <a href="administracion.html">Ver maqueta administrativa</a></p>
+    <div class="alert alert-success" role="status">Acceso de ejemplo correcto.</div>
+
+<div class="cabecera"><p class="eyebrow">Área de cliente</p><h1>Mi cuenta</h1><p>Cliente de ejemplo</p></div>
+<div class="row g-4"><div class="col-md-6"><section class="franja reveal"><h2>Explorar productos</h2><p>Revisar el catálogo y seleccionar equipos.</p><a class="btn btn-primary" href="productos.html">Ver productos</a></section></div><div class="col-md-6"><section class="franja reveal"><h2>Revisar el carrito</h2><p>Ver los productos seleccionados y continuar la simulación.</p><a class="btn btn-outline-primary" href="carrito.html">Abrir carrito</a></section></div></div>
+<form onsubmit="event.preventDefault(); alert('Maqueta HTML: el procesamiento de este formulario se prueba con Django.');"><button class="btn btn-outline-primary">Cerrar sesión de ejemplo</button></form>
+
+  </main>
+  <footer class="site-footer"><div class="container d-flex flex-wrap justify-content-between gap-3 py-4"><span>SoundShop CL · Música, audio y tecnología</span><a href="nosotros.html">Sobre la tienda</a><small>Evaluación 1 · Maqueta HTML estática</small></div></footer>
+</body>
+</html>

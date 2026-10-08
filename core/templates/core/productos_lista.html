@@ -1,0 +1,11 @@
+{% load static %}
+<div class="row g-4">
+  {% for producto in productos %}
+  <article class="col-6 col-md-4 col-lg-3 reveal">
+    <a class="producto-imagen" href="{% url 'core:detalle_producto' producto.id %}"><img src="{% static producto.imagen %}" alt="{{ producto.nombre }}" loading="lazy" width="400" height="300"></a>
+    <div class="pt-3"><p class="eyebrow mb-1">{{ producto.marca }}</p><h3 class="h5"><a href="{% url 'core:detalle_producto' producto.id %}">{{ producto.nombre }}</a></h3>
+      <div class="d-flex flex-wrap justify-content-between gap-1"><strong>${{ producto.precio|floatformat:'0g' }}</strong><small>{% if producto.stock > 0 %}Disponible{% else %}Sin stock{% endif %}</small></div>
+    </div>
+  </article>
+  {% empty %}<p>No hay productos para esta búsqueda. <a href="{% url 'core:catalogo' %}">Ver todos</a></p>{% endfor %}
+</div>

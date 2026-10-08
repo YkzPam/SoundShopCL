@@ -1,8 +1,0 @@
-<form method="get" class="filter-form">
-  <div class="field-group"><label for="{{ formulario.q.id_for_label }}">{{ formulario.q.label }}</label>{{ formulario.q }}</div>
-  {% if not categoria_actual %}<div class="field-group"><label for="{{ formulario.categoria.id_for_label }}">{{ formulario.categoria.label }}</label>{{ formulario.categoria }}</div>{% endif %}
-  <div class="field-group"><label for="{{ formulario.precio_maximo.id_for_label }}">{{ formulario.precio_maximo.label }}</label>{{ formulario.precio_maximo }}</div>
-  <div class="field-group"><label for="{{ formulario.orden.id_for_label }}">{{ formulario.orden.label }}</label>{{ formulario.orden }}</div>
-  <label class="check-field">{{ formulario.solo_disponibles }}<span>Mostrar solo productos con stock</span></label>
-  <button type="submit" class="button button--primary button--full">Aplicar filtros</button>
-</form>

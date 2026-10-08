@@ -1,0 +1,101 @@
+
+<!doctype html>
+<html lang="es" data-bs-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nuevo producto · SoundShop CL</title>
+  <link rel="icon" href="../static/img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../static/vendor/bootstrap/bootstrap.min.css">
+  <link rel="stylesheet" href="../static/css/tienda.css">
+  <script src="../static/vendor/bootstrap/bootstrap.bundle.min.js" defer></script>
+  <script src="../static/js/tienda.js" defer></script>
+</head>
+<body>
+  <a class="visually-hidden-focusable" href="#contenido">Saltar al contenido</a>
+  <header class="site-header">
+    <nav class="navbar navbar-expand-lg container" aria-label="Navegación principal">
+      <a class="navbar-brand" href="inicio.html"><span class="marca-disco" aria-hidden="true">◎</span> soundshop <small>CL</small></a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu" aria-controls="menu" aria-expanded="false" aria-label="Abrir navegación"><span class="navbar-toggler-icon"></span></button>
+      <div class="collapse navbar-collapse" id="menu">
+        <div class="navbar-nav ms-auto gap-lg-2">
+          <a class="nav-link" href="inicio.html">Inicio</a>
+          <a class="nav-link" href="productos.html">Productos</a>
+          <a class="nav-link" href="categorias.html">Categorías</a>
+          <a class="nav-link" href="nosotros.html">Nosotros</a>
+          <a class="nav-link" href="carrito.html">Carrito</a>
+          <a class="nav-link" href="administracion.html">Administración</a>
+          <a class="nav-link" href="cliente.html">Mi cuenta</a>
+        </div>
+        <button class="tema ms-lg-3" type="button" id="cambiar-tema" aria-label="Cambiar a modo oscuro">◐</button>
+      </div>
+    </nav>
+  </header>
+  <main id="contenido" class="container py-4 py-md-5"><p class="small text-body-secondary">Prototipo HTML reconstruido de la versión corregida. Los formularios no procesan datos. <a href="administracion.html">Ver maqueta administrativa</a></p>
+
+
+<nav class="admin-menu mb-4" aria-label="Administración"><a href="administracion.html">Resumen</a><a href="admin-productos.html">Productos</a><a href="admin-usuarios.html">Usuarios</a><a href="inicio.html">Ver tienda ↗</a></nav>
+<p class="small text-body-secondary">Panel de ejemplo de la Evaluación 1. Los formularios validan y muestran una vista previa; no guardan cambios.</p>
+<section class="form-admin"><h1 class="h2">Nuevo producto</h1><p>Completar los seis campos y revisar la salida del servidor.</p><form onsubmit="event.preventDefault(); alert('Maqueta HTML: el procesamiento de este formulario se prueba con Django.');">
+
+  <div class="mb-3">
+    <label for="id_nombre">Nombre:</label>
+    <input type="text" name="nombre" maxlength="80" minlength="3" class="form-control" required id="id_nombre">
+
+
+  </div>
+
+  <div class="mb-3">
+    <label for="id_marca">Marca:</label>
+    <input type="text" name="marca" maxlength="60" class="form-control" required id="id_marca">
+
+
+  </div>
+
+  <div class="mb-3">
+    <label for="id_categoria">Categoría:</label>
+    <select name="categoria" class="form-select" id="id_categoria">
+  <option value="audifonos">Audífonos</option>
+
+  <option value="tornamesas-vinilos">Tornamesas y vinilos</option>
+
+  <option value="estudio-creacion">Estudio y creación</option>
+
+  <option value="instrumentos">Instrumentos</option>
+
+  <option value="sonido-en-vivo">Sonido en vivo</option>
+
+</select>
+
+
+  </div>
+
+  <div class="mb-3">
+    <label for="id_descripcion">Descripción:</label>
+    <textarea name="descripcion" cols="40" rows="3" maxlength="500" minlength="10" class="form-control" required id="id_descripcion">
+</textarea>
+
+
+  </div>
+
+  <div class="mb-3">
+    <label for="id_precio">Precio en pesos:</label>
+    <input type="number" name="precio" min="1" max="10000000" class="form-control" required id="id_precio">
+
+
+  </div>
+
+  <div class="mb-3">
+    <label for="id_stock">Stock:</label>
+    <input type="number" name="stock" min="0" max="999" class="form-control" required id="id_stock">
+
+
+  </div>
+
+<button class="btn btn-primary">Validar y ver resultado</button> <a class="btn btn-outline-primary" href="admin-productos.html">Volver</a></form>
+</section>
+
+  </main>
+  <footer class="site-footer"><div class="container d-flex flex-wrap justify-content-between gap-3 py-4"><span>SoundShop CL · Música, audio y tecnología</span><a href="nosotros.html">Sobre la tienda</a><small>Evaluación 1 · Maqueta HTML estática</small></div></footer>
+</body>
+</html>

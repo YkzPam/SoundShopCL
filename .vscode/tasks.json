@@ -1,36 +1,8 @@
 {
   "version": "2.0.0",
   "tasks": [
-    {
-      "label": "Django: ejecutar servidor",
-      "type": "shell",
-      "command": "${workspaceFolder}\\venv\\Scripts\\python.exe",
-      "args": ["manage.py", "runserver"],
-      "options": {"cwd": "${workspaceFolder}"},
-      "isBackground": true,
-      "problemMatcher": []
-    },
-    {
-      "label": "Django: ejecutar pruebas",
-      "type": "shell",
-      "command": "${workspaceFolder}\\venv\\Scripts\\python.exe",
-      "args": ["manage.py", "test"],
-      "options": {"cwd": "${workspaceFolder}"},
-      "problemMatcher": []
-    },
-    {
-      "label": "Tailwind: compilar CSS",
-      "type": "npm",
-      "script": "build:css",
-      "problemMatcher": [],
-      "group": "build"
-    },
-    {
-      "label": "Tailwind: observar cambios",
-      "type": "npm",
-      "script": "watch:css",
-      "isBackground": true,
-      "problemMatcher": []
-    }
+    {"label": "E1: revisar configuración", "type": "process", "command": "${workspaceFolder}/venv/Scripts/python.exe", "args": ["manage.py", "check"], "problemMatcher": []},
+    {"label": "E1: ejecutar pruebas", "type": "process", "command": "${workspaceFolder}/venv/Scripts/python.exe", "args": ["manage.py", "test", "core", "--verbosity", "2"], "problemMatcher": [], "group": "test"},
+    {"label": "E1: abrir tienda", "type": "process", "command": "${workspaceFolder}/venv/Scripts/python.exe", "args": ["manage.py", "runserver", "127.0.0.1:8000", "--noreload"], "isBackground": true, "problemMatcher": []}
   ]
 }

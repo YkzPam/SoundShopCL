@@ -1,402 +1,212 @@
-"""Vistas del catálogo, el carrito y la cuenta de usuario."""
+"""Petición, JSON, condiciones y contexto para HTML.
 
-import secrets
-
+La cuenta y el carrito son temporales. Los formularios administrativos validan
+y muestran una salida de ejemplo, pero no escriben archivos ni base de datos.
+"""
+import json
+from pathlib import Path
 from django.contrib import messages
-from django.core.cache import caches
-from django.http import JsonResponse
+from django.http import Http404
 from django.shortcuts import redirect, render
-from django.templatetags.static import static
-from django.urls import reverse
-from django.utils import timezone
-from django.utils.http import url_has_allowed_host_and_scheme
-from django.views.decorators.http import require_POST
+from .forms import LoginForm, ProductoForm, RegistroForm, UsuarioForm
 
-from .catalogo import (
-    calcular_carrito,
-    categorias_con_resumen,
-    filtrar_productos,
-    obtener_categoria,
-    obtener_producto,
-    obtener_productos,
-)
-from .forms import (
-    CantidadCarritoForm,
-    CantidadProductoForm,
-    FiltroCatalogoForm,
-    RegistroForm,
-    IniciarSesionForm,
-)
-from .cuentas import clave_correo, crear_cuenta, verificar_cuenta
+DATA_DIR = Path(__file__).resolve().parent / "data"
 
 
-def _carrito_sesion(request) -> dict[str, int]:
-    carrito = request.session.get("carrito", {})
-    return carrito if isinstance(carrito, dict) else {}
+def leer_json(nombre):
+    with (DATA_DIR / nombre).open(encoding="utf-8") as archivo:
+        return json.load(archivo)
 
 
-def _guardar_carrito(request, carrito: dict[str, int]) -> None:
-    request.session["carrito"] = carrito
-    request.session.modified = True
-
-
-def _usuario_sesion(request) -> dict[str, str]:
-    usuario = request.session.get("usuario_tienda", {})
-    if not isinstance(usuario, dict) or not usuario.get("nombre"):
-        return {}
-    return usuario
-
-
-def _destino_seguro(request, destino: str, alternativa: str) -> str:
-    if destino and url_has_allowed_host_and_scheme(
-        destino,
-        allowed_hosts={request.get_host()},
-        require_https=request.is_secure(),
-    ):
-        return destino
-    return alternativa
-
-
-def _solicitud_ajax(request) -> bool:
-    return request.headers.get("X-Requested-With") == "XMLHttpRequest"
-
-
-def _precio_clp(valor: int) -> str:
-    return f"${valor:,}".replace(",", ".")
-
-
-def _respuesta_carrito_json(
-    request,
-    mensaje: str,
-    *,
-    ok: bool,
-    estado: int = 200,
-    producto_agregado=None,
-    cantidad_agregada: int = 0,
-    requiere_sesion: bool = False,
-    registro_url: str = "",
-):
-    lineas, total, cantidad = calcular_carrito(_carrito_sesion(request))
-    datos_lineas = [
-        {
-            "id": linea["producto"].id,
-            "nombre": linea["producto"].nombre,
-            "marca": linea["producto"].marca,
-            "cantidad": linea["cantidad"],
-            "subtotal": linea["subtotal"],
-            "subtotal_formateado": _precio_clp(linea["subtotal"]),
-            "imagen": static(linea["producto"].imagen),
-            "detalle_url": reverse("core:detalle_producto", args=[linea["producto"].id]),
-        }
-        for linea in lineas
-    ]
-    agregado = None
-    if producto_agregado is not None:
-        cantidad_en_carrito = next(
-            (
-                linea["cantidad"]
-                for linea in lineas
-                if linea["producto"].id == producto_agregado.id
-            ),
-            0,
-        )
-        agregado = {
-            "id": producto_agregado.id,
-            "nombre": producto_agregado.nombre,
-            "imagen": static(producto_agregado.imagen),
-            "cantidad_agregada": cantidad_agregada,
-            "cantidad_en_carrito": cantidad_en_carrito,
-            "subtotal_formateado": _precio_clp(producto_agregado.precio * cantidad_en_carrito),
-        }
-    return JsonResponse(
-        {
-            "ok": ok,
-            "mensaje": mensaje,
-            "cantidad": cantidad,
-            "total": total,
-            "total_formateado": _precio_clp(total),
-            "lineas": datos_lineas,
-            "producto_agregado": agregado,
-            "requiere_sesion": requiere_sesion,
-            "registro_url": registro_url or reverse("core:registro"),
-        },
-        status=estado,
-    )
-
-
-def _datos_catalogo(request, categoria_forzada: str = "") -> dict[str, object]:
-    datos = request.GET.copy()
-    if categoria_forzada:
-        datos["categoria"] = categoria_forzada
-    formulario = FiltroCatalogoForm(datos or None)
-    filtros = {
-        "consulta": "",
-        "categoria": categoria_forzada,
-        "precio_maximo": None,
-        "solo_disponibles": False,
-        "orden": "destacados",
-    }
-    if formulario.is_valid():
-        filtros = {
-            "consulta": formulario.cleaned_data["q"],
-            "categoria": categoria_forzada or formulario.cleaned_data["categoria"],
-            "precio_maximo": formulario.cleaned_data["precio_maximo"],
-            "solo_disponibles": formulario.cleaned_data["solo_disponibles"],
-            "orden": formulario.cleaned_data["orden"] or "destacados",
-        }
-    productos = filtrar_productos(**filtros)
-    return {
-        "formulario": formulario,
-        "formulario_movil": FiltroCatalogoForm(datos or None, auto_id="mobile_%s"),
-        "productos": productos,
-        "cantidad_resultados": len(productos),
-        "consulta_activa": filtros["consulta"],
-    }
+def obtener_producto(producto_id):
+    for producto in leer_json("catalogo.json")["productos"]:
+        if producto["id"] == producto_id:
+            return producto
+    raise Http404("Producto no encontrado")
 
 
 def inicio(request):
-    contexto = {
-        "resumen_categorias": categorias_con_resumen(),
-        "cantidad_productos": len(obtener_productos()),
-        "producto_portada": obtener_producto(7),
-    }
-    return render(request, "core/inicio.html", contexto)
+    datos = leer_json("catalogo.json")
+    return render(request, "core/inicio.html", {"productos": datos["productos"][:4], "titulo": "Inicio"})
 
 
 def catalogo(request):
-    contexto = _datos_catalogo(request)
-    contexto["titulo_catalogo"] = "Explora el catálogo"
+    datos = leer_json("catalogo.json")
+    busqueda = request.GET.get("q", "").strip()
+    categoria = request.GET.get("categoria", "")
+    productos = []
+    for producto in datos["productos"]:
+        coincide_texto = busqueda.casefold() in (producto["nombre"] + " " + producto["marca"]).casefold()
+        coincide_categoria = not categoria or producto["categoria"] == categoria
+        if coincide_texto and coincide_categoria:
+            productos.append(producto)
+    contexto = {"productos": productos, "categorias": datos["categorias"], "busqueda": busqueda,
+                "categoria_actual": categoria, "titulo": "Productos"}
     return render(request, "core/catalogo.html", contexto)
 
 
-def nosotros(request):
-    return render(request, "core/nosotros.html", {
-        "cantidad_productos": len(obtener_productos()),
-        "cantidad_categorias": len(categorias_con_resumen()),
-    })
-
-
-def buscar(request):
-    contexto = _datos_catalogo(request)
-    consulta = contexto["consulta_activa"]
-    contexto["titulo_catalogo"] = f'Resultados para “{consulta}”' if consulta else "Buscar productos"
-    return render(request, "core/catalogo.html", contexto)
+def detalle_producto(request, producto_id):
+    producto = obtener_producto(producto_id)
+    return render(request, "core/detalle.html", {"producto": producto, "titulo": producto["nombre"]})
 
 
 def categorias(request):
-    return render(
-        request,
-        "core/categorias.html",
-        {"resumen_categorias": categorias_con_resumen()},
-    )
+    datos = leer_json("catalogo.json")
+    categorias_lista = []
+    for categoria in datos["categorias"]:
+        productos = [p for p in datos["productos"] if p["categoria"] == categoria["slug"]]
+        categoria["cantidad"] = len(productos)
+        categoria["imagen"] = productos[0]["imagen"] if productos else ""
+        categorias_lista.append(categoria)
+    return render(request, "core/categorias.html", {"categorias": categorias_lista, "titulo": "Categorías"})
 
 
-def detalle_categoria(request, slug: str):
-    categoria = obtener_categoria(slug)
-    if categoria is None:
-        messages.warning(request, "La categoría solicitada no existe.")
-        return redirect("core:categorias")
-    contexto = _datos_catalogo(request, categoria_forzada=slug)
-    contexto.update(
-        {
-            "categoria_actual": categoria,
-            "titulo_catalogo": categoria.nombre,
-            "coleccion_visual": next(
-                (item for item in categorias_con_resumen() if item["categoria"].slug == slug),
-                None,
-            ),
-        }
-    )
-    return render(request, "core/catalogo.html", contexto)
+def nosotros(request):
+    return render(request, "core/nosotros.html", {"titulo": "Nosotros"})
 
 
-def detalle_producto(request, producto_id: int):
-    producto = obtener_producto(producto_id)
-    if producto is None:
-        messages.warning(request, "El producto solicitado no existe o fue retirado del catálogo.")
-        return redirect("core:catalogo")
-    contexto = {
-        "producto": producto,
-        "categoria": obtener_categoria(producto.categoria),
-        "formulario_cantidad": CantidadProductoForm(stock=producto.stock),
-        "relacionados": [
-            item
-            for item in filtrar_productos(categoria=producto.categoria)
-            if item.id != producto.id
-        ][:3],
-    }
-    return render(request, "core/detalle_producto.html", contexto)
-
-
-def carrito(request):
-    lineas, total, cantidad = calcular_carrito(_carrito_sesion(request))
-    contexto = {"lineas": lineas, "total": total, "cantidad": cantidad}
-    return render(request, "core/carrito.html", contexto)
-
-
-@require_POST
-def agregar_al_carrito(request, producto_id: int):
-    producto = obtener_producto(producto_id)
-    if producto is None:
-        mensaje = "No fue posible encontrar el producto."
-        if _solicitud_ajax(request):
-            return _respuesta_carrito_json(request, mensaje, ok=False, estado=404)
-        messages.error(request, mensaje)
-        return redirect("core:catalogo")
-    if not producto.puede_comprarse:
-        mensaje = f"{producto.nombre} se encuentra temporalmente sin stock."
-        if _solicitud_ajax(request):
-            return _respuesta_carrito_json(request, mensaje, ok=False, estado=400)
-        messages.warning(request, mensaje)
-        return redirect("core:detalle_producto", producto_id=producto.id)
-
-    formulario = CantidadProductoForm(request.POST, stock=producto.stock)
-    if not formulario.is_valid():
-        mensaje = f"La cantidad debe estar entre 1 y {producto.stock} unidades."
-        if _solicitud_ajax(request):
-            return _respuesta_carrito_json(request, mensaje, ok=False, estado=400)
-        messages.error(request, mensaje)
-        return redirect("core:detalle_producto", producto_id=producto.id)
-
-    cantidad = formulario.cleaned_data["cantidad"]
-    carrito_actual = _carrito_sesion(request).copy()
-    cantidad_nueva = int(carrito_actual.get(str(producto.id), 0)) + cantidad
-    if cantidad_nueva > producto.stock:
-        mensaje = f"Solo quedan {producto.stock} unidades de {producto.nombre}."
-        if _solicitud_ajax(request):
-            return _respuesta_carrito_json(request, mensaje, ok=False, estado=400)
-        messages.warning(request, mensaje)
-        return redirect("core:detalle_producto", producto_id=producto.id)
-
-    carrito_actual[str(producto.id)] = cantidad_nueva
-    _guardar_carrito(request, carrito_actual)
-    mensaje = f"{producto.nombre} fue agregado al carrito."
-    if _solicitud_ajax(request):
-        return _respuesta_carrito_json(
-            request,
-            mensaje,
-            ok=True,
-            producto_agregado=producto,
-            cantidad_agregada=cantidad,
-        )
-    messages.success(request, mensaje)
-    return redirect("core:carrito")
-
-
-@require_POST
-def actualizar_carrito(request, producto_id: int):
-    producto = obtener_producto(producto_id)
-    formulario = CantidadCarritoForm(request.POST)
-    if producto is None or not formulario.is_valid():
-        messages.error(request, "No fue posible actualizar la cantidad indicada.")
-        return redirect("core:carrito")
-
-    cantidad = formulario.cleaned_data["cantidad"]
-    carrito_actual = _carrito_sesion(request).copy()
-    clave = str(producto.id)
-    if cantidad == 0:
-        carrito_actual.pop(clave, None)
-        messages.info(request, f"{producto.nombre} fue retirado del carrito.")
-    elif cantidad > producto.stock:
-        messages.warning(request, f"La cantidad supera el stock disponible ({producto.stock}).")
-        return redirect("core:carrito")
-    else:
-        carrito_actual[clave] = cantidad
-        messages.success(request, "La cantidad fue actualizada.")
-    _guardar_carrito(request, carrito_actual)
-    return redirect("core:carrito")
-
-
-@require_POST
-def eliminar_del_carrito(request, producto_id: int):
-    producto = obtener_producto(producto_id)
-    carrito_actual = _carrito_sesion(request).copy()
-    eliminado = carrito_actual.pop(str(producto_id), None)
-    _guardar_carrito(request, carrito_actual)
-    if eliminado and producto:
-        messages.info(request, f"{producto.nombre} fue retirado del carrito.")
-    return redirect("core:carrito")
-
-
-@require_POST
-def confirmar_pedido(request):
-    if not _usuario_sesion(request):
-        messages.warning(request, "Inicia sesión o crea una cuenta para continuar con tu pedido. Tu carrito se conserva.")
-        return redirect(f'{reverse("core:registro")}?next={reverse("core:carrito")}')
-
-    lineas, total, cantidad = calcular_carrito(_carrito_sesion(request))
-    if not lineas:
-        messages.warning(request, "Agrega al menos un producto antes de confirmar el pedido.")
-        return redirect("core:carrito")
-
-    ahora = timezone.localtime()
-    request.session["ultimo_pedido"] = {
-        "codigo": f"SSCL-{ahora:%y%m%d}-{secrets.token_hex(2).upper()}",
-        "total": total,
-        "cantidad": cantidad,
-        "fecha": ahora.strftime("%d-%m-%Y %H:%M"),
-    }
-    _guardar_carrito(request, {})
-    return redirect("core:pedido_confirmado")
-
-
-def pedido_confirmado(request):
-    pedido = request.session.get("ultimo_pedido")
-    if not pedido:
-        return redirect("core:inicio")
-    return render(request, "core/pedido_confirmado.html", {"pedido": pedido})
+def login(request):
+    formulario = LoginForm(request.POST if request.method == "POST" else None)
+    if request.method == "POST" and formulario.is_valid():
+        usuario_encontrado = None
+        for usuario in leer_json("usuarios.json"):
+            if (usuario["correo"] == formulario.cleaned_data["correo"].lower()
+                    and usuario["clave_demo"] == formulario.cleaned_data["clave"] and usuario["activo"]):
+                usuario_encontrado = usuario
+                break
+        if usuario_encontrado:
+            request.session["nombre"] = usuario_encontrado["nombre"]
+            request.session["rol"] = usuario_encontrado["rol"]
+            messages.success(request, "Acceso de ejemplo correcto.")
+            if usuario_encontrado["rol"] == "administrador":
+                return redirect("core:gestion")
+            return redirect("core:cliente")
+        formulario.add_error(None, "El correo o la contraseña de ejemplo no son correctos.")
+    return render(request, "core/login.html", {"formulario": formulario, "titulo": "Iniciar sesión"})
 
 
 def registro(request):
-    # Los POST anteriores sin acción siguen siendo registros válidos.
-    modo = request.POST.get('accion', 'crear') if request.method == 'POST' else request.GET.get('modo', 'ingresar')
-    modo = 'crear' if modo == 'crear' else 'ingresar'
-    formulario = (RegistroForm if modo == 'crear' else IniciarSesionForm)(request.POST if request.method == 'POST' else None)
-    siguiente_solicitado = request.POST.get("next", request.GET.get("next", ""))
-    siguiente = _destino_seguro(request, siguiente_solicitado, "")
+    formulario = RegistroForm(request.POST if request.method == "POST" else None)
+    resultado = None
     if request.method == "POST" and formulario.is_valid():
-        datos = formulario.cleaned_data
-        usuario = None
-        if modo == 'crear':
-            nombre = datos['nombre'].strip().split()[0]
-            if crear_cuenta(nombre, datos['correo'], datos['contrasena']):
-                usuario = {'nombre': nombre}
-            else:
-                formulario.add_error('correo', 'Este correo ya tiene una cuenta. Selecciona Iniciar sesión.')
+        correo = formulario.cleaned_data["correo"].lower()
+        existe = any(u["correo"] == correo for u in leer_json("usuarios.json"))
+        if existe:
+            formulario.add_error("correo", "Ese correo ya está en los datos de ejemplo.")
         else:
-            limite = 'intentos:' + clave_correo(datos['correo'])
-            intentos = caches['cuentas'].get(limite, 0)
-            if intentos >= 5:
-                formulario.add_error(None, 'Demasiados intentos. Espera cinco minutos antes de volver a ingresar.')
-            else:
-                usuario = verificar_cuenta(datos['correo'], datos['contrasena'])
-                if usuario:
-                    caches['cuentas'].delete(limite)
-                else:
-                    caches['cuentas'].set(limite, intentos + 1, timeout=300)
-                    formulario.add_error(None, 'El correo o la contraseña no coinciden. Revisa tus datos o crea una cuenta.')
-        if usuario:
-            request.session.cycle_key()
-            request.session['usuario_tienda'] = usuario
-            messages.success(request, f"Sesión iniciada. Bienvenido, {usuario['nombre']}.")
-            return redirect(siguiente or reverse('core:registro_confirmado'))
-    return render(
-        request,
-        "core/registro.html",
-        {"registro_formulario": formulario, "siguiente": siguiente, "modo_cuenta": modo},
-    )
+            resultado = {"nombre": formulario.cleaned_data["nombre"], "correo": correo}
+            messages.success(request, "Datos de registro validados. No se creó una cuenta permanente.")
+    return render(request, "core/registro.html", {"formulario": formulario, "resultado": resultado,
+                                                 "titulo": "Crear cuenta"})
 
 
-def registro_confirmado(request):
-    usuario = request.session.get("usuario_tienda")
-    if not isinstance(usuario, dict) or not usuario.get("nombre"):
-        return redirect("core:registro")
-    return render(request, "core/registro_confirmado.html", {"usuario": usuario})
-
-
-@require_POST
-def cerrar_sesion(request):
-    request.session.pop("usuario_tienda", None)
-    request.session.modified = True
-    messages.info(request, "La sesión se cerró correctamente.")
+def salir(request):
+    if request.method == "POST":
+        request.session.pop("rol", None)
+        request.session.pop("nombre", None)
+        messages.success(request, "Se cerró el acceso de ejemplo.")
     return redirect("core:inicio")
+
+
+def cliente(request):
+    if not request.session.get("rol"):
+        return redirect("core:login")
+    return render(request, "core/cliente.html", {"titulo": "Mi cuenta"})
+
+
+def carrito(request):
+    cantidades = request.session.get("carrito", {})
+    lineas = []
+    total = 0
+    for producto in leer_json("catalogo.json")["productos"]:
+        cantidad = cantidades.get(str(producto["id"]), 0)
+        if cantidad:
+            subtotal = cantidad * producto["precio"]
+            total += subtotal
+            lineas.append({"producto": producto, "cantidad": cantidad, "subtotal": subtotal})
+    return render(request, "core/carrito.html", {"lineas": lineas, "total": total, "titulo": "Carrito"})
+
+
+def agregar_carrito(request, producto_id):
+    producto = obtener_producto(producto_id)
+    if request.method == "POST":
+        cantidades = request.session.get("carrito", {})
+        clave = str(producto_id)
+        cantidad = cantidades.get(clave, 0)
+        if cantidad < producto["stock"]:
+            cantidades[clave] = cantidad + 1
+            request.session["carrito"] = cantidades
+            messages.success(request, "Producto agregado al carrito.")
+        else:
+            messages.warning(request, "No hay más unidades disponibles.")
+    return redirect("core:carrito")
+
+
+def quitar_carrito(request, producto_id):
+    if request.method == "POST":
+        cantidades = request.session.get("carrito", {})
+        cantidades.pop(str(producto_id), None)
+        request.session["carrito"] = cantidades
+    return redirect("core:carrito")
+
+
+def confirmar(request):
+    if request.method != "POST":
+        return redirect("core:carrito")
+    if not request.session.get("rol"):
+        messages.info(request, "Para continuar debe iniciar sesión con una cuenta de ejemplo.")
+        return redirect("core:login")
+    if not request.session.get("carrito"):
+        messages.warning(request, "El carrito está vacío.")
+        return redirect("core:carrito")
+    request.session["carrito"] = {}
+    return render(request, "core/confirmacion.html", {"titulo": "Confirmación"})
+
+
+def gestion(request):
+    if request.session.get("rol") != "administrador":
+        return redirect("core:login")
+    datos = leer_json("catalogo.json")
+    contexto = {"titulo": "Administración", "total_productos": len(datos["productos"]),
+                "total_usuarios": len(leer_json("usuarios.json")),
+                "sin_stock": len([p for p in datos["productos"] if p["stock"] == 0])}
+    return render(request, "core/gestion.html", contexto)
+
+
+def gestion_productos(request):
+    if request.session.get("rol") != "administrador":
+        return redirect("core:login")
+    return render(request, "core/gestion_productos.html", {
+        "productos": leer_json("catalogo.json")["productos"], "titulo": "Administrar productos"})
+
+
+def producto_formulario(request, producto_id=None):
+    if request.session.get("rol") != "administrador":
+        return redirect("core:login")
+    datos = leer_json("catalogo.json")
+    producto = obtener_producto(producto_id) if producto_id is not None else None
+    formulario = ProductoForm(request.POST if request.method == "POST" else None,
+                               initial=producto, categorias=datos["categorias"])
+    resultado = None
+    if request.method == "POST" and formulario.is_valid():
+        resultado = formulario.cleaned_data
+        messages.success(request, "Producto validado. Esta salida es una vista previa, no un cambio guardado.")
+    return render(request, "core/producto_formulario.html", {
+        "formulario": formulario, "resultado": resultado, "producto": producto,
+        "titulo": "Editar producto" if producto else "Nuevo producto"})
+
+
+def gestion_usuarios(request):
+    if request.session.get("rol") != "administrador":
+        return redirect("core:login")
+    formulario = UsuarioForm(request.POST if request.method == "POST" else None)
+    resultado = None
+    usuarios = leer_json("usuarios.json")
+    if request.method == "POST" and formulario.is_valid():
+        if any(u["correo"] == formulario.cleaned_data["correo"].lower() for u in usuarios):
+            formulario.add_error("correo", "El correo ya está en los datos de ejemplo.")
+        else:
+            resultado = formulario.cleaned_data
+            messages.success(request, "Usuario validado para vista previa. No se guardaron cambios.")
+    return render(request, "core/gestion_usuarios.html", {
+        "usuarios": usuarios, "formulario": formulario, "resultado": resultado, "titulo": "Administrar usuarios"})

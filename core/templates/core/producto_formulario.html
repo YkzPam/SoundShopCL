@@ -1,0 +1,5 @@
+{% extends 'base.html' %}
+{% block contenido %}
+{% include 'core/admin_menu.html' %}<section class="form-admin"><h1 class="h2">{{ titulo }}</h1><p>Completar los seis campos y revisar la salida del servidor.</p><form method="post" novalidate>{% csrf_token %}{% include 'core/formulario.html' %}<button class="btn btn-primary">Validar y ver resultado</button> <a class="btn btn-outline-primary" href="{% url 'core:gestion_productos' %}">Volver</a></form>
+{% if resultado %}<section class="resultado mt-4" aria-labelledby="resultado-titulo"><h2 class="h4" id="resultado-titulo">Vista previa validada</h2><dl><dt>Nombre</dt><dd>{{ resultado.nombre }}</dd><dt>Marca</dt><dd>{{ resultado.marca }}</dd><dt>Categoría</dt><dd>{{ resultado.categoria }}</dd><dt>Descripción</dt><dd>{{ resultado.descripcion }}</dd><dt>Precio</dt><dd>${{ resultado.precio|floatformat:'0g' }}</dd><dt>Stock</dt><dd>{{ resultado.stock }} · {% if resultado.stock > 0 %}Disponible{% else %}Sin stock{% endif %}</dd></dl><p class="mb-0">El JSON no fue modificado.</p></section>{% endif %}</section>
+{% endblock %}

@@ -1,0 +1,9 @@
+{% extends 'base.html' %}{% load static %}
+{% block contenido %}
+<section class="hero row align-items-center g-4 mb-5">
+  <div class="col-md-6 reveal"><p class="eyebrow">SoundShop CL / Tienda musical</p><h1>El sonido<br>empieza aquí.</h1><p class="lead">Instrumentos y equipos para escuchar, crear y compartir música.</p><a class="btn btn-primary" href="{% url 'core:catalogo' %}">Explorar productos →</a></div>
+  <div class="col-md-6 reveal"><img class="hero-imagen" src="{% static 'img/portada-astra-panorama.webp' %}" alt="Guitarra eléctrica Astra Seven" width="900" height="500"></div>
+</section>
+<section aria-labelledby="seleccion"><div class="d-flex justify-content-between align-items-end gap-3 mb-4"><div><p class="eyebrow">Una selección para comenzar</p><h2 id="seleccion">Encuentra tu sonido.</h2></div><a href="{% url 'core:catalogo' %}">Ver catálogo →</a></div>{% include 'core/productos_lista.html' %}</section>
+<section class="franja reveal mt-5"><h2>Escuchar. Crear. Tocar.</h2><p>Cinco categorías para elegir el equipo según su uso.</p><a class="btn btn-outline-primary" href="{% url 'core:categorias' %}">Explorar categorías</a></section>
+{% endblock %}

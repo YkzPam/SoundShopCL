@@ -1,0 +1,4 @@
+{% extends 'base.html' %}{% load static %}
+{% block contenido %}
+<section class="lectura reveal"><p class="eyebrow">La tienda</p><h1>Música para el día a día.</h1><p class="lead">SoundShop CL reúne instrumentos, equipos de audio y accesorios en una tienda digital.</p><p>El catálogo se organiza por uso: audífonos, tornamesas, estudio, instrumentos y sonido en vivo. Cada producto muestra su descripción, precio y disponibilidad para facilitar la elección.</p><img class="nosotros-imagen" src="{% static 'img/portada-astra-panorama.webp' %}" alt="Guitarra eléctrica en un estudio" width="900" height="500"><p class="mt-4">Esta entrega representa una tienda propuesta para el caso académico. Los productos y las cuentas son datos ficticios; no existe una sucursal ni un servicio de pago operativo.</p><a class="btn btn-primary" href="{% url 'core:catalogo' %}">Conocer el catálogo</a></section>
+{% endblock %}
