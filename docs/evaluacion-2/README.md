@@ -12,6 +12,8 @@ Los pasos de instalación, migración, catálogo y creación del administrador s
 
 La base local no se distribuye en GitHub. Al descargar el proyecto se deben ejecutar `migrate`, `cargar_catalogo` y `createsuperuser`. Este último paso crea un usuario administrativo en la nueva base; no utiliza la cuenta de GitHub ni la cuenta simulada del cliente. La extensión SQLite DB Viewer permite abrir `db.sqlite3` desde VS Code para revisar las tablas y los registros, pero no sustituye al motor SQLite utilizado por Django.
 
+`requirements.txt` fija las mismas cinco versiones del ZIP de referencia del docente: asgiref 3.12.1, Django 6.1.1, Faker 40.40.0, sqlparse 0.6.0 y tzdata 2026.5. La instalación se comprueba con `python -m pip check` y `python -m pip freeze` dentro del entorno virtual. La rúbrica exige la configuración y el funcionamiento del proyecto, no una versión específica; estas versiones se conservan para seguir el entorno de referencia solicitado por el estudiante.
+
 ## 3. Modelos y relaciones de la tienda
 
 | N.º | Modelo | Tabla propia | Función |
@@ -61,6 +63,8 @@ Para abrir el editable, ingresar a <https://excalidraw.com/> y utilizar **Abrir*
 
 Las migraciones fueron generadas por Django a medida que se incorporaron o modificaron los modelos. No son diez archivos vacíos. `makemigrations` registra el cambio en archivos Python; `migrate` aplica esos archivos a SQLite. La décima migración conserva un cambio real posterior al modelo inicial y permite explicar cómo se modifica una estructura existente.
 
+Los archivos conservan la cabecera de Django 5.2.17, la versión que los generó originalmente. La actualización del entorno a Django 6.1.1 no reescribe ese historial: las diez migraciones existentes se aplicaron correctamente con la nueva versión y `makemigrations --check --dry-run` no detectó cambios pendientes. Cambiar solamente esa cabecera daría una referencia falsa de cómo se generaron.
+
 ```powershell
 .\venv\Scripts\python.exe manage.py showmigrations core
 .\venv\Scripts\python.exe manage.py makemigrations core --check --dry-run
@@ -104,18 +108,18 @@ La variable `SOUNDSHOP_DB` selecciona otro archivo SQLite durante esa terminal. 
 
 ## 8. Verificaciones locales del 8 de octubre de 2026
 
-Las cuatro cargas se ejecutaron en `work/cargas.sqlite3`, separada de la base del catálogo. El comando verificó las inserciones y una consulta posterior, en otro proceso, confirmó 1.101.100 clientes acumulados. El historial de esa base tiene las diez migraciones aplicadas. SQLite devolvió integridad `ok` y ninguna infracción de claves foráneas en ambas bases.
+Las cuatro cargas se repitieron después de alinear las dependencias con el ZIP del docente, utilizando Django 6.1.1 y Faker 40.40.0. La nueva base `work/revision-e2-61fc4ac4/cargas.sqlite3` permanece separada del catálogo. El comando verificó las inserciones y una consulta posterior, en otro proceso, confirmó 1.101.100 clientes acumulados. El historial de esa base tiene las diez migraciones aplicadas. SQLite devolvió integridad `ok` y ninguna infracción de claves foráneas tanto en la base de cargas como en la del catálogo.
 
 | Carga solicitada | Registros antes | Registros después | Tiempo local informado |
 | --- | ---: | ---: | ---: |
-| 100 | 0 | 100 | 0,02 s |
-| 1.000 | 100 | 1.100 | 0,17 s |
-| 100.000 | 1.100 | 101.100 | 16,26 s |
-| 1.000.000 | 101.100 | 1.101.100 | 165,16 s |
+| 100 | 0 | 100 | 0,03 s |
+| 1.000 | 100 | 1.100 | 0,16 s |
+| 100.000 | 1.100 | 101.100 | 16,42 s |
+| 1.000.000 | 101.100 | 1.101.100 | 166,24 s |
 
 Los tiempos corresponden a esas ejecuciones locales; no son valores garantizados en otro computador. Estas cargas no se realizaron con el docente. La base principal conserva diez productos y tres clientes comerciales de prueba. Los archivos SQLite y la carpeta `work/` están excluidos de Git.
 
-Las diecisiete pruebas automáticas pasaron. Comprueban SQLite, tablas y migraciones, registro de modelos, correspondencia del esquema, acceso administrativo, creación, consulta, filtros, modificación y eliminación de productos, validaciones, relaciones, repetición del catálogo, una carga pequeña de Faker y respuesta de las páginas conservadas. El CRUD completo se prueba con productos; no se afirma que se haya repetido manualmente con cada uno de los diez modelos.
+Las diecisiete pruebas automáticas pasaron con las cinco dependencias del docente, tanto en el entorno actualizado como en un entorno virtual nuevo. `pip check` no encontró conflictos y `pip freeze` mostró exactamente las cinco versiones de requirements.txt. Las pruebas comprueban SQLite, tablas y migraciones, registro de modelos, correspondencia del esquema, acceso administrativo, creación, consulta, filtros, modificación y eliminación de productos, validaciones, relaciones, repetición del catálogo, una carga pequeña de Faker y respuesta de las páginas conservadas. El CRUD completo se prueba con productos; no se afirma que se haya repetido manualmente con cada uno de los diez modelos.
 
 Los tests crean su administrador únicamente en la base temporal de pruebas. La contraseña de ese usuario no sirve para ingresar a la tienda real y no constituye una credencial administrativa distribuida. `self.client.get` y `self.client.post` simulan solicitudes; las comprobaciones comparan la respuesta y los registros almacenados. No son una grabación de interacción en el navegador.
 
@@ -153,7 +157,7 @@ La guía se contrastó con *E2 Evaluacion_inv_Caso_Semestral_Music_pro_U2 Backen
 
 Café y Código. (s. f.). *django-examples* [Repositorio de código]. GitHub. https://github.com/cafeycodigo/django-examples
 
-El ZIP del repositorio del docente se utilizó como referencia de SQLite, modelos, opciones de ModelAdmin, migraciones y seeding. No se copian sus otras aplicaciones ni se instala todo su conjunto de dependencias. El proyecto mantiene las versiones compatibles declaradas en su propio archivo requirements.txt.
+El ZIP del repositorio del docente se utilizó como referencia de SQLite, modelos, opciones de ModelAdmin, migraciones y seeding. El archivo requirements.txt de E2 ahora coincide con sus cinco dependencias y versiones. Los modelos y los comandos siguen adaptados a la tienda musical; no se copian las aplicaciones ajenas al caso. La coincidencia del entorno no implica que ambos proyectos sean idénticos.
 
 *Ejercicios de Migraciones, Modelos y Administrador en Django*. (s. f.). AAI INACAP, Unidad 2 de Framework back end [Material del curso con acceso institucional]. https://aai.inacap.cl/mod/page/view.php?id=2336194
 

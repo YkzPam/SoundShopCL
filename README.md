@@ -18,12 +18,22 @@ python -m venv venv
 .\venv\Scripts\python.exe manage.py runserver
 ```
 
+Las cinco versiones de `requirements.txt` coinciden con el archivo del ZIP `django-examples-main.zip` entregado por el docente: Django 6.1.1, Faker 40.40.0, asgiref 3.12.1, sqlparse 0.6.0 y tzdata 2026.5. Esta coincidencia corresponde al entorno de referencia; no significa que se hayan copiado sus otras aplicaciones ni que la rúbrica exija literalmente esas versiones.
+
+Si el entorno `venv` ya existe, no hace falta crearlo otra vez. Para actualizarlo y comprobar sus dependencias, ejecutar:
+
+```powershell
+.\venv\Scripts\python.exe -m pip install -r requirements.txt
+.\venv\Scripts\python.exe -m pip check
+.\venv\Scripts\python.exe -m pip freeze
+```
+
 El asistente de `createsuperuser` solicita un nombre de usuario, correo y contraseña elegidos por el propietario. La contraseña no se muestra mientras se escribe. No existe una contraseña administrativa pública ni una cuenta administrativa incluida en la descarga.
 
 - Tienda: <http://127.0.0.1:8000/>.
 - Django Admin: <http://127.0.0.1:8000/admin/>.
 
-También se pueden utilizar las tareas de **Terminal → Ejecutar tarea**. Sus nombres comienzan con **E2:**; permiten revisar la configuración, aplicar migraciones, cargar el catálogo, crear el administrador, probar la aplicación y elegir la cantidad de clientes ficticios. Primero debe existir el entorno `venv` con las dependencias instaladas.
+También se pueden utilizar las tareas de **Terminal → Ejecutar tarea**. Sus nombres comienzan con **E2:**; permiten instalar y verificar las dependencias, revisar la configuración, aplicar migraciones, cargar el catálogo, crear el administrador, probar la aplicación y elegir la cantidad de clientes ficticios. Primero debe existir el entorno `venv`. La tarea de creación del administrador solicita las credenciales en la terminal y no las guarda en los archivos del proyecto.
 
 Bootstrap, las imágenes, el CSS y el JavaScript están incluidos en `static/`. La tienda no necesita Node ni una compilación de estilos. Las animaciones requieren ejecutar Django, cargar la página en el navegador y tener permitidas las animaciones en las preferencias de accesibilidad del dispositivo.
 

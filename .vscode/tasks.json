@@ -1,6 +1,9 @@
 {
   "version": "2.0.0",
   "tasks": [
+    {"label": "E2: instalar dependencias del ejemplo docente", "type": "process", "command": "${workspaceFolder}/venv/Scripts/python.exe", "args": ["-m", "pip", "install", "-r", "requirements.txt"], "problemMatcher": []},
+    {"label": "E2: verificar dependencias instaladas", "type": "process", "command": "${workspaceFolder}/venv/Scripts/python.exe", "args": ["-m", "pip", "check"], "problemMatcher": []},
+    {"label": "E2: ver versiones instaladas", "type": "process", "command": "${workspaceFolder}/venv/Scripts/python.exe", "args": ["-m", "pip", "freeze"], "problemMatcher": []},
     {"label": "E2: revisar configuración", "type": "process", "command": "${workspaceFolder}/venv/Scripts/python.exe", "args": ["manage.py", "check"], "problemMatcher": []},
     {"label": "E2: aplicar migraciones", "type": "process", "command": "${workspaceFolder}/venv/Scripts/python.exe", "args": ["manage.py", "migrate"], "problemMatcher": []},
     {"label": "E2: ver historial de migraciones", "type": "process", "command": "${workspaceFolder}/venv/Scripts/python.exe", "args": ["manage.py", "showmigrations", "core"], "problemMatcher": []},
