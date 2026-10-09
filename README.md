@@ -49,6 +49,8 @@ El catálogo público consulta la base de datos. Los cambios guardados en los pr
 
 El enlace **Panel de administración** abre Django Admin. El acceso exige un usuario activo con permisos administrativos. Los diez modelos de la tienda están registrados con opciones de consulta; productos y clientes incluyen búsqueda, filtros y paginación.
 
+Las boletas, compras y sus detalles se gestionan desde apartados separados. Primero se guarda la boleta o compra y después se agregan sus detalles, seleccionando el documento y el producto en los campos normales de Admin. No se utiliza autocompletado ni se insertan formularios de detalles dentro del documento; las búsquedas y los filtros de los listados se conservan.
+
 La cuenta y el carrito de cliente conservan el recorrido simulado de la primera entrega. El registro de la tienda no crea una cuenta permanente y el carrito no genera ventas ni cobros. El modelo `Cliente` almacena datos comerciales; no es una cuenta de acceso de Django. Las boletas y compras de esta evaluación se administran desde Django Admin.
 
 ## 3. Archivos de la Evaluación 2

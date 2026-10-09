@@ -88,6 +88,24 @@ class Evaluacion2Tests(TestCase):
         for modelo in apps.get_app_config("core").get_models():
             ruta = reverse("admin:core_" + modelo._meta.model_name + "_changelist")
             self.assertEqual(self.client.get(ruta).status_code, 200)
+            configuracion = admin.site._registry[modelo]
+            self.assertEqual(configuracion.autocomplete_fields, ())
+            self.assertEqual(configuracion.inlines, ())
+            ruta = reverse("admin:core_" + modelo._meta.model_name + "_add")
+            respuesta = self.client.get(ruta)
+            self.assertEqual(respuesta.status_code, 200)
+            self.assertEqual(respuesta.context["inline_admin_formsets"], [])
+
+        respuesta = self.client.get(reverse("admin:core_boleta_add"))
+        self.assertContains(respuesta, '<select name="cliente"')
+        respuesta = self.client.get(reverse("admin:core_detalleboleta_add"))
+        self.assertContains(respuesta, '<select name="boleta"')
+        self.assertContains(respuesta, '<select name="producto"')
+        respuesta = self.client.get(reverse("admin:core_compraproveedor_add"))
+        self.assertContains(respuesta, '<select name="proveedor"')
+        respuesta = self.client.get(reverse("admin:core_detallecompra_add"))
+        self.assertContains(respuesta, '<select name="compra"')
+        self.assertContains(respuesta, '<select name="producto"')
 
     def test_invitado_no_entra_admin(self):
         self.client.logout()
