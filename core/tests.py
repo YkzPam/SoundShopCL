@@ -259,8 +259,22 @@ class Evaluacion2Tests(TestCase):
         self.assertIn("VERIFICADO", salida.getvalue())
 
     def test_faker_rechaza_cantidad_invalida(self):
+        antes = Cliente.objects.count()
         with self.assertRaises(CommandError):
             call_command("generar_clientes", cantidad=0, stdout=StringIO())
+        self.assertEqual(Cliente.objects.count(), antes)
+
+    def test_faker_rechaza_cantidad_negativa(self):
+        antes = Cliente.objects.count()
+        with self.assertRaises(CommandError):
+            call_command("generar_clientes", cantidad=-1, stdout=StringIO())
+        self.assertEqual(Cliente.objects.count(), antes)
+
+    def test_faker_rechaza_cantidad_sobre_el_maximo(self):
+        antes = Cliente.objects.count()
+        with self.assertRaises(CommandError):
+            call_command("generar_clientes", cantidad=1_000_001, stdout=StringIO())
+        self.assertEqual(Cliente.objects.count(), antes)
 
     def test_paginas_y_enlaces_anteriores(self):
         for nombre in ("inicio", "catalogo", "categorias", "nosotros", "login", "registro", "carrito"):

@@ -112,6 +112,8 @@ Un cliente asociado a una boleta no puede eliminarse porque la relación utiliza
 
 `generar_clientes` recibe la cantidad solicitada. Faker con configuración `es_CL` produce nombres y teléfonos; cada correo ficticio recibe un prefijo de carga y un número para evitar duplicados. El bucle prepara lotes de hasta mil objetos. `bulk_create` guarda cada lote sin mantener un millón de objetos en memoria. `transaction.atomic` revierte la carga completa si ocurre un error durante la inserción.
 
+El intervalo permitido va de 1 a 1.000.000 de clientes por ejecución. Las pruebas de límites comprueban que cero, un número negativo y 1.000.001 provocan `CommandError` sin insertar registros. El último caso se rechaza antes de generar datos; no realiza una carga superior al millón ni sustituye las cuatro cargas solicitadas para la defensa.
+
 El comando consulta la cantidad antes y después, cuenta los registros del prefijo y recupera el primero y el último. Solo informa **VERIFICADO** cuando la diferencia y el número almacenado coinciden con lo solicitado. La carga es acumulativa: agregar mil clientes no reemplaza los registros que ya existían. Los clientes ficticios no se convierten en usuarios de acceso a Django.
 
 La primera línea también identifica el archivo SQLite seleccionado mediante `connection.settings_dict["NAME"]`. `Base: default` es el nombre de la conexión, no la ruta del archivo. El dato `archivo SQLite` permite comprobar si la carga se dirige a `db.sqlite3` o a la base separada seleccionada con `SOUNDSHOP_DB`. La prueba de Faker verifica que esa ruta aparece en la salida y que los registros se almacenan.
@@ -168,7 +170,17 @@ La ampliación mantiene el mismo patrón de `TestCase`, `self.client.get`, `self
 | Cliente con boleta | Admin impide su eliminación y conserva ambos registros mediante `PROTECT`. |
 | Eliminar boleta | Se eliminan la boleta y sus detalles mediante `CASCADE`, sin borrar el cliente ni los productos. |
 
-La última ejecución local de esta ampliación terminó con 25 pruebas aprobadas y ningún error de configuración. Las ocho pruebas nuevas se agrupan en CRUD de clientes, validaciones de correo y reglas de eliminación relacionada. Las operaciones se realizan en la base temporal de tests y no eliminan ni modifican registros de la base del catálogo. No constituyen una prueba manual en otro PC ni reemplazan la defensa presencial.
+La primera ampliación de este apartado terminó con 25 pruebas aprobadas y ningún error de configuración. Sus ocho pruebas nuevas se agrupan en CRUD de clientes, validaciones de correo y reglas de eliminación relacionada. Las operaciones se realizan en la base temporal de tests y no eliminan ni modifican registros de la base del catálogo. No constituyen una prueba manual en otro PC ni reemplazan la defensa presencial.
+
+### 8.2. Pruebas de límites, relaciones y carga inicial
+
+Las comprobaciones siguientes refuerzan comportamientos ya implementados, sin agregar campos, tablas, migraciones ni funciones a la tienda. Cada grupo se incorpora después de ejecutar las pruebas y se documenta con el resultado observado. No se utilizan para simular avances anteriores ni una instalación en otro PC.
+
+| Grupo | Comprobación |
+| --- | --- |
+| Límites de Faker | Cero, cantidades negativas y cantidades superiores al millón se rechazan sin crear clientes. |
+
+La ejecución local posterior a este grupo terminó con 27 pruebas aprobadas. Todos los casos utilizan la base temporal de tests; la base principal y las cuatro cargas masivas existentes no se modificaron.
 
 ## 9. Correspondencia con los diez indicadores de la rúbrica
 
