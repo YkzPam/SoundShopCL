@@ -95,6 +95,8 @@ La guía de E2 incluye los resultados de las cuatro cargas locales y un recorrid
 
 La ampliación de las pruebas del administrador se documenta en [Pruebas adicionales de administración](docs/evaluacion-2/README.md#81-pruebas-adicionales-de-administración). Comprueba el CRUD de clientes, los correos inválidos o duplicados y las reglas de eliminación entre clientes, boletas y detalles mediante solicitudes a Django Admin y consultas a la base temporal de tests; no requiere agregar modelos ni funciones a la aplicación.
 
+Las [Pruebas de límites, relaciones y carga inicial](docs/evaluacion-2/README.md#82-pruebas-de-límites-relaciones-y-carga-inicial) incluyen cantidades inválidas de Faker, precio y stock, protección de proveedores y repetición del catálogo sin duplicar ni sobrescribir los registros identificados por sus claves existentes. La ejecución local final de E2 terminó con 36 pruebas aprobadas; sigue pendiente comprobar la instalación en el otro computador y realizar la defensa con el docente.
+
 ## 5. Continuidad de la Evaluación 1 y publicación
 
 La primera entrega se conserva intacta en la rama [evaluacion1](https://github.com/YkzPam/SoundShopCL/tree/evaluacion1), en el commit `381abd52a831058e2032d6c5d5eaefcf32cd8499`. La segunda entrega utiliza la rama [evaluacion-2](https://github.com/YkzPam/SoundShopCL/tree/evaluacion-2). Sus documentos iniciales permanecen como antecedentes; las instrucciones vigentes para ejecutar E2 son las de este README y la guía de E2.

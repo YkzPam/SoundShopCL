@@ -312,6 +312,38 @@ class Evaluacion2Tests(TestCase):
         self.assertEqual(Producto.objects.count(), 10)
         self.assertEqual(Categoria.objects.count(), 5)
 
+    def test_catalogo_repetido_no_duplica_los_diez_modelos(self):
+        modelos = list(apps.get_app_config("core").get_models())
+        antes = {}
+        for modelo in modelos:
+            antes[modelo.__name__] = modelo.objects.count()
+        call_command("cargar_catalogo", stdout=StringIO())
+        for modelo in modelos:
+            self.assertEqual(modelo.objects.count(), antes[modelo.__name__], modelo.__name__)
+
+    def test_catalogo_conserva_datos_editados_del_cliente(self):
+        cliente = Cliente.objects.first()
+        cliente.nombre = "Cliente conservado"
+        cliente.telefono = "+56900001111"
+        cliente.activo = False
+        cliente.save()
+        call_command("cargar_catalogo", stdout=StringIO())
+        cliente.refresh_from_db()
+        self.assertEqual(cliente.nombre, "Cliente conservado")
+        self.assertEqual(cliente.telefono, "+56900001111")
+        self.assertFalse(cliente.activo)
+
+    def test_catalogo_conserva_precio_stock_y_estado_del_producto(self):
+        self.producto.precio = 64990
+        self.producto.stock = 0
+        self.producto.activo = False
+        self.producto.save()
+        call_command("cargar_catalogo", stdout=StringIO())
+        self.producto.refresh_from_db()
+        self.assertEqual(self.producto.precio, 64990)
+        self.assertEqual(self.producto.stock, 0)
+        self.assertFalse(self.producto.activo)
+
     def test_faker_almacena_cantidad(self):
         antes = Cliente.objects.count()
         salida = StringIO()

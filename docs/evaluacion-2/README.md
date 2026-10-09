@@ -181,10 +181,13 @@ Las comprobaciones siguientes refuerzan comportamientos ya implementados, sin ag
 | Límites de Faker | Cero, cantidades negativas y cantidades superiores al millón se rechazan sin crear clientes. |
 | Precio y stock | Admin acepta el precio mínimo actual de 1 y stock cero; rechaza precio cero, stock negativo y stock no numérico sin guardar el producto. |
 | Compras a proveedores | Admin protege al proveedor asociado a una compra. Borrar la compra elimina sus detalles, pero conserva al proveedor y los productos. |
+| Repetición del catálogo | Repetir la carga mantiene la cantidad de registros de los diez modelos y conserva los datos editados de clientes y el precio, stock y estado de productos. |
 
-La ejecución local posterior a estos grupos terminó con 33 pruebas aprobadas. La prueba del precio mínimo comprueba el límite de `MinValueValidator(1)` ya definido en el modelo; no cambia la política ni los precios de los productos del catálogo. Todos los casos utilizan la base temporal de tests; la base principal y las cuatro cargas masivas existentes no se modificaron.
+La ejecución local final posterior a estos grupos terminó con 36 pruebas aprobadas. Se incorporaron once casos: dos de límites de Faker, cuatro de precio y stock, dos de relaciones de compras y tres de repetición del catálogo. La prueba del precio mínimo comprueba el límite de `MinValueValidator(1)` ya definido en el modelo; no cambia la política ni los precios de los productos del catálogo. Todos los casos utilizan la base temporal de tests; la base principal y las cuatro cargas masivas existentes no se modificaron.
 
 La protección del proveedor se comprueba con un proveedor ficticio nuevo, asociado solamente a una compra. Así se identifica la relación `CompraProveedor.proveedor` con `PROTECT`, sin depender de productos que también impidan su eliminación. La prueba de eliminación utiliza una compra con detalles y verifica el comportamiento de `DetalleCompra.compra` con `CASCADE`. No comprueba un CRUD completo de compras ni una gestión automática del stock.
+
+Las pruebas del catálogo repiten `cargar_catalogo` sobre registros existentes. Un caso compara las cantidades de los diez modelos antes y después; otro conserva el nombre, teléfono y estado editados de un cliente; el tercero conserva el precio, stock cero y estado inactivo de un producto. Se mantienen el correo y el código utilizados como claves de búsqueda por `get_or_create`. La comprobación no afirma que una clave modificada siga identificando el mismo registro inicial.
 
 ## 9. Correspondencia con los diez indicadores de la rúbrica
 
