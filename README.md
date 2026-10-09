@@ -4,7 +4,7 @@ Proyecto individual de una tienda de equipos musicales desarrollado con Django. 
 
 ## 1. Ejecución desde Visual Studio Code
 
-Extraer la descarga de GitHub y abrir en Visual Studio Code la carpeta que contiene `manage.py`. Las plantillas HTML de Django no se ejecutan directamente al hacer doble clic.
+Seleccionar la rama [evaluacion-2](https://github.com/YkzPam/SoundShopCL/tree/evaluacion-2) antes de descargar desde **Code → Download ZIP**. La rama `evaluacion1` conserva la primera entrega y no contiene esta ampliación. Extraer la descarga y abrir en Visual Studio Code la carpeta que contiene `manage.py`. Las plantillas HTML de Django no se ejecutan directamente al hacer doble clic.
 
 Con Python 3.12 o superior instalado, ejecutar en la terminal integrada:
 
@@ -40,6 +40,10 @@ Bootstrap, las imágenes, el CSS y el JavaScript están incluidos en `static/`. 
 ## 2. Datos y acceso administrativo
 
 La aplicación utiliza `db.sqlite3`, creado por las migraciones. Este archivo y el entorno virtual no se publican en GitHub: cada computador crea su propia base y su propio administrador siguiendo el apartado anterior. Iniciar sesión en GitHub no inicia sesión en Django Admin.
+
+El administrador se crea una sola vez por base de datos, no cada vez que se inicia el servidor. Una descarga nueva no incluye los usuarios ni la contraseña del computador original. Puede elegirse el mismo nombre de usuario en el otro equipo, pero será una cuenta independiente. Si ya existe una cuenta administrativa en esa base, se utiliza la existente; no hace falta crear otra para cada práctica.
+
+La preparación y la comprobación antes de la clase se detallan en [Preparación del administrador en otro PC](docs/evaluacion-2/README.md#21-preparación-y-comprobación-del-administrador-en-otro-pc). Las credenciales deben conservarse de forma privada, fuera de los archivos publicados. No se incorpora una contraseña fija ni una creación automática de superusuarios al código.
 
 El catálogo público consulta la base de datos. Los cambios guardados en los productos desde Django Admin se muestran al volver a cargar la tienda. `core/data/catalogo.json` se conserva como fuente del catálogo inicial; editar ese JSON no sustituye la gestión de registros en SQLite. La carga inicial puede repetirse sin sobrescribir los productos ya editados.
 

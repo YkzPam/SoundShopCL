@@ -14,6 +14,24 @@ La base local no se distribuye en GitHub. Al descargar el proyecto se deben ejec
 
 `requirements.txt` fija las mismas cinco versiones del ZIP de referencia del docente: asgiref 3.12.1, Django 6.1.1, Faker 40.40.0, sqlparse 0.6.0 y tzdata 2026.5. La instalación se comprueba con `python -m pip check` y `python -m pip freeze` dentro del entorno virtual. La rúbrica exige la configuración y el funcionamiento del proyecto, no una versión específica; estas versiones se conservan para seguir el entorno de referencia solicitado por el estudiante.
 
+### 2.1. Preparación y comprobación del administrador en otro PC
+
+La descarga debe realizarse desde la rama `evaluacion-2`, no desde `evaluacion1`. En VS Code se abre la carpeta donde está `manage.py`, se crea el entorno `venv` y se instalan las dependencias según el README principal. Con ese entorno preparado, ejecutar en la terminal integrada:
+
+```powershell
+.\venv\Scripts\python.exe manage.py check
+.\venv\Scripts\python.exe manage.py migrate
+.\venv\Scripts\python.exe manage.py cargar_catalogo
+.\venv\Scripts\python.exe manage.py createsuperuser
+.\venv\Scripts\python.exe manage.py runserver
+```
+
+`createsuperuser` solicita nombre de usuario, correo y contraseña. La contraseña no muestra caracteres mientras se escribe. Esta cuenta se guarda en la base seleccionada en ese computador y se crea una sola vez por base; no debe repetirse cada vez que se inicia la tienda. Si ya existe un administrador, puede utilizarse el existente. La cuenta de GitHub y el registro simulado del cliente no reemplazan este acceso.
+
+Abrir <http://127.0.0.1:8000/admin/> con las credenciales recién elegidas y comprobar que aparecen los diez modelos de la tienda. Antes de la evaluación, practicar el CRUD con un producto nuevo siguiendo el apartado 6 y una carga pequeña de Faker siguiendo el apartado 7. Las cuatro cargas deben demostrarse con el docente. El código descargado es compartido, pero las bases, los registros y las cuentas de cada computador son independientes.
+
+Si las cargas se realizan en otro archivo SQLite mediante `SOUNDSHOP_DB`, ese archivo tampoco comparte el administrador de `db.sqlite3`. Para consultarlo en Django Admin debe crearse una cuenta en la base de cargas e iniciarse un servidor que utilice esa misma variable. No se debe publicar la contraseña ni copiar la base privada al repositorio para evitar este paso.
+
 ## 3. Modelos y relaciones de la tienda
 
 | N.º | Modelo | Tabla propia | Función |
@@ -123,6 +141,8 @@ Las diecisiete pruebas automáticas pasaron con las cinco dependencias del docen
 
 Los tests crean su administrador únicamente en la base temporal de pruebas. La contraseña de ese usuario no sirve para ingresar a la tienda real y no constituye una credencial administrativa distribuida. `self.client.get` y `self.client.post` simulan solicitudes; las comprobaciones comparan la respuesta y los registros almacenados. No son una grabación de interacción en el navegador.
 
+El 8 de octubre también se creó un administrador activo, con permisos de personal y superusuario, en la base principal `db.sqlite3` del computador original. Su autenticación se comprobó con el cliente de pruebas de Django sobre esa base local: el panel y los listados de los diez modelos respondieron con HTTP 200; una solicitud sin sesión se redirigió al inicio de sesión. Esta comprobación no utilizó el administrador temporal de los tests. La base y las credenciales permanecen excluidas de GitHub; al descargar el proyecto en otro PC, debe prepararse su propia cuenta conforme al apartado 2.1.
+
 ## 9. Correspondencia con los diez indicadores de la rúbrica
 
 | N.º | Indicador resumido | Máximo | Evidencia del proyecto | Comprobación pendiente ante el docente |
@@ -130,7 +150,7 @@ Los tests crean su administrador únicamente en la base temporal de pruebas. La 
 | 1 | Conexión y configuración de la base | 10 | SQLite en settings.py; conexión e integridad verificadas. | Identificar la base y explicar la configuración. |
 | 2 | Modelos, atributos, tipos, claves y relaciones | 10 | Diez modelos en models.py y diagrama correspondiente. | Explicar campos, claves y decisiones de relaciones. |
 | 3 | Migraciones, diagrama y datos Faker almacenados | 10 | Diez migraciones, esquema y cuatro cargas locales verificadas. | Ejecutar las cargas y explicar el historial. |
-| 4 | Acceso y modelos registrados en Admin | 10 | Diez registros en admin.py; pruebas de acceso y listados. | Crear la cuenta privada e ingresar en la demostración. |
+| 4 | Acceso y modelos registrados en Admin | 10 | Diez modelos registrados; administrador creado en la base local y acceso a los diez listados comprobado. | Preparar una cuenta si se utiliza otra base o computador e ingresar durante la demostración. |
 | 5 | Presentación y usabilidad del administrador | 10 | Columnas, búsqueda, filtros, grupos, paginación y títulos. | Mostrar su uso y explicar la configuración. |
 | 6 | Creación de registros desde Admin | 10 | Prueba de creación y consulta del producto persistido. | Crear un registro y verificarlo presencialmente. |
 | 7 | Consulta y verificación de datos | 10 | Listados, búsquedas, filtros y consultas SQLite. | Buscar y mostrar información almacenada. |
