@@ -69,7 +69,6 @@ class DetalleBoletaInline(admin.TabularInline):
     model = DetalleBoleta
     extra = 0
     readonly_fields = ("subtotal",)
-    autocomplete_fields = ("producto",)
 
     @admin.display(description="Subtotal")
     def subtotal(self, obj):
@@ -81,7 +80,6 @@ class BoletaAdmin(admin.ModelAdmin):
     list_display = ("numero", "fecha", "cliente", "sucursal")
     search_fields = ("=numero", "cliente__nombre")
     list_filter = ("fecha", "sucursal")
-    autocomplete_fields = ("cliente",)
     inlines = (DetalleBoletaInline,)
 
 
@@ -91,7 +89,6 @@ class DetalleBoletaAdmin(admin.ModelAdmin):
     search_fields = ("=boleta__numero", "producto__nombre")
     list_filter = ("boleta__fecha",)
     readonly_fields = ("subtotal",)
-    autocomplete_fields = ("boleta", "producto")
 
     @admin.display(description="Subtotal")
     def subtotal(self, obj):
@@ -102,7 +99,6 @@ class DetalleCompraInline(admin.TabularInline):
     model = DetalleCompra
     extra = 0
     readonly_fields = ("subtotal",)
-    autocomplete_fields = ("producto",)
 
     @admin.display(description="Subtotal")
     def subtotal(self, obj):
@@ -123,7 +119,6 @@ class DetalleCompraAdmin(admin.ModelAdmin):
     search_fields = ("=compra__numero", "producto__nombre")
     list_filter = ("compra__fecha",)
     readonly_fields = ("subtotal",)
-    autocomplete_fields = ("compra", "producto")
 
     @admin.display(description="Subtotal")
     def subtotal(self, obj):
