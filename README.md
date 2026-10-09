@@ -41,6 +41,8 @@ Bootstrap, las imágenes, el CSS y el JavaScript están incluidos en `static/`. 
 
 La aplicación utiliza `db.sqlite3`, creado por las migraciones. Este archivo y el entorno virtual no se publican en GitHub: cada computador crea su propia base y su propio administrador siguiendo el apartado anterior. Iniciar sesión en GitHub no inicia sesión en Django Admin.
 
+Estado de la preparación local al 9 de octubre de 2026: por solicitud del propietario, el entorno virtual, la base principal y las credenciales locales del computador original se trasladaron a un respaldo fuera de la carpeta del proyecto. Esta copia de trabajo no tiene todavía una base de demostración ni un administrador preparados. Para practicar desde cero en este mismo equipo corresponde seguir el apartado 1, igual que en una descarga nueva. El respaldo no forma parte de la entrega en GitHub.
+
 El administrador se crea una sola vez por base de datos, no cada vez que se inicia el servidor. Una descarga nueva no incluye los usuarios ni la contraseña del computador original. Puede elegirse el mismo nombre de usuario en el otro equipo, pero será una cuenta independiente. Si ya existe una cuenta administrativa en esa base, se utiliza la existente; no hace falta crear otra para cada práctica.
 
 La preparación y la comprobación antes de la clase se detallan en [Preparación del administrador en otro PC](docs/evaluacion-2/README.md#21-preparación-y-comprobación-del-administrador-en-otro-pc). Las credenciales deben conservarse de forma privada, fuera de los archivos publicados. No se incorpora una contraseña fija ni una creación automática de superusuarios al código.
@@ -97,7 +99,7 @@ La guía de E2 incluye los resultados de las cuatro cargas locales y un recorrid
 
 La ampliación de las pruebas del administrador se documenta en [Pruebas adicionales de administración](docs/evaluacion-2/README.md#81-pruebas-adicionales-de-administración). Comprueba el CRUD de clientes, los correos inválidos o duplicados y las reglas de eliminación entre clientes, boletas y detalles mediante solicitudes a Django Admin y consultas a la base temporal de tests; no requiere agregar modelos ni funciones a la aplicación.
 
-Las [Pruebas de límites, relaciones y carga inicial](docs/evaluacion-2/README.md#82-pruebas-de-límites-relaciones-y-carga-inicial) incluyen cantidades inválidas de Faker, precio y stock, protección de proveedores y repetición del catálogo sin duplicar ni sobrescribir los registros identificados por sus claves existentes. La ejecución local final de E2 terminó con 36 pruebas aprobadas; sigue pendiente comprobar la instalación en el otro computador y realizar la defensa con el docente.
+Las [Pruebas de límites, relaciones y carga inicial](docs/evaluacion-2/README.md#82-pruebas-de-límites-relaciones-y-carga-inicial) incluyen cantidades inválidas de Faker, precio y stock, protección de proveedores y repetición del catálogo sin duplicar ni sobrescribir los registros identificados por sus claves existentes. La verificación del 9 de octubre de 2026 terminó con 36 pruebas aprobadas en una base temporal de tests. Ese resultado comprueba el código, pero no significa que la base de demostración esté preparada. Quedan pendientes la preparación local indicada en el apartado 2, la comprobación en el otro computador y la defensa con el docente.
 
 ## 5. Continuidad de la Evaluación 1 y publicación
 
