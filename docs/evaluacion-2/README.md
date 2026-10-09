@@ -102,6 +102,8 @@ La eliminación debe demostrarse con ese producto nuevo, sin asociarlo a una bol
 
 El CRUD también puede practicarse en **Clientes**: crear un registro ficticio con nombre, correo y teléfono; buscarlo por correo; modificar sus datos o su estado activo; y eliminarlo si no está asociado a una boleta. Después de guardar, abrir nuevamente el registro permite comprobar que el cambio persiste. Estas operaciones utilizan el mismo Django Admin existente, sin agregar formularios ni vistas propias.
 
+El campo `correo` del cliente utiliza `EmailField(unique=True)`. Un correo sin formato válido o un correo que ya pertenece a otro cliente debe mostrar un error en el formulario de Admin y no crear otro registro. Las pruebas comprueban ambos rechazos y que la cantidad de clientes permanece sin cambios; no se incorporan validadores nuevos al modelo.
+
 ## 7. Catálogo inicial y generación con Faker
 
 `cargar_catalogo` utiliza los diez productos del JSON existente como datos iniciales. Incorpora categorías, marcas, proveedor, sucursal y documentos relacionados, además de tres clientes ficticios con Faker. `get_or_create` busca un registro y lo crea solo si no existe; repetir el comando no sobrescribe los registros que fueron modificados en Admin. Los contactos `example.test` y el sector de la sucursal son datos de prueba, no una tienda física confirmada.
@@ -151,7 +153,7 @@ El 8 de octubre también se creó un administrador activo, con permisos de perso
 
 ### 8.1. Pruebas adicionales de administración
 
-La ampliación mantiene el mismo patrón de `TestCase`, `self.client.get`, `self.client.post` y comprobaciones de registros utilizado en las pruebas existentes. Se incorporaron cuatro casos del CRUD de clientes, sin modificar modelos, migraciones ni opciones de Admin:
+La ampliación mantiene el mismo patrón de `TestCase`, `self.client.get`, `self.client.post` y comprobaciones de registros utilizado en las pruebas existentes. Se incorporaron casos del CRUD y de las validaciones de clientes, sin modificar modelos, migraciones ni opciones de Admin:
 
 | Prueba | Comprobación |
 | --- | --- |
@@ -159,8 +161,10 @@ La ampliación mantiene el mismo patrón de `TestCase`, `self.client.get`, `self
 | Consultar cliente | La búsqueda por correo y el filtro de estado muestran el registro correspondiente. |
 | Modificar cliente | El nombre, teléfono y estado actualizados persisten al consultar de nuevo. |
 | Eliminar cliente | Un cliente nuevo sin boletas se elimina y deja de existir en la base. |
+| Correo inválido | Admin muestra el error del campo y no crea el cliente. |
+| Correo duplicado | Admin rechaza el correo existente y conserva un único registro con ese correo. |
 
-La última ejecución local de esta ampliación terminó con 21 pruebas aprobadas y ningún error de configuración. Las operaciones se realizan en la base temporal de tests y no eliminan ni modifican registros de la base del catálogo. No constituyen una prueba manual en otro PC ni reemplazan la defensa presencial.
+La última ejecución local de esta ampliación terminó con 23 pruebas aprobadas y ningún error de configuración. Las operaciones se realizan en la base temporal de tests y no eliminan ni modifican registros de la base del catálogo. No constituyen una prueba manual en otro PC ni reemplazan la defensa presencial.
 
 ## 9. Correspondencia con los diez indicadores de la rúbrica
 

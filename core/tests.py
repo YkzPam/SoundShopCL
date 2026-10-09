@@ -144,6 +144,26 @@ class Evaluacion2Tests(TestCase):
         self.assertFalse(Cliente.objects.filter(correo="crud-cliente@example.test").exists())
         self.assertEqual(Cliente.objects.count(), antes)
 
+    def test_cliente_admin_rechaza_correo_invalido(self):
+        antes = Cliente.objects.count()
+        datos = self.datos_cliente()
+        datos["correo"] = "correo-sin-formato"
+        respuesta = self.client.post(reverse("admin:core_cliente_add"), datos)
+        self.assertEqual(respuesta.status_code, 200)
+        self.assertIn("correo", respuesta.context["adminform"].form.errors)
+        self.assertEqual(Cliente.objects.count(), antes)
+
+    def test_cliente_admin_rechaza_correo_duplicado(self):
+        antes = Cliente.objects.count()
+        existente = Cliente.objects.first()
+        datos = self.datos_cliente()
+        datos["correo"] = existente.correo
+        respuesta = self.client.post(reverse("admin:core_cliente_add"), datos)
+        self.assertEqual(respuesta.status_code, 200)
+        self.assertIn("correo", respuesta.context["adminform"].form.errors)
+        self.assertEqual(Cliente.objects.filter(correo=existente.correo).count(), 1)
+        self.assertEqual(Cliente.objects.count(), antes)
+
     def test_crear_producto_desde_admin(self):
         respuesta = self.client.post(reverse("admin:core_producto_add"), self.datos_producto())
         self.assertEqual(respuesta.status_code, 302)
