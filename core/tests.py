@@ -230,6 +230,40 @@ class Evaluacion2Tests(TestCase):
         respuesta = self.client.post(reverse("admin:core_producto_add"), datos)
         self.assertIn("codigo", respuesta.context["adminform"].form.errors)
 
+    def test_producto_admin_acepta_precio_minimo_y_stock_cero(self):
+        datos = self.datos_producto()
+        datos["precio"] = "1.00"
+        datos["stock"] = "0"
+        respuesta = self.client.post(reverse("admin:core_producto_add"), datos)
+        self.assertEqual(respuesta.status_code, 302)
+        nuevo = Producto.objects.get(codigo="SS-TEST")
+        self.assertEqual(nuevo.precio, 1)
+        self.assertEqual(nuevo.stock, 0)
+
+    def test_producto_admin_rechaza_precio_cero(self):
+        datos = self.datos_producto()
+        datos["precio"] = "0"
+        respuesta = self.client.post(reverse("admin:core_producto_add"), datos)
+        self.assertEqual(respuesta.status_code, 200)
+        self.assertIn("precio", respuesta.context["adminform"].form.errors)
+        self.assertFalse(Producto.objects.filter(codigo="SS-TEST").exists())
+
+    def test_producto_admin_rechaza_stock_negativo(self):
+        datos = self.datos_producto()
+        datos["stock"] = "-1"
+        respuesta = self.client.post(reverse("admin:core_producto_add"), datos)
+        self.assertEqual(respuesta.status_code, 200)
+        self.assertIn("stock", respuesta.context["adminform"].form.errors)
+        self.assertFalse(Producto.objects.filter(codigo="SS-TEST").exists())
+
+    def test_producto_admin_rechaza_stock_no_numerico(self):
+        datos = self.datos_producto()
+        datos["stock"] = "sin-stock"
+        respuesta = self.client.post(reverse("admin:core_producto_add"), datos)
+        self.assertEqual(respuesta.status_code, 200)
+        self.assertIn("stock", respuesta.context["adminform"].form.errors)
+        self.assertFalse(Producto.objects.filter(codigo="SS-TEST").exists())
+
     def test_relaciones_y_precio_historico(self):
         detalle = DetalleBoleta.objects.first()
         historico = detalle.subtotal
