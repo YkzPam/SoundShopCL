@@ -11,7 +11,10 @@ from django.db import connection
 from django.db.models.deletion import ProtectedError
 from django.test import TestCase
 from django.urls import reverse
-from .models import Categoria, Cliente, Producto, Boleta, DetalleBoleta
+from .models import (
+    Categoria, Cliente, Producto, Boleta, DetalleBoleta,
+    Proveedor, CompraProveedor, DetalleCompra,
+)
 
 
 class Evaluacion2Tests(TestCase):
@@ -185,6 +188,31 @@ class Evaluacion2Tests(TestCase):
         self.assertFalse(Boleta.objects.filter(id=boleta.id).exists())
         self.assertFalse(DetalleBoleta.objects.filter(boleta_id=boleta.id).exists())
         self.assertTrue(Cliente.objects.filter(id=cliente_id).exists())
+        self.assertEqual(Producto.objects.count(), productos_antes)
+
+    def test_admin_no_elimina_proveedor_con_compra(self):
+        proveedor = Proveedor.objects.create(
+            nombre="Proveedor protegido E2", correo="proveedor-prueba@example.test",
+        )
+        compra = CompraProveedor.objects.create(
+            numero=2, proveedor=proveedor, sucursal=CompraProveedor.objects.first().sucursal,
+        )
+        respuesta = self.client.post(reverse("admin:core_proveedor_delete", args=[proveedor.id]), {"post": "yes"})
+        self.assertEqual(respuesta.status_code, 200)
+        self.assertTrue(respuesta.context["protected"])
+        self.assertTrue(Proveedor.objects.filter(id=proveedor.id).exists())
+        self.assertTrue(CompraProveedor.objects.filter(id=compra.id).exists())
+
+    def test_admin_elimina_compra_y_detalles_sin_borrar_proveedor_ni_productos(self):
+        compra = CompraProveedor.objects.first()
+        proveedor_id = compra.proveedor_id
+        productos_antes = Producto.objects.count()
+        self.assertTrue(DetalleCompra.objects.filter(compra_id=compra.id).exists())
+        respuesta = self.client.post(reverse("admin:core_compraproveedor_delete", args=[compra.id]), {"post": "yes"})
+        self.assertEqual(respuesta.status_code, 302)
+        self.assertFalse(CompraProveedor.objects.filter(id=compra.id).exists())
+        self.assertFalse(DetalleCompra.objects.filter(compra_id=compra.id).exists())
+        self.assertTrue(Proveedor.objects.filter(id=proveedor_id).exists())
         self.assertEqual(Producto.objects.count(), productos_antes)
 
     def test_crear_producto_desde_admin(self):

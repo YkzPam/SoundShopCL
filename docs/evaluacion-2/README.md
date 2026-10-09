@@ -180,8 +180,11 @@ Las comprobaciones siguientes refuerzan comportamientos ya implementados, sin ag
 | --- | --- |
 | Límites de Faker | Cero, cantidades negativas y cantidades superiores al millón se rechazan sin crear clientes. |
 | Precio y stock | Admin acepta el precio mínimo actual de 1 y stock cero; rechaza precio cero, stock negativo y stock no numérico sin guardar el producto. |
+| Compras a proveedores | Admin protege al proveedor asociado a una compra. Borrar la compra elimina sus detalles, pero conserva al proveedor y los productos. |
 
-La ejecución local posterior a estos grupos terminó con 31 pruebas aprobadas. La prueba del precio mínimo comprueba el límite de `MinValueValidator(1)` ya definido en el modelo; no cambia la política ni los precios de los productos del catálogo. Todos los casos utilizan la base temporal de tests; la base principal y las cuatro cargas masivas existentes no se modificaron.
+La ejecución local posterior a estos grupos terminó con 33 pruebas aprobadas. La prueba del precio mínimo comprueba el límite de `MinValueValidator(1)` ya definido en el modelo; no cambia la política ni los precios de los productos del catálogo. Todos los casos utilizan la base temporal de tests; la base principal y las cuatro cargas masivas existentes no se modificaron.
+
+La protección del proveedor se comprueba con un proveedor ficticio nuevo, asociado solamente a una compra. Así se identifica la relación `CompraProveedor.proveedor` con `PROTECT`, sin depender de productos que también impidan su eliminación. La prueba de eliminación utiliza una compra con detalles y verifica el comportamiento de `DetalleCompra.compra` con `CASCADE`. No comprueba un CRUD completo de compras ni una gestión automática del stock.
 
 ## 9. Correspondencia con los diez indicadores de la rúbrica
 
