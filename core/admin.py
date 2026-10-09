@@ -64,11 +64,25 @@ class ProductoAdmin(admin.ModelAdmin):
     list_per_page = 25
 
 
+class DetalleBoletaInline(admin.TabularInline):
+    # Permite completar los productos de una boleta dentro de su formulario.
+    model = DetalleBoleta
+    extra = 0
+    readonly_fields = ("subtotal",)
+    autocomplete_fields = ("producto",)
+
+    @admin.display(description="Subtotal")
+    def subtotal(self, obj):
+        return obj.subtotal if obj and obj.pk else None
+
+
 @admin.register(Boleta)
 class BoletaAdmin(admin.ModelAdmin):
     list_display = ("numero", "fecha", "cliente", "sucursal")
     search_fields = ("=numero", "cliente__nombre")
     list_filter = ("fecha", "sucursal")
+    autocomplete_fields = ("cliente",)
+    inlines = (DetalleBoletaInline,)
 
 
 @admin.register(DetalleBoleta)
@@ -76,6 +90,23 @@ class DetalleBoletaAdmin(admin.ModelAdmin):
     list_display = ("boleta", "producto", "cantidad", "precio_unitario", "subtotal")
     search_fields = ("=boleta__numero", "producto__nombre")
     list_filter = ("boleta__fecha",)
+    readonly_fields = ("subtotal",)
+    autocomplete_fields = ("boleta", "producto")
+
+    @admin.display(description="Subtotal")
+    def subtotal(self, obj):
+        return obj.subtotal if obj and obj.pk else None
+
+
+class DetalleCompraInline(admin.TabularInline):
+    model = DetalleCompra
+    extra = 0
+    readonly_fields = ("subtotal",)
+    autocomplete_fields = ("producto",)
+
+    @admin.display(description="Subtotal")
+    def subtotal(self, obj):
+        return obj.subtotal if obj and obj.pk else None
 
 
 @admin.register(CompraProveedor)
@@ -83,6 +114,7 @@ class CompraProveedorAdmin(admin.ModelAdmin):
     list_display = ("numero", "fecha", "proveedor", "sucursal")
     search_fields = ("=numero", "proveedor__nombre")
     list_filter = ("fecha", "sucursal")
+    inlines = (DetalleCompraInline,)
 
 
 @admin.register(DetalleCompra)
@@ -90,3 +122,9 @@ class DetalleCompraAdmin(admin.ModelAdmin):
     list_display = ("compra", "producto", "cantidad", "precio_costo", "subtotal")
     search_fields = ("=compra__numero", "producto__nombre")
     list_filter = ("compra__fecha",)
+    readonly_fields = ("subtotal",)
+    autocomplete_fields = ("compra", "producto")
+
+    @admin.display(description="Subtotal")
+    def subtotal(self, obj):
+        return obj.subtotal if obj and obj.pk else None

@@ -85,27 +85,62 @@ class Evaluacion2Tests(TestCase):
 
     def test_acceso_admin_y_listados(self):
         self.assertContains(self.client.get(reverse("admin:index")), "SoundShop CL")
+        autocompletados = {
+            Boleta: ("cliente",),
+            DetalleBoleta: ("boleta", "producto"),
+            DetalleCompra: ("compra", "producto"),
+        }
+        detalles_integrados = {
+            Boleta: DetalleBoleta,
+            CompraProveedor: DetalleCompra,
+        }
         for modelo in apps.get_app_config("core").get_models():
             ruta = reverse("admin:core_" + modelo._meta.model_name + "_changelist")
             self.assertEqual(self.client.get(ruta).status_code, 200)
             configuracion = admin.site._registry[modelo]
-            self.assertEqual(configuracion.autocomplete_fields, ())
-            self.assertEqual(configuracion.inlines, ())
+            self.assertEqual(configuracion.autocomplete_fields, autocompletados.get(modelo, ()))
             ruta = reverse("admin:core_" + modelo._meta.model_name + "_add")
             respuesta = self.client.get(ruta)
             self.assertEqual(respuesta.status_code, 200)
-            self.assertEqual(respuesta.context["inline_admin_formsets"], [])
+            formularios = respuesta.context["inline_admin_formsets"]
+            if modelo in detalles_integrados:
+                self.assertEqual(len(formularios), 1)
+                self.assertEqual(formularios[0].opts.model, detalles_integrados[modelo])
+                self.assertEqual(formularios[0].opts.autocomplete_fields, ("producto",))
+            else:
+                self.assertEqual(configuracion.inlines, ())
+                self.assertEqual(formularios, [])
 
         respuesta = self.client.get(reverse("admin:core_boleta_add"))
         self.assertContains(respuesta, '<select name="cliente"')
+        self.assertContains(respuesta, 'class="admin-autocomplete"')
         respuesta = self.client.get(reverse("admin:core_detalleboleta_add"))
         self.assertContains(respuesta, '<select name="boleta"')
         self.assertContains(respuesta, '<select name="producto"')
+        self.assertContains(respuesta, 'class="admin-autocomplete"')
         respuesta = self.client.get(reverse("admin:core_compraproveedor_add"))
         self.assertContains(respuesta, '<select name="proveedor"')
         respuesta = self.client.get(reverse("admin:core_detallecompra_add"))
         self.assertContains(respuesta, '<select name="compra"')
         self.assertContains(respuesta, '<select name="producto"')
+        self.assertContains(respuesta, 'class="admin-autocomplete"')
+
+        relaciones = (
+            ("boleta", "cliente", Cliente.objects.first()),
+            ("detalleboleta", "boleta", Boleta.objects.first()),
+            ("detalleboleta", "producto", self.producto),
+            ("detallecompra", "compra", CompraProveedor.objects.first()),
+            ("detallecompra", "producto", self.producto),
+        )
+        for nombre_modelo, campo, registro in relaciones:
+            respuesta = self.client.get(reverse("admin:autocomplete"), {
+                "app_label": "core", "model_name": nombre_modelo,
+                "field_name": campo,
+                "term": str(registro.numero) if campo in ("boleta", "compra") else str(registro),
+            })
+            self.assertEqual(respuesta.status_code, 200)
+            resultados = [dato["id"] for dato in respuesta.json()["results"]]
+            self.assertIn(str(registro.pk), resultados)
 
     def test_invitado_no_entra_admin(self):
         self.client.logout()
