@@ -104,6 +104,8 @@ El CRUD también puede practicarse en **Clientes**: crear un registro ficticio c
 
 El campo `correo` del cliente utiliza `EmailField(unique=True)`. Un correo sin formato válido o un correo que ya pertenece a otro cliente debe mostrar un error en el formulario de Admin y no crear otro registro. Las pruebas comprueban ambos rechazos y que la cantidad de clientes permanece sin cambios; no se incorporan validadores nuevos al modelo.
 
+Un cliente asociado a una boleta no puede eliminarse porque la relación utiliza `PROTECT`; Admin muestra los registros que impiden el borrado. Eliminar una boleta, en cambio, elimina sus detalles mediante `CASCADE`, pero conserva al cliente y los productos del catálogo. Las pruebas adicionales verifican ambas reglas existentes mediante solicitudes a Django Admin y consultas posteriores a la base temporal.
+
 ## 7. Catálogo inicial y generación con Faker
 
 `cargar_catalogo` utiliza los diez productos del JSON existente como datos iniciales. Incorpora categorías, marcas, proveedor, sucursal y documentos relacionados, además de tres clientes ficticios con Faker. `get_or_create` busca un registro y lo crea solo si no existe; repetir el comando no sobrescribe los registros que fueron modificados en Admin. Los contactos `example.test` y el sector de la sucursal son datos de prueba, no una tienda física confirmada.
@@ -153,7 +155,7 @@ El 8 de octubre también se creó un administrador activo, con permisos de perso
 
 ### 8.1. Pruebas adicionales de administración
 
-La ampliación mantiene el mismo patrón de `TestCase`, `self.client.get`, `self.client.post` y comprobaciones de registros utilizado en las pruebas existentes. Se incorporaron casos del CRUD y de las validaciones de clientes, sin modificar modelos, migraciones ni opciones de Admin:
+La ampliación mantiene el mismo patrón de `TestCase`, `self.client.get`, `self.client.post` y comprobaciones de registros utilizado en las pruebas existentes. Se incorporaron casos del CRUD, las validaciones de clientes y las relaciones con boletas, sin modificar modelos, migraciones ni opciones de Admin:
 
 | Prueba | Comprobación |
 | --- | --- |
@@ -163,8 +165,10 @@ La ampliación mantiene el mismo patrón de `TestCase`, `self.client.get`, `self
 | Eliminar cliente | Un cliente nuevo sin boletas se elimina y deja de existir en la base. |
 | Correo inválido | Admin muestra el error del campo y no crea el cliente. |
 | Correo duplicado | Admin rechaza el correo existente y conserva un único registro con ese correo. |
+| Cliente con boleta | Admin impide su eliminación y conserva ambos registros mediante `PROTECT`. |
+| Eliminar boleta | Se eliminan la boleta y sus detalles mediante `CASCADE`, sin borrar el cliente ni los productos. |
 
-La última ejecución local de esta ampliación terminó con 23 pruebas aprobadas y ningún error de configuración. Las operaciones se realizan en la base temporal de tests y no eliminan ni modifican registros de la base del catálogo. No constituyen una prueba manual en otro PC ni reemplazan la defensa presencial.
+La última ejecución local de esta ampliación terminó con 25 pruebas aprobadas y ningún error de configuración. Las ocho pruebas nuevas se agrupan en CRUD de clientes, validaciones de correo y reglas de eliminación relacionada. Las operaciones se realizan en la base temporal de tests y no eliminan ni modifican registros de la base del catálogo. No constituyen una prueba manual en otro PC ni reemplazan la defensa presencial.
 
 ## 9. Correspondencia con los diez indicadores de la rúbrica
 
@@ -175,10 +179,10 @@ La última ejecución local de esta ampliación terminó con 23 pruebas aprobada
 | 3 | Migraciones, diagrama y datos Faker almacenados | 10 | Diez migraciones, esquema y cuatro cargas locales verificadas. | Ejecutar las cargas y explicar el historial. |
 | 4 | Acceso y modelos registrados en Admin | 10 | Diez modelos registrados; administrador creado en la base local y acceso a los diez listados comprobado. | Preparar una cuenta si se utiliza otra base o computador e ingresar durante la demostración. |
 | 5 | Presentación y usabilidad del administrador | 10 | Columnas, búsqueda, filtros, grupos, paginación y títulos. | Mostrar su uso y explicar la configuración. |
-| 6 | Creación de registros desde Admin | 10 | Prueba de creación y consulta del producto persistido. | Crear un registro y verificarlo presencialmente. |
+| 6 | Creación de registros desde Admin | 10 | Pruebas de creación y consulta de productos y clientes persistidos. | Crear un registro y verificarlo presencialmente. |
 | 7 | Consulta y verificación de datos | 10 | Listados, búsquedas, filtros y consultas SQLite. | Buscar y mostrar información almacenada. |
-| 8 | Modificación y persistencia desde Admin | 10 | Prueba de edición, nueva consulta y cambio visible en catálogo. | Modificar y comprobar el registro nuevamente. |
-| 9 | Eliminación y persistencia desde Admin | 10 | Prueba de borrado de producto y protección de registros relacionados. | Eliminar un registro sin referencias y verificarlo. |
+| 8 | Modificación y persistencia desde Admin | 10 | Pruebas de edición y nueva consulta de productos y clientes; cambio del producto visible en catálogo. | Modificar y comprobar el registro nuevamente. |
+| 9 | Eliminación y persistencia desde Admin | 10 | Borrado de productos y clientes sin referencias; protección de clientes con boletas y eliminación de detalles al borrar la boleta. | Eliminar un registro sin referencias y verificarlo. |
 | 10 | Demostración y explicación de Django Admin | 10 | Recorrido y explicación de archivos en esta guía. | Defensa presencial del estudiante. |
 | | Máximo posible | 100 | Cobertura técnica local; no es una calificación asignada. | La puntuación la determina el docente. |
 

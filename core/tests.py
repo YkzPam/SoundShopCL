@@ -164,6 +164,29 @@ class Evaluacion2Tests(TestCase):
         self.assertEqual(Cliente.objects.filter(correo=existente.correo).count(), 1)
         self.assertEqual(Cliente.objects.count(), antes)
 
+    def test_admin_no_elimina_cliente_con_boleta(self):
+        boleta = Boleta.objects.first()
+        cliente = boleta.cliente
+        antes = Cliente.objects.count()
+        respuesta = self.client.post(reverse("admin:core_cliente_delete", args=[cliente.id]), {"post": "yes"})
+        self.assertEqual(respuesta.status_code, 200)
+        self.assertTrue(respuesta.context["protected"])
+        self.assertTrue(Cliente.objects.filter(id=cliente.id).exists())
+        self.assertTrue(Boleta.objects.filter(id=boleta.id).exists())
+        self.assertEqual(Cliente.objects.count(), antes)
+
+    def test_admin_elimina_boleta_y_detalles_sin_borrar_cliente_ni_productos(self):
+        boleta = Boleta.objects.first()
+        cliente_id = boleta.cliente_id
+        productos_antes = Producto.objects.count()
+        self.assertTrue(DetalleBoleta.objects.filter(boleta_id=boleta.id).exists())
+        respuesta = self.client.post(reverse("admin:core_boleta_delete", args=[boleta.id]), {"post": "yes"})
+        self.assertEqual(respuesta.status_code, 302)
+        self.assertFalse(Boleta.objects.filter(id=boleta.id).exists())
+        self.assertFalse(DetalleBoleta.objects.filter(boleta_id=boleta.id).exists())
+        self.assertTrue(Cliente.objects.filter(id=cliente_id).exists())
+        self.assertEqual(Producto.objects.count(), productos_antes)
+
     def test_crear_producto_desde_admin(self):
         respuesta = self.client.post(reverse("admin:core_producto_add"), self.datos_producto())
         self.assertEqual(respuesta.status_code, 302)
