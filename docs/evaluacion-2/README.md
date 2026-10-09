@@ -100,6 +100,8 @@ Para la demostración presencial se ingresa a `/admin/` con la cuenta creada med
 
 La eliminación debe demostrarse con ese producto nuevo, sin asociarlo a una boleta ni compra. Si se intenta eliminar un equipo utilizado en un detalle, `PROTECT` impedirá el borrado: es una regla del modelo, no un fallo del administrador. Las validaciones rechazan códigos repetidos, precios no positivos y cantidades no positivas. Después de guardar un cambio en un producto activo, el catálogo público lo muestra al recargar la página.
 
+El CRUD también puede practicarse en **Clientes**: crear un registro ficticio con nombre, correo y teléfono; buscarlo por correo; modificar sus datos o su estado activo; y eliminarlo si no está asociado a una boleta. Después de guardar, abrir nuevamente el registro permite comprobar que el cambio persiste. Estas operaciones utilizan el mismo Django Admin existente, sin agregar formularios ni vistas propias.
+
 ## 7. Catálogo inicial y generación con Faker
 
 `cargar_catalogo` utiliza los diez productos del JSON existente como datos iniciales. Incorpora categorías, marcas, proveedor, sucursal y documentos relacionados, además de tres clientes ficticios con Faker. `get_or_create` busca un registro y lo crea solo si no existe; repetir el comando no sobrescribe los registros que fueron modificados en Admin. Los contactos `example.test` y el sector de la sucursal son datos de prueba, no una tienda física confirmada.
@@ -141,11 +143,24 @@ Los tiempos corresponden a esas ejecuciones locales; no son valores garantizados
 
 El ajuste que identifica el archivo SQLite se comprobó con una carga nueva de 100 clientes en una base separada. La salida mostró la ruta seleccionada y una consulta posterior, desde otro proceso, confirmó los 100 registros, integridad `ok` y ninguna infracción de claves foráneas. Esta comprobación local no utilizó la base del catálogo ni representa una prueba en otro PC.
 
-Las diecisiete pruebas automáticas pasaron con las cinco dependencias del docente, tanto en el entorno actualizado como en un entorno virtual nuevo. `pip check` no encontró conflictos y `pip freeze` mostró exactamente las cinco versiones de requirements.txt. Las pruebas comprueban SQLite, tablas y migraciones, registro de modelos, correspondencia del esquema, acceso administrativo, creación, consulta, filtros, modificación y eliminación de productos, validaciones, relaciones, repetición del catálogo, una carga pequeña de Faker y respuesta de las páginas conservadas. El CRUD completo se prueba con productos; no se afirma que se haya repetido manualmente con cada uno de los diez modelos.
+Las diecisiete pruebas automáticas iniciales pasaron con las cinco dependencias del docente, tanto en el entorno actualizado como en un entorno virtual nuevo. `pip check` no encontró conflictos y `pip freeze` mostró exactamente las cinco versiones de requirements.txt. Esas pruebas comprueban SQLite, tablas y migraciones, registro de modelos, correspondencia del esquema, acceso administrativo, creación, consulta, filtros, modificación y eliminación de productos, validaciones, relaciones, repetición del catálogo, una carga pequeña de Faker y respuesta de las páginas conservadas. En esa verificación inicial el CRUD completo se probó con productos; no se afirma que se haya repetido manualmente con cada uno de los diez modelos.
 
 Los tests crean su administrador únicamente en la base temporal de pruebas. La contraseña de ese usuario no sirve para ingresar a la tienda real y no constituye una credencial administrativa distribuida. `self.client.get` y `self.client.post` simulan solicitudes; las comprobaciones comparan la respuesta y los registros almacenados. No son una grabación de interacción en el navegador.
 
 El 8 de octubre también se creó un administrador activo, con permisos de personal y superusuario, en la base principal `db.sqlite3` del computador original. Su autenticación se comprobó con el cliente de pruebas de Django sobre esa base local: el panel y los listados de los diez modelos respondieron con HTTP 200; una solicitud sin sesión se redirigió al inicio de sesión. Esta comprobación no utilizó el administrador temporal de los tests. La base y las credenciales permanecen excluidas de GitHub; al descargar el proyecto en otro PC, debe prepararse su propia cuenta conforme al apartado 2.1.
+
+### 8.1. Pruebas adicionales de administración
+
+La ampliación mantiene el mismo patrón de `TestCase`, `self.client.get`, `self.client.post` y comprobaciones de registros utilizado en las pruebas existentes. Se incorporaron cuatro casos del CRUD de clientes, sin modificar modelos, migraciones ni opciones de Admin:
+
+| Prueba | Comprobación |
+| --- | --- |
+| Crear cliente | El formulario guarda nombre, correo, teléfono y estado activo. |
+| Consultar cliente | La búsqueda por correo y el filtro de estado muestran el registro correspondiente. |
+| Modificar cliente | El nombre, teléfono y estado actualizados persisten al consultar de nuevo. |
+| Eliminar cliente | Un cliente nuevo sin boletas se elimina y deja de existir en la base. |
+
+La última ejecución local de esta ampliación terminó con 21 pruebas aprobadas y ningún error de configuración. Las operaciones se realizan en la base temporal de tests y no eliminan ni modifican registros de la base del catálogo. No constituyen una prueba manual en otro PC ni reemplazan la defensa presencial.
 
 ## 9. Correspondencia con los diez indicadores de la rúbrica
 

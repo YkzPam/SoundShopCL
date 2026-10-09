@@ -32,6 +32,12 @@ class Evaluacion2Tests(TestCase):
             "proveedor": str(self.producto.proveedor_id), "imagen": "",
         }
 
+    def datos_cliente(self):
+        return {
+            "nombre": "Cliente de prueba E2", "correo": "crud-cliente@example.test",
+            "telefono": "+56911112222", "activo": "on",
+        }
+
     def test_conexion_sqlite_y_diez_tablas(self):
         self.assertEqual(connection.vendor, "sqlite")
         tablas = [t for t in connection.introspection.table_names() if t.startswith("core_")]
@@ -90,6 +96,53 @@ class Evaluacion2Tests(TestCase):
         cliente = User.objects.create_user(username="sin_permisos", password="SoloTests2026")
         self.client.force_login(cliente)
         self.assertEqual(self.client.get(reverse("admin:index")).status_code, 302)
+
+    def test_crear_cliente_desde_admin(self):
+        respuesta = self.client.post(reverse("admin:core_cliente_add"), self.datos_cliente())
+        self.assertEqual(respuesta.status_code, 302)
+        nuevo = Cliente.objects.get(correo="crud-cliente@example.test")
+        self.assertEqual(nuevo.nombre, "Cliente de prueba E2")
+        self.assertEqual(nuevo.telefono, "+56911112222")
+        self.assertTrue(nuevo.activo)
+
+    def test_consulta_busqueda_y_filtro_clientes_admin(self):
+        cliente = Cliente.objects.create(
+            nombre="Cliente consulta E2", correo="consulta-cliente@example.test",
+            telefono="", activo=False,
+        )
+        respuesta = self.client.get(reverse("admin:core_cliente_changelist"), {"q": cliente.correo})
+        self.assertContains(respuesta, cliente.nombre)
+        self.assertEqual(respuesta.context["cl"].result_count, 1)
+        respuesta = self.client.get(reverse("admin:core_cliente_changelist"), {"activo__exact": "0"})
+        self.assertContains(respuesta, cliente.nombre)
+        self.assertEqual(respuesta.context["cl"].result_count, 1)
+
+    def test_modificar_cliente_desde_admin(self):
+        self.client.post(reverse("admin:core_cliente_add"), self.datos_cliente())
+        cliente = Cliente.objects.get(correo="crud-cliente@example.test")
+        datos = self.datos_cliente()
+        datos["nombre"] = "Cliente actualizado"
+        datos["telefono"] = "+56933334444"
+        del datos["activo"]
+        respuesta = self.client.post(reverse("admin:core_cliente_change", args=[cliente.id]), datos)
+        self.assertEqual(respuesta.status_code, 302)
+        cliente.refresh_from_db()
+        self.assertEqual(cliente.nombre, "Cliente actualizado")
+        self.assertEqual(cliente.telefono, "+56933334444")
+        self.assertFalse(cliente.activo)
+        self.assertContains(
+            self.client.get(reverse("admin:core_cliente_change", args=[cliente.id])),
+            "Cliente actualizado",
+        )
+
+    def test_eliminar_cliente_desde_admin(self):
+        antes = Cliente.objects.count()
+        self.client.post(reverse("admin:core_cliente_add"), self.datos_cliente())
+        cliente = Cliente.objects.get(correo="crud-cliente@example.test")
+        respuesta = self.client.post(reverse("admin:core_cliente_delete", args=[cliente.id]), {"post": "yes"})
+        self.assertEqual(respuesta.status_code, 302)
+        self.assertFalse(Cliente.objects.filter(correo="crud-cliente@example.test").exists())
+        self.assertEqual(Cliente.objects.count(), antes)
 
     def test_crear_producto_desde_admin(self):
         respuesta = self.client.post(reverse("admin:core_producto_add"), self.datos_producto())
