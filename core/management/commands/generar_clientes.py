@@ -2,7 +2,7 @@
 from time import perf_counter
 from uuid import uuid4
 from django.core.management.base import BaseCommand, CommandError
-from django.db import transaction
+from django.db import connection, transaction
 from faker import Faker
 from core.models import Cliente
 
@@ -22,7 +22,11 @@ class Command(BaseCommand):
         antes = Cliente.objects.count()
         inicio = perf_counter()
         lote = []
-        self.stdout.write(f"Base: {Cliente.objects.db}; antes: {antes}; solicitados: {cantidad}.")
+        archivo = connection.settings_dict["NAME"]
+        self.stdout.write(
+            f"Base: {Cliente.objects.db}; archivo SQLite: {archivo}; "
+            f"antes: {antes}; solicitados: {cantidad}."
+        )
 
         # Una transacción permite revertir la carga completa si ocurre un error.
         # Cada lote guarda hasta 1.000 objetos; no mantiene el millón en memoria.

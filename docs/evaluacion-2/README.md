@@ -108,6 +108,8 @@ La eliminación debe demostrarse con ese producto nuevo, sin asociarlo a una bol
 
 El comando consulta la cantidad antes y después, cuenta los registros del prefijo y recupera el primero y el último. Solo informa **VERIFICADO** cuando la diferencia y el número almacenado coinciden con lo solicitado. La carga es acumulativa: agregar mil clientes no reemplaza los registros que ya existían. Los clientes ficticios no se convierten en usuarios de acceso a Django.
 
+La primera línea también identifica el archivo SQLite seleccionado mediante `connection.settings_dict["NAME"]`. `Base: default` es el nombre de la conexión, no la ruta del archivo. El dato `archivo SQLite` permite comprobar si la carga se dirige a `db.sqlite3` o a la base separada seleccionada con `SOUNDSHOP_DB`. La prueba de Faker verifica que esa ruta aparece en la salida y que los registros se almacenan.
+
 Para separar las cargas grandes de la tienda, ejecutar en la misma terminal de VS Code:
 
 ```powershell
@@ -136,6 +138,8 @@ Las cuatro cargas se repitieron después de alinear las dependencias con el ZIP 
 | 1.000.000 | 101.100 | 1.101.100 | 166,24 s |
 
 Los tiempos corresponden a esas ejecuciones locales; no son valores garantizados en otro computador. Estas cargas no se realizaron con el docente. La base principal conserva diez productos y tres clientes comerciales de prueba. Los archivos SQLite y la carpeta `work/` están excluidos de Git.
+
+El ajuste que identifica el archivo SQLite se comprobó con una carga nueva de 100 clientes en una base separada. La salida mostró la ruta seleccionada y una consulta posterior, desde otro proceso, confirmó los 100 registros, integridad `ok` y ninguna infracción de claves foráneas. Esta comprobación local no utilizó la base del catálogo ni representa una prueba en otro PC.
 
 Las diecisiete pruebas automáticas pasaron con las cinco dependencias del docente, tanto en el entorno actualizado como en un entorno virtual nuevo. `pip check` no encontró conflictos y `pip freeze` mostró exactamente las cinco versiones de requirements.txt. Las pruebas comprueban SQLite, tablas y migraciones, registro de modelos, correspondencia del esquema, acceso administrativo, creación, consulta, filtros, modificación y eliminación de productos, validaciones, relaciones, repetición del catálogo, una carga pequeña de Faker y respuesta de las páginas conservadas. El CRUD completo se prueba con productos; no se afirma que se haya repetido manualmente con cada uno de los diez modelos.
 

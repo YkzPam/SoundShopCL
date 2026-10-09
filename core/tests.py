@@ -159,6 +159,7 @@ class Evaluacion2Tests(TestCase):
         salida = StringIO()
         call_command("generar_clientes", cantidad=12, stdout=salida)
         self.assertEqual(Cliente.objects.count() - antes, 12)
+        self.assertIn(f"archivo SQLite: {connection.settings_dict['NAME']}", salida.getvalue())
         self.assertIn("VERIFICADO", salida.getvalue())
 
     def test_faker_rechaza_cantidad_invalida(self):
