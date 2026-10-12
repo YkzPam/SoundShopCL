@@ -1,4 +1,28 @@
 {% extends 'base.html' %}{% load static %}
 {% block contenido %}
-<section class="lectura reveal"><p class="eyebrow">La tienda</p><h1>Música para el día a día.</h1><p class="lead">SoundShop CL reúne instrumentos, equipos de audio y accesorios en una tienda digital.</p><p>El catálogo se organiza por uso: audífonos, tornamesas, estudio, instrumentos y sonido en vivo. Cada producto muestra su descripción, precio y disponibilidad para facilitar la elección.</p><img class="nosotros-imagen" src="{% static 'img/portada-astra-panorama.webp' %}" alt="Guitarra eléctrica en un estudio" width="900" height="500"><a class="btn btn-primary mt-4" href="{% url 'core:catalogo' %}">Conocer el catálogo</a></section>
+<section class="nosotros-intro reveal" aria-labelledby="nosotros-titulo">
+  <div><p class="eyebrow">Nosotros / SoundShop CL</p><h1 id="nosotros-titulo">Un espacio para<br><em>tu música.</em></h1></div>
+  <div class="nosotros-presentacion"><p class="lead">SoundShop CL reúne instrumentos, equipos de audio y accesorios en una tienda digital.</p><p>Para escuchar una canción, trabajar en una mezcla o comenzar a tocar. El catálogo se organiza por uso, para que la elección parta de lo que quieres hacer.</p></div>
+</section>
+
+<figure class="nosotros-portada reveal">
+  <div class="nosotros-escena">
+    <img src="{% static 'img/portada-astra-panorama.webp' %}" alt="Guitarra eléctrica en un espacio de estudio" width="900" height="500">
+    <span class="nosotros-lema" aria-hidden="true">Escuchar.<br>Crear.<br>Tocar.</span>
+  </div>
+  <figcaption><span>Música, audio y tecnología.</span><span>SoundShop CL</span></figcaption>
+</figure>
+
+<section class="nosotros-enfoque seccion-editorial" aria-labelledby="nosotros-enfoque-titulo">
+  <div class="reveal"><p class="eyebrow">La forma de explorar</p><h2 id="nosotros-enfoque-titulo">Menos vueltas.<br>Más música.</h2><p>La ficha de cada producto reúne su descripción, marca, precio y disponibilidad. La información necesaria para revisar el equipo antes de añadirlo al carrito.</p><a class="enlace-editorial" href="{% url 'core:catalogo' %}">Conocer el catálogo ↗</a></div>
+  <div class="nosotros-recorridos">
+    <article class="reveal"><span class="numero-editorial">01</span><div><h3>Escuchar</h3><p>Audífonos y equipos para volver a tus canciones o descubrir nuevos sonidos.</p></div></article>
+    <article class="reveal"><span class="numero-editorial">02</span><div><h3>Crear</h3><p>Micrófonos, interfaces y controladores para trabajar en tus ideas musicales.</p></div></article>
+    <article class="reveal"><span class="numero-editorial">03</span><div><h3>Tocar</h3><p>Instrumentos, parlantes y mezcladores para ensayar y llevar la música al escenario.</p></div></article>
+  </div>
+</section>
+
+<section class="nosotros-cierre reveal" aria-labelledby="nosotros-cierre-titulo">
+  <p class="eyebrow">El siguiente paso es tuyo</p><h2 id="nosotros-cierre-titulo">Que suene a ti.</h2><p>Encuentra una categoría y empieza a explorar.</p><a class="btn btn-primary" href="{% url 'core:categorias' %}">Ver categorías ↗</a>
+</section>
 {% endblock %}

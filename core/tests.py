@@ -1,5 +1,6 @@
 """Pruebas de SQLite, modelos y operaciones del administrador de Django."""
 import json
+from decimal import Decimal
 from io import StringIO
 from pathlib import Path
 from django.apps import apps
@@ -9,8 +10,9 @@ from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.db import connection
 from django.db.models.deletion import ProtectedError
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
 from django.urls import reverse
+from .templatetags.moneda import pesos
 from .models import (
     Categoria, Cliente, Producto, Boleta, DetalleBoleta,
     Proveedor, CompraProveedor, DetalleCompra,
@@ -416,3 +418,78 @@ class Evaluacion2Tests(TestCase):
             self.assertEqual(self.client.get(reverse("core:" + nombre)).status_code, 200)
         self.assertRedirects(self.client.get(reverse("core:gestion")), reverse("admin:index"))
         self.assertRedirects(self.client.get(reverse("core:login_admin")), reverse("admin:index"))
+
+    def test_precio_admin_con_puntos_y_formulario_numerico(self):
+        self.producto.precio = Decimal("20990.00")
+        self.producto.save()
+        respuesta = self.client.get(reverse("admin:core_producto_changelist"))
+        self.assertContains(respuesta, "20.990")
+        configuracion = admin.site._registry[Producto]
+        self.assertEqual(configuracion.precio_pesos.admin_order_field, "precio")
+        respuesta = self.client.get(reverse("admin:core_producto_change", args=[self.producto.id]))
+        self.assertEqual(respuesta.context["adminform"].form["precio"].value(), Decimal("20990.00"))
+        self.producto.refresh_from_db()
+        self.assertEqual(self.producto.precio, Decimal("20990.00"))
+
+    def test_ficha_muestra_precio_stock_detalles_y_formulario_actual(self):
+        self.producto.precio = Decimal("20990.00")
+        self.producto.stock = 3
+        self.producto.save()
+        respuesta = self.client.get(reverse("core:detalle_producto", args=[self.producto.id]))
+        self.assertContains(respuesta, self.producto.nombre)
+        self.assertContains(respuesta, "$20.990")
+        self.assertContains(respuesta, "3 unidades en stock")
+        self.assertContains(respuesta, "<details>", count=2)
+        self.assertContains(respuesta, "csrfmiddlewaretoken")
+        self.assertContains(
+            respuesta,
+            'action="' + reverse("core:agregar_carrito", args=[self.producto.id]) + '" method="post"',
+        )
+
+    def test_ficha_sin_stock_no_ofrece_agregar_al_carrito(self):
+        self.producto.stock = 0
+        self.producto.save()
+        respuesta = self.client.get(reverse("core:detalle_producto", args=[self.producto.id]))
+        self.assertContains(respuesta, "Producto agotado")
+        self.assertContains(respuesta, 'type="button" disabled')
+        self.assertNotContains(respuesta, 'action="' + reverse("core:agregar_carrito", args=[self.producto.id]) + '"')
+
+    def test_carrito_invitado_conserva_limite_stock_y_calculos(self):
+        self.client.logout()
+        self.producto.precio = Decimal("20990.00")
+        self.producto.stock = 1
+        self.producto.save()
+        ruta = reverse("core:agregar_carrito", args=[self.producto.id])
+        self.assertRedirects(self.client.post(ruta), reverse("core:carrito"))
+        self.assertRedirects(self.client.post(ruta), reverse("core:carrito"))
+        self.assertEqual(self.client.session["carrito"][str(self.producto.id)], 1)
+        respuesta = self.client.get(reverse("core:carrito"))
+        self.assertEqual(respuesta.context["total"], Decimal("20990.00"))
+        self.assertContains(respuesta, "$20.990")
+        self.producto.refresh_from_db()
+        self.assertEqual(self.producto.stock, 1)
+        self.assertEqual(self.producto.precio, Decimal("20990.00"))
+
+    def test_inicio_conserva_seleccion_y_accesos(self):
+        respuesta = self.client.get(reverse("core:inicio"))
+        self.assertContains(respuesta, 'id="inicio-titulo"')
+        self.assertContains(respuesta, "El sonido")
+        self.assertEqual(len(respuesta.context["productos"]), 4)
+        for nombre in ("catalogo", "categorias", "nosotros"):
+            self.assertContains(respuesta, 'href="' + reverse("core:" + nombre) + '"')
+
+    def test_nosotros_presenta_tienda_y_enlaces_existentes(self):
+        respuesta = self.client.get(reverse("core:nosotros"))
+        self.assertContains(respuesta, 'id="nosotros-titulo"')
+        self.assertContains(respuesta, "tienda digital")
+        self.assertContains(respuesta, "portada-astra-panorama.webp")
+        self.assertContains(respuesta, 'href="' + reverse("core:catalogo") + '"')
+        self.assertContains(respuesta, 'href="' + reverse("core:categorias") + '"')
+
+
+class FormatoMonedaTests(SimpleTestCase):
+    def test_pesos_con_puntos_y_decimales_sin_alterar_valores(self):
+        self.assertEqual(pesos(Decimal("20990.00")), "20.990")
+        self.assertEqual(pesos(Decimal("1000000.00")), "1.000.000")
+        self.assertEqual(pesos(Decimal("20990.50")), "20.990,50")
+        self.assertEqual(pesos(0), "0")

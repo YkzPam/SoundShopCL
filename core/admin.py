@@ -1,4 +1,5 @@
 from django.contrib import admin
+from .templatetags.moneda import pesos
 from .models import (
     Categoria, Marca, Proveedor, Sucursal, Cliente, Producto,
     Boleta, DetalleBoleta, CompraProveedor, DetalleCompra,
@@ -49,7 +50,7 @@ class ClienteAdmin(admin.ModelAdmin):
 @admin.register(Producto)
 class ProductoAdmin(admin.ModelAdmin):
     # Las mismas opciones de ModelAdmin utilizadas en el ejemplo del docente.
-    list_display = ("codigo", "nombre", "categoria", "marca", "precio", "stock", "activo")
+    list_display = ("codigo", "nombre", "categoria", "marca", "precio_pesos", "stock", "activo")
     search_fields = ("codigo", "nombre", "marca__nombre")
     list_filter = ("categoria", "marca", "activo")
     ordering = ("codigo",)
@@ -62,6 +63,10 @@ class ProductoAdmin(admin.ModelAdmin):
         ("Registro", {"fields": ("id",)}),
     )
     list_per_page = 25
+
+    @admin.display(description="Precio (CLP)", ordering="precio")
+    def precio_pesos(self, obj):
+        return pesos(obj.precio)
 
 
 class DetalleBoletaInline(admin.TabularInline):
