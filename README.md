@@ -41,7 +41,7 @@ Bootstrap, las imágenes, el CSS y el JavaScript están incluidos en `static/`. 
 
 La aplicación utiliza `db.sqlite3`, creado por las migraciones. Este archivo y el entorno virtual no se publican en GitHub: cada computador crea su propia base y su propio administrador siguiendo el apartado anterior. Iniciar sesión en GitHub no inicia sesión en Django Admin.
 
-Estado de la preparación local al 9 de octubre de 2026: por solicitud del propietario, el entorno virtual, la base principal y las credenciales locales del computador original se trasladaron a un respaldo fuera de la carpeta del proyecto. Esta copia de trabajo no tiene todavía una base de demostración ni un administrador preparados. Para practicar desde cero en este mismo equipo corresponde seguir el apartado 1, igual que en una descarga nueva. El respaldo no forma parte de la entrega en GitHub.
+Antes de la demostración, comprobar que las diez migraciones de `core` estén aplicadas y que la cuenta administrativa permita entrar a Django Admin. La preparación de una copia local no prepara automáticamente una descarga en otro computador.
 
 El administrador se crea una sola vez por base de datos, no cada vez que se inicia el servidor. Una descarga nueva no incluye los usuarios ni la contraseña del computador original. Puede elegirse el mismo nombre de usuario en el otro equipo, pero será una cuenta independiente. Si ya existe una cuenta administrativa en esa base, se utiliza la existente; no hace falta crear otra para cada práctica.
 
@@ -99,16 +99,13 @@ La guía de E2 incluye los resultados de las cuatro cargas locales y un recorrid
 
 La ampliación de las pruebas del administrador se documenta en [Pruebas adicionales de administración](docs/evaluacion-2/README.md#81-pruebas-adicionales-de-administración). Comprueba el CRUD de clientes, los correos inválidos o duplicados y las reglas de eliminación entre clientes, boletas y detalles mediante solicitudes a Django Admin y consultas a la base temporal de tests; no requiere agregar modelos ni funciones a la aplicación.
 
-Las [Pruebas de límites, relaciones y carga inicial](docs/evaluacion-2/README.md#82-pruebas-de-límites-relaciones-y-carga-inicial) incluyen cantidades inválidas de Faker, precio y stock, protección de proveedores y repetición del catálogo sin duplicar ni sobrescribir los registros identificados por sus claves existentes. La verificación del 9 de octubre de 2026 terminó con 36 pruebas aprobadas en una base temporal de tests. Ese resultado comprueba el código, pero no significa que la base de demostración esté preparada. Quedan pendientes la preparación local indicada en el apartado 2, la comprobación en el otro computador y la defensa con el docente.
+Las [Pruebas de límites, relaciones y carga inicial](docs/evaluacion-2/README.md#82-pruebas-de-límites-relaciones-y-carga-inicial) incluyen cantidades inválidas de Faker, precio y stock, protección de proveedores y repetición del catálogo sin duplicar ni sobrescribir los registros identificados por sus claves existentes. La verificación del 13 de octubre de 2026 terminó con 43 pruebas aprobadas en una base temporal de tests, sin errores de configuración ni cambios pendientes de migración. La comprobación en otro computador y la defensa con el docente siguen siendo pasos separados.
 
 ## 5. Continuidad de la Evaluación 1 y publicación
 
-La primera entrega se conserva intacta en la rama [evaluacion1](https://github.com/YkzPam/SoundShopCL/tree/evaluacion1), en el commit `381abd52a831058e2032d6c5d5eaefcf32cd8499`. La segunda entrega utiliza la rama [evaluacion-2](https://github.com/YkzPam/SoundShopCL/tree/evaluacion-2). Sus documentos iniciales permanecen como antecedentes; las instrucciones vigentes para ejecutar E2 son las de este README y la guía de E2.
+La primera entrega se conserva intacta en la rama [evaluacion1](https://github.com/YkzPam/SoundShopCL/tree/evaluacion1), en el commit `381abd52a831058e2032d6c5d5eaefcf32cd8499`. Sus diagramas de flujo, mockups, prototipo HTML y documentos de corrección se consultan en esa rama.
 
-- [Análisis inicial del caso tienda](docs/01-analisis-tienda.md).
-- [Diagrama de flujo del cliente](docs/diagrama-flujo.excalidraw) y [flujo administrativo de E1](docs/diagrama-administrador.excalidraw).
-- [Mockups de E1](docs/mockups/index.html) y [prototipo HTML de E1](prototipo-html/inicio.html).
-- [Correspondencia histórica con la rúbrica de E1](docs/04-rubrica.md).
+La descarga de [evaluacion-2](https://github.com/YkzPam/SoundShopCL/tree/evaluacion-2) no incluye esos antecedentes de E1. En `docs/evaluacion-2/` se conservan la guía vigente, el diagrama de base de datos en PNG y SVG, su editable de Excalidraw y el esquema correspondiente a los diez modelos. La interfaz funcional permanece en las plantillas de Django; no depende del prototipo HTML retirado.
 
 Para entregar E2, publicar el código actualizado y las migraciones en el mismo repositorio, verificar el último commit e informar su hash. Adjuntar también la imagen del diagrama de base de datos en la plataforma indicada por el docente. GitHub conserva el código; no ejecuta este servidor Django como una página de GitHub Pages.
 

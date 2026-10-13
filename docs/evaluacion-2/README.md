@@ -12,7 +12,7 @@ Los pasos de instalación, migración, catálogo y creación del administrador s
 
 La base local no se distribuye en GitHub. Al descargar el proyecto se deben ejecutar `migrate`, `cargar_catalogo` y `createsuperuser`. Este último paso crea un usuario administrativo en la nueva base; no utiliza la cuenta de GitHub ni la cuenta simulada del cliente. La extensión SQLite DB Viewer permite abrir `db.sqlite3` desde VS Code para revisar las tablas y los registros, pero no sustituye al motor SQLite utilizado por Django.
 
-Estado de la preparación local al 9 de octubre de 2026: el entorno `venv`, la base principal `db.sqlite3` y las credenciales locales del computador original se trasladaron a un respaldo fuera del proyecto por solicitud del propietario, para practicar la instalación desde cero. No se borraron los datos del respaldo, pero esta copia de trabajo no tiene una base de demostración preparada. Los resultados del apartado 8 corresponden a verificaciones anteriores o a bases de pruebas separadas; no sustituyen la preparación descrita en el README principal y en el apartado 2.1. Esta preparación también está pendiente en el computador original.
+La copia de demostración verificada el 13 de octubre de 2026 contiene las diez tablas propias, las diez migraciones aplicadas y un administrador activo. Esos datos y credenciales son locales y no se incluyen en GitHub. Una descarga nueva debe prepararse según el README principal y el apartado 2.1; el estado de la copia utilizada para las pruebas no se transfiere a otro computador.
 
 `requirements.txt` fija las mismas cinco versiones del ZIP de referencia del docente: asgiref 3.12.1, Django 6.1.1, Faker 40.40.0, sqlparse 0.6.0 y tzdata 2026.5. La instalación se comprueba con `python -m pip check` y `python -m pip freeze` dentro del entorno virtual. La rúbrica exige la configuración y el funcionamiento del proyecto, no una versión específica; estas versiones se conservan para seguir el entorno de referencia solicitado por el estudiante.
 
@@ -193,14 +193,20 @@ Las pruebas del catálogo repiten `cargar_catalogo` sobre registros existentes. 
 
 Tras restaurar los formularios de detalles dentro de boletas y compras, se retiró únicamente el autocompletado. La prueba existente de acceso verifica los diez formularios de creación, los detalles integrados y la presencia de registros relacionados en los selectores normales. También comprueba que no se utilicen campos autocompletados. El subtotal solo se calcula cuando el detalle ya está guardado, para que los formularios vacíos no produzcan errores. La verificación del 9 de octubre de 2026 terminó con las 36 pruebas aprobadas en una base temporal, sin errores de configuración ni cambios pendientes de migración. El ajuste no modifica los modelos, las diez migraciones, el diagrama ni los comandos de Faker y no prepara por sí solo la base de demostración.
 
+### 8.3. Verificación actual y separación de entregas
+
+El 13 de octubre de 2026 se ejecutaron 43 pruebas con resultado `OK`; `manage.py check` y `pip check` no informaron errores, y `makemigrations core --check --dry-run` no detectó cambios pendientes. Las bases locales verificadas conservaron diez tablas y diez migraciones de `core`, integridad correcta y ninguna referencia rota. La base separada de Faker contiene los cuatro lotes de 100, 1.000, 100.000 y 1.000.000 de clientes. Estas comprobaciones no sustituyen la defensa ni la ejecución de las cargas con el docente.
+
+Los diagramas de flujo, mockups, prototipo HTML y documentos de E1 se retiraron únicamente de `evaluacion-2`. Permanecen en `evaluacion1`. La limpieza no modifica modelos, migraciones, Admin, comandos de Faker, datos locales ni la interfaz Django.
+
 ## 9. Correspondencia con los diez indicadores de la rúbrica
 
 | N.º | Indicador resumido | Máximo | Evidencia del proyecto | Preparación o comprobación pendiente |
 | --- | --- | ---: | --- | --- |
-| 1 | Conexión y configuración de la base | 10 | SQLite en settings.py; conexión e integridad verificadas en las bases de pruebas. | Preparar la base de demostración con migrate; identificarla y explicar la configuración. |
+| 1 | Conexión y configuración de la base | 10 | SQLite en settings.py; conexión e integridad verificadas en las bases locales y de pruebas. | Preparar la base al usar otro computador; identificarla y explicar la configuración. |
 | 2 | Modelos, atributos, tipos, claves y relaciones | 10 | Diez modelos en models.py y diagrama correspondiente. | Explicar campos, claves y decisiones de relaciones. |
-| 3 | Migraciones, diagrama y datos Faker almacenados | 10 | Diez migraciones aplicadas en las verificaciones, esquema y cuatro cargas locales documentadas. | Aplicar las migraciones a la base de demostración; ejecutar las cargas con el docente y explicar el historial. |
-| 4 | Acceso y modelos registrados en Admin | 10 | Diez modelos registrados; acceso a los diez listados comprobado en tests y en la base local posteriormente respaldada. | Crear un administrador en la nueva base de demostración, también en el computador original, e ingresar durante la defensa. |
+| 3 | Migraciones, diagrama y datos Faker almacenados | 10 | Diez migraciones aplicadas, esquema correspondiente y cuatro cargas locales verificadas. | Aplicar las migraciones al usar otro computador; ejecutar las cargas con el docente y explicar el historial. |
+| 4 | Acceso y modelos registrados en Admin | 10 | Diez modelos registrados; acceso a los diez listados comprobado en tests y administrador activo en la base local de demostración. | Crear un administrador al usar otra base e ingresar durante la defensa. |
 | 5 | Presentación y usabilidad del administrador | 10 | Columnas, búsqueda, filtros, grupos, paginación y títulos. | Mostrar su uso y explicar la configuración. |
 | 6 | Creación de registros desde Admin | 10 | Pruebas de creación y consulta de productos y clientes persistidos en la base temporal de tests. | Crear un registro y verificarlo presencialmente. |
 | 7 | Consulta y verificación de datos | 10 | Listados, búsquedas, filtros y consultas SQLite. | Buscar y mostrar información almacenada. |
@@ -223,7 +229,7 @@ La entrega al docente incluye el enlace de GitHub a E2 y el hash de ese commit. 
 
 ## 12. Material de referencia utilizado
 
-La guía se contrastó con *E2 Evaluacion_inv_Caso_Semestral_Music_pro_U2 Backend (2).pdf* y *E2 Escala_Apreciacion_U2 Backend (1).xlsx*, entregados por el docente, más el correo y la exigencia de clase confirmada de diez tablas y diez migraciones. El PDF de trece páginas explicita filtros, búsquedas, personalización y las cuatro cargas en sus páginas 9 a 11. Las marcas de ejemplo de la planilla no se interpretan como una nota obtenida por este proyecto.
+La guía se contrastó con *E2 Evaluacion_inv_Caso_Semestral_Music_pro_U2 Backend (3).pdf* y *E2 Escala_Apreciacion_U2 Backend (2).xlsx*, entregados por el docente, más el correo y la exigencia de clase confirmada de diez tablas y diez migraciones. El PDF de trece páginas explicita filtros, búsquedas, personalización y las cuatro cargas en sus páginas 9 a 11. Las marcas de ejemplo de la planilla no se interpretan como una nota obtenida por este proyecto.
 
 Café y Código. (s. f.). *django-examples* [Repositorio de código]. GitHub. https://github.com/cafeycodigo/django-examples
 
@@ -231,4 +237,6 @@ El ZIP del repositorio del docente se utilizó como referencia de SQLite, modelo
 
 *Ejercicios de Migraciones, Modelos y Administrador en Django*. (s. f.). AAI INACAP, Unidad 2 de Framework back end [Material del curso con acceso institucional]. https://aai.inacap.cl/mod/page/view.php?id=2336194
 
-Se verificó el contenido escrito de ese apartado y sus pasos de entorno, aplicación, modelos y migraciones. Los dos videos enlazados se abrieron en Chrome: YouTube indicó que no había subtítulos, la exportación de transcripción no encontró texto y los paneles de transcripción quedaron vacíos. No se considera revisada su explicación audiovisual completa. Esa revisión requiere un archivo o una transcripción accesible; no se afirma haber reproducido todas las clases.
+El 13 de octubre de 2026 se revisó en Chrome el contenido escrito de ese apartado y los recursos de la Unidad 2 sobre entorno virtual, arquitectura, rutas, vistas, plantillas, modelos, relaciones, migraciones, Admin y generación de datos. También se contrastaron el ZIP del ejercicio de clase y el ejemplo de la semana 9. Los dos videos principales no tienen transcripción disponible; no se considera revisada su explicación audiovisual completa.
+
+La actividad formativa «10 Ejercicios de migraciones en Django» solicita diez aplicaciones diferentes y es una tarea separada de la Evaluación 2. No se confunde con la exigencia de diez tablas y diez migraciones del proyecto SoundShop CL. Los ejemplos de biblioteca, flota y otras técnicas de los materiales son referencias de aprendizaje, no una instrucción para agregar todos sus campos y funciones a esta tienda.
