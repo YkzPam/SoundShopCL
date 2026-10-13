@@ -81,7 +81,7 @@ SoundShopCL/
 
 ## 4. Diagramas, pruebas y defensa
 
-- [Guía de E2: modelos, migraciones, Admin, Faker y rúbrica](docs/evaluacion-2/README.md).
+- [Guía de E2: modelos, migraciones, Admin y Faker](docs/evaluacion-2/README.md).
 - [Diagrama de base de datos en PNG](docs/evaluacion-2/diagrama-base-datos.png), [SVG](docs/evaluacion-2/diagrama-base-datos.svg) y [editable de Excalidraw](docs/evaluacion-2/diagrama-base-datos.excalidraw).
 - [Correspondencia del esquema con los modelos](docs/evaluacion-2/esquema.json).
 
@@ -95,7 +95,7 @@ Para ejecutar las pruebas y revisar el historial:
 .\venv\Scripts\python.exe manage.py makemigrations core --check --dry-run
 ```
 
-La guía de E2 incluye los resultados de las cuatro cargas locales y un recorrido para explicar el código. Esas pruebas no sustituyen las cargas y la defensa presencial con el docente. La calificación depende de esa demostración y de la revisión de la entrega.
+La guía de E2 incluye los resultados de las cuatro cargas locales. Esas pruebas no sustituyen las cargas y la defensa presencial con el docente. La calificación depende de esa demostración y de la revisión de la entrega.
 
 La ampliación de las pruebas del administrador se documenta en [Pruebas adicionales de administración](docs/evaluacion-2/README.md#81-pruebas-adicionales-de-administración). Comprueba el CRUD de clientes, los correos inválidos o duplicados y las reglas de eliminación entre clientes, boletas y detalles mediante solicitudes a Django Admin y consultas a la base temporal de tests; no requiere agregar modelos ni funciones a la aplicación.
 
