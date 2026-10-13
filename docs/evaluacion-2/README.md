@@ -193,11 +193,11 @@ Las pruebas del catálogo repiten `cargar_catalogo` sobre registros existentes. 
 
 Tras restaurar los formularios de detalles dentro de boletas y compras, se retiró únicamente el autocompletado. La prueba existente de acceso verifica los diez formularios de creación, los detalles integrados y la presencia de registros relacionados en los selectores normales. También comprueba que no se utilicen campos autocompletados. El subtotal solo se calcula cuando el detalle ya está guardado, para que los formularios vacíos no produzcan errores. La verificación del 9 de octubre de 2026 terminó con las 36 pruebas aprobadas en una base temporal, sin errores de configuración ni cambios pendientes de migración. El ajuste no modifica los modelos, las diez migraciones, el diagrama ni los comandos de Faker y no prepara por sí solo la base de demostración.
 
-### 8.3. Verificación actual y separación de entregas
+### 8.3. Verificación actual y continuidad de etapas
 
 El 13 de octubre de 2026 se ejecutaron 43 pruebas con resultado `OK`; `manage.py check` y `pip check` no informaron errores, y `makemigrations core --check --dry-run` no detectó cambios pendientes. Las bases locales verificadas conservaron diez tablas y diez migraciones de `core`, integridad correcta y ninguna referencia rota. La base separada de Faker contiene los cuatro lotes de 100, 1.000, 100.000 y 1.000.000 de clientes. Estas comprobaciones no sustituyen la defensa ni la ejecución de las cargas con el docente.
 
-Los diagramas de flujo, mockups, prototipo HTML y documentos de E1 se retiraron únicamente de `evaluacion-2`. Permanecen en `evaluacion1`. La limpieza no modifica modelos, migraciones, Admin, comandos de Faker, datos locales ni la interfaz Django.
+Los diagramas de flujo, mockups, prototipo HTML y documentos de E1 vuelven a incluirse en `evaluacion-2` como antecedentes para consultar las etapas del desarrollo. La rama `evaluacion1` permanece intacta. El README principal distingue esos antecedentes de la documentación vigente de E2. La restauración no modifica modelos, migraciones, Admin, comandos de Faker, datos locales ni la interfaz Django.
 
 ## 9. Correspondencia con los diez indicadores de la rúbrica
 

@@ -103,9 +103,16 @@ Las [Pruebas de límites, relaciones y carga inicial](docs/evaluacion-2/README.m
 
 ## 5. Continuidad de la Evaluación 1 y publicación
 
-La primera entrega se conserva intacta en la rama [evaluacion1](https://github.com/YkzPam/SoundShopCL/tree/evaluacion1), en el commit `381abd52a831058e2032d6c5d5eaefcf32cd8499`. Sus diagramas de flujo, mockups, prototipo HTML y documentos de corrección se consultan en esa rama.
+La primera entrega se conserva intacta en la rama [evaluacion1](https://github.com/YkzPam/SoundShopCL/tree/evaluacion1), en el commit `381abd52a831058e2032d6c5d5eaefcf32cd8499`. La rama [evaluacion-2](https://github.com/YkzPam/SoundShopCL/tree/evaluacion-2) continúa esa misma tienda e incluye también los materiales de E1 como antecedentes para consultar las etapas del desarrollo.
 
-La descarga de [evaluacion-2](https://github.com/YkzPam/SoundShopCL/tree/evaluacion-2) no incluye esos antecedentes de E1. En `docs/evaluacion-2/` se conservan la guía vigente, el diagrama de base de datos en PNG y SVG, su editable de Excalidraw y el esquema correspondiente a los diez modelos. La interfaz funcional permanece en las plantillas de Django; no depende del prototipo HTML retirado.
+Antecedentes de la Evaluación 1:
+
+- [Análisis inicial del caso tienda](docs/01-analisis-tienda.md) y [datos y validaciones iniciales](docs/02-datos-y-validaciones.md).
+- [Secuencia de la corrección](docs/03-pasos-correccion.md), [rúbrica anterior](docs/04-rubrica.md) y [verificación de E1](docs/05-verificacion.md).
+- [Diagrama de flujo del cliente](docs/diagrama-flujo.excalidraw) y [diagrama administrativo de E1](docs/diagrama-administrador.excalidraw).
+- [Mockups de E1](docs/mockups/index.html) y [prototipo HTML estático](prototipo-html/inicio.html).
+
+Los documentos anteriores describen E1 y no sustituyen las instrucciones actuales de instalación, base de datos ni acceso administrativo. La guía vigente y el diagrama de base de datos de E2 están en `docs/evaluacion-2/`. El prototipo HTML es una maqueta de la etapa anterior; la tienda funcional de E2 se ejecuta con Django y utiliza las plantillas de `core/templates/`.
 
 Para entregar E2, publicar el código actualizado y las migraciones en el mismo repositorio, verificar el último commit e informar su hash. Adjuntar también la imagen del diagrama de base de datos en la plataforma indicada por el docente. GitHub conserva el código; no ejecuta este servidor Django como una página de GitHub Pages.
 
