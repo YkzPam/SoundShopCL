@@ -4,7 +4,7 @@ Proyecto individual de una tienda de equipos musicales desarrollado con Django. 
 
 ## 1. Ejecución desde Visual Studio Code
 
-Seleccionar la rama [evaluacion-2](https://github.com/YkzPam/SoundShopCL/tree/evaluacion-2) antes de descargar desde **Code → Download ZIP**. La rama `evaluacion1` conserva la primera entrega y no contiene esta ampliación. Extraer la descarga y abrir en Visual Studio Code la carpeta que contiene `manage.py`. Las plantillas HTML de Django no se ejecutan directamente al hacer doble clic.
+Seleccionar la rama [evaluacion-2](https://github.com/YkzPam/SoundShopCL/tree/evaluacion-2) antes de descargar desde **Code → Download ZIP**. La rama `evaluacion1` conserva la primera entrega y no contiene las funciones de E2. Extraer la descarga y abrir en Visual Studio Code la carpeta que contiene `manage.py`. Las plantillas HTML de Django no se ejecutan directamente al hacer doble clic.
 
 Con Python 3.12 o superior instalado, ejecutar en la terminal integrada:
 
@@ -97,9 +97,7 @@ Para ejecutar las pruebas y revisar el historial:
 
 La guía de E2 incluye los resultados de las cuatro cargas locales. Esas pruebas no sustituyen las cargas y la defensa presencial con el docente. La calificación depende de esa demostración y de la revisión de la entrega.
 
-La ampliación de las pruebas del administrador se documenta en [Pruebas adicionales de administración](docs/evaluacion-2/README.md#81-pruebas-adicionales-de-administración). Comprueba el CRUD de clientes, los correos inválidos o duplicados y las reglas de eliminación entre clientes, boletas y detalles mediante solicitudes a Django Admin y consultas a la base temporal de tests; no requiere agregar modelos ni funciones a la aplicación.
-
-Las [Pruebas de límites, relaciones y carga inicial](docs/evaluacion-2/README.md#82-pruebas-de-límites-relaciones-y-carga-inicial) incluyen cantidades inválidas de Faker, precio y stock, protección de proveedores y repetición del catálogo sin duplicar ni sobrescribir los registros identificados por sus claves existentes. La verificación del 13 de octubre de 2026 terminó con 43 pruebas aprobadas en una base temporal de tests, sin errores de configuración ni cambios pendientes de migración. La comprobación en otro computador y la defensa con el docente siguen siendo pasos separados.
+Las [Pruebas y comprobaciones](docs/evaluacion-2/README.md#8-pruebas-y-comprobaciones) cubren el CRUD de productos y clientes, validaciones, relaciones, límites de Faker y carga del catálogo. La ejecución local del 13 de octubre de 2026 terminó con 43 pruebas aprobadas en una base temporal de tests, sin errores de configuración ni cambios pendientes de migración. Cada computador debe preparar su propia base y su cuenta administrativa.
 
 ## 5. Continuidad de la Evaluación 1 y publicación
 
@@ -108,7 +106,7 @@ La primera entrega se conserva intacta en la rama [evaluacion1](https://github.c
 Antecedentes de la Evaluación 1:
 
 - [Análisis inicial del caso tienda](docs/01-analisis-tienda.md) y [datos y validaciones iniciales](docs/02-datos-y-validaciones.md).
-- [Secuencia de la corrección](docs/03-pasos-correccion.md), [rúbrica anterior](docs/04-rubrica.md) y [verificación de E1](docs/05-verificacion.md).
+- [Rúbrica de E1](docs/04-rubrica.md) y [verificación de E1](docs/05-verificacion.md).
 - [Diagrama de flujo del cliente](docs/diagrama-flujo.excalidraw) y [diagrama administrativo de E1](docs/diagrama-administrador.excalidraw).
 - [Mockups de E1](docs/mockups/index.html) y [prototipo HTML estático](prototipo-html/inicio.html).
 

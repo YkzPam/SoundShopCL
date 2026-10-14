@@ -2,7 +2,7 @@
 
 ## 1. Alcance de la entrega
 
-La segunda evaluación continúa el mismo caso de tienda musical de E1. Su desarrollo se concentra en SQLite, modelos relacionados, migraciones, diagrama, Django Admin y datos ficticios. El correo del docente exige demostrar las cuatro cargas de Faker y explicar el código presencialmente. Las diez tablas propias y las diez migraciones de `core` corresponden a la exigencia de clase confirmada por el estudiante; no se atribuye esa cantidad al texto de la rúbrica.
+La segunda evaluación continúa el mismo caso de tienda musical de E1. Su desarrollo se concentra en SQLite, diez modelos propios, diez migraciones de `core`, diagrama de base de datos, Django Admin y datos ficticios. Las cuatro cargas de Faker y la explicación del código forman parte de la demostración presencial.
 
 La rama `evaluacion1` conserva la Evaluación 1 en el commit `381abd52a831058e2032d6c5d5eaefcf32cd8499`. La segunda entrega se publica en `evaluacion-2`, sin modificar `evaluacion1`. El diseño de la tienda se conserva y sus consultas pasan a utilizar SQLite. No se desarrollan pagos, una API, un administrador propio ni cuentas permanentes de clientes.
 
@@ -11,8 +11,6 @@ La rama `evaluacion1` conserva la Evaluación 1 en el commit `381abd52a831058e20
 Los pasos de instalación, migración, catálogo y creación del administrador se encuentran en el [README principal](../../README.md). La configuración utiliza `django.db.backends.sqlite3` y, por defecto, el archivo `db.sqlite3` en la carpeta de `manage.py`. La aplicación `core` está registrada en `INSTALLED_APPS` y la ruta `/admin/` utiliza el administrador incluido en Django.
 
 La base local no se distribuye en GitHub. Al descargar el proyecto se deben ejecutar `migrate`, `cargar_catalogo` y `createsuperuser`. Este último paso crea un usuario administrativo en la nueva base; no utiliza la cuenta de GitHub ni la cuenta simulada del cliente. La extensión SQLite DB Viewer permite abrir `db.sqlite3` desde VS Code para revisar las tablas y los registros, pero no sustituye al motor SQLite utilizado por Django.
-
-La copia de demostración verificada el 13 de octubre de 2026 contiene las diez tablas propias, las diez migraciones aplicadas y un administrador activo. Esos datos y credenciales son locales y no se incluyen en GitHub. Una descarga nueva debe prepararse según el README principal y el apartado 2.1; el estado de la copia utilizada para las pruebas no se transfiere a otro computador.
 
 `requirements.txt` fija las mismas cinco versiones del ZIP de referencia del docente: asgiref 3.12.1, Django 6.1.1, Faker 40.40.0, sqlparse 0.6.0 y tzdata 2026.5. La instalación se comprueba con `python -m pip check` y `python -m pip freeze` dentro del entorno virtual. La rúbrica exige la configuración y el funcionamiento del proyecto, no una versión específica; estas versiones se conservan para seguir el entorno de referencia solicitado por el estudiante.
 
@@ -83,8 +81,6 @@ Para abrir el editable, ingresar a <https://excalidraw.com/> y utilizar **Abrir*
 
 Las migraciones fueron generadas por Django a medida que se incorporaron o modificaron los modelos. No son diez archivos vacíos. `makemigrations` registra el cambio en archivos Python; `migrate` aplica esos archivos a SQLite. La décima migración conserva un cambio real posterior al modelo inicial y permite explicar cómo se modifica una estructura existente.
 
-Los archivos conservan la cabecera de Django 5.2.17, la versión que los generó originalmente. La actualización del entorno a Django 6.1.1 no reescribe ese historial: las diez migraciones existentes se aplicaron correctamente con la nueva versión y `makemigrations --check --dry-run` no detectó cambios pendientes. Cambiar solamente esa cabecera daría una referencia falsa de cómo se generaron.
-
 ```powershell
 .\venv\Scripts\python.exe manage.py showmigrations core
 .\venv\Scripts\python.exe manage.py makemigrations core --check --dry-run
@@ -106,7 +102,7 @@ El CRUD también puede practicarse en **Clientes**: crear un registro ficticio c
 
 El campo `correo` del cliente utiliza `EmailField(unique=True)`. Un correo sin formato válido o un correo que ya pertenece a otro cliente debe mostrar un error en el formulario de Admin y no crear otro registro. Las pruebas comprueban ambos rechazos y que la cantidad de clientes permanece sin cambios; no se incorporan validadores nuevos al modelo.
 
-Un cliente asociado a una boleta no puede eliminarse porque la relación utiliza `PROTECT`; Admin muestra los registros que impiden el borrado. Eliminar una boleta, en cambio, elimina sus detalles mediante `CASCADE`, pero conserva al cliente y los productos del catálogo. Las pruebas adicionales verifican ambas reglas existentes mediante solicitudes a Django Admin y consultas posteriores a la base temporal.
+Un cliente asociado a una boleta no puede eliminarse porque la relación utiliza `PROTECT`; Admin muestra los registros que impiden el borrado. Eliminar una boleta, en cambio, elimina sus detalles mediante `CASCADE`, pero conserva al cliente y los productos del catálogo. Las pruebas verifican ambas reglas mediante solicitudes a Django Admin y consultas posteriores a la base temporal.
 
 ## 7. Catálogo inicial y generación con Faker
 
@@ -136,65 +132,19 @@ Remove-Item Env:SOUNDSHOP_DB
 
 La variable `SOUNDSHOP_DB` selecciona otro archivo SQLite durante esa terminal. Al retirarla, los comandos vuelven a utilizar `db.sqlite3`. No se borra ninguna de las dos bases. Para ver el archivo de demostración en Django Admin, se mantiene la variable, se crea un administrador en esa base y se inicia el servidor desde la misma terminal.
 
-## 8. Historial de verificaciones locales del 8 y 9 de octubre de 2026
+## 8. Pruebas y comprobaciones
 
-El 8 de octubre de 2026 se repitieron las cuatro cargas después de alinear las dependencias con el ZIP del docente, utilizando Django 6.1.1 y Faker 40.40.0. Se utilizó la base `work/revision-e2-61fc4ac4/cargas.sqlite3`, separada del catálogo. El comando verificó las inserciones y una consulta posterior, en otro proceso, confirmó 1.101.100 clientes acumulados. Esa base tenía las diez migraciones aplicadas. SQLite devolvió integridad `ok` y ninguna infracción de claves foráneas tanto en la base de cargas como en la del catálogo utilizada en esa verificación.
+La ejecución local del 13 de octubre de 2026 terminó con 43 pruebas aprobadas. `manage.py check` y `pip check` no informaron errores; `makemigrations core --check --dry-run` no detectó cambios pendientes. Las pruebas utilizan una base temporal y no modifican los registros de la tienda.
 
-| Carga solicitada | Registros antes | Registros después | Tiempo local informado |
-| --- | ---: | ---: | ---: |
-| 100 | 0 | 100 | 0,03 s |
-| 1.000 | 100 | 1.100 | 0,16 s |
-| 100.000 | 1.100 | 101.100 | 16,42 s |
-| 1.000.000 | 101.100 | 1.101.100 | 166,24 s |
+Las comprobaciones cubren la conexión SQLite, los diez modelos y migraciones, la correspondencia del esquema, el registro y acceso a Django Admin, el CRUD de productos y clientes, las validaciones, las relaciones `PROTECT` y `CASCADE`, la carga del catálogo y una carga pequeña de Faker. También verifican las páginas de la tienda y el formato de precios. El administrador de tests existe únicamente en la base temporal y no sirve para ingresar a la base de demostración.
 
-Los tiempos corresponden a esas ejecuciones locales; no son valores garantizados en otro computador. Estas cargas no se realizaron con el docente. Durante esas comprobaciones, la base principal contenía diez productos y tres clientes comerciales de prueba; posteriormente se trasladó al respaldo descrito en el apartado 2. Esa cantidad no representa una base de demostración preparada en la carpeta actual. Los archivos SQLite y la carpeta `work/` están excluidos de Git.
+Las bases locales revisadas presentaron integridad `ok` y ninguna referencia rota. Una base separada conserva los cuatro lotes de clientes ficticios:
 
-El ajuste que identifica el archivo SQLite se comprobó con una carga nueva de 100 clientes en una base separada. La salida mostró la ruta seleccionada y una consulta posterior, desde otro proceso, confirmó los 100 registros, integridad `ok` y ninguna infracción de claves foráneas. Esta comprobación local no utilizó la base del catálogo ni representa una prueba en otro PC.
+| Carga | Registros acumulados |
+| --- | ---: |
+| 100 | 100 |
+| 1.000 | 1.100 |
+| 100.000 | 101.100 |
+| 1.000.000 | 1.101.100 |
 
-Las diecisiete pruebas automáticas iniciales pasaron con las cinco dependencias del docente, tanto en el entorno actualizado como en un entorno virtual nuevo. `pip check` no encontró conflictos y `pip freeze` mostró exactamente las cinco versiones de requirements.txt. Esas pruebas comprueban SQLite, tablas y migraciones, registro de modelos, correspondencia del esquema, acceso administrativo, creación, consulta, filtros, modificación y eliminación de productos, validaciones, relaciones, repetición del catálogo, una carga pequeña de Faker y respuesta de las páginas conservadas. En esa verificación inicial el CRUD completo se probó con productos; no se afirma que se haya repetido manualmente con cada uno de los diez modelos.
-
-Los tests crean su administrador únicamente en la base temporal de pruebas. La contraseña de ese usuario no sirve para ingresar a la tienda real y no constituye una credencial administrativa distribuida. `self.client.get` y `self.client.post` simulan solicitudes; las comprobaciones comparan la respuesta y los registros almacenados. No son una grabación de interacción en el navegador.
-
-El 8 de octubre también se creó un administrador activo, con permisos de personal y superusuario, en la base principal `db.sqlite3` del computador original. Su autenticación se comprobó con el cliente de pruebas de Django sobre esa base local: el panel y los listados de los diez modelos respondieron con HTTP 200; una solicitud sin sesión se redirigió al inicio de sesión. Esta comprobación no utilizó el administrador temporal de los tests. Ese usuario pertenece a la base posteriormente respaldada; no constituye una cuenta lista para acceder desde la copia de trabajo actual. La base y las credenciales están excluidas de GitHub. Para una nueva base de demostración, tanto en el computador original como en otro PC, debe crearse una cuenta conforme al apartado 2.1.
-
-### 8.1. Pruebas adicionales de administración
-
-La ampliación mantiene el mismo patrón de `TestCase`, `self.client.get`, `self.client.post` y comprobaciones de registros utilizado en las pruebas existentes. Se incorporaron casos del CRUD, las validaciones de clientes y las relaciones con boletas, sin modificar modelos, migraciones ni opciones de Admin:
-
-| Prueba | Comprobación |
-| --- | --- |
-| Crear cliente | El formulario guarda nombre, correo, teléfono y estado activo. |
-| Consultar cliente | La búsqueda por correo y el filtro de estado muestran el registro correspondiente. |
-| Modificar cliente | El nombre, teléfono y estado actualizados persisten al consultar de nuevo. |
-| Eliminar cliente | Un cliente nuevo sin boletas se elimina y deja de existir en la base. |
-| Correo inválido | Admin muestra el error del campo y no crea el cliente. |
-| Correo duplicado | Admin rechaza el correo existente y conserva un único registro con ese correo. |
-| Cliente con boleta | Admin impide su eliminación y conserva ambos registros mediante `PROTECT`. |
-| Eliminar boleta | Se eliminan la boleta y sus detalles mediante `CASCADE`, sin borrar el cliente ni los productos. |
-
-La primera ampliación de este apartado terminó con 25 pruebas aprobadas y ningún error de configuración. Sus ocho pruebas nuevas se agrupan en CRUD de clientes, validaciones de correo y reglas de eliminación relacionada. Las operaciones se realizan en la base temporal de tests y no eliminan ni modifican registros de la base del catálogo. No constituyen una prueba manual en otro PC ni reemplazan la defensa presencial.
-
-### 8.2. Pruebas de límites, relaciones y carga inicial
-
-Las comprobaciones siguientes refuerzan comportamientos ya implementados, sin agregar campos, tablas, migraciones ni funciones a la tienda. Cada grupo se incorpora después de ejecutar las pruebas y se documenta con el resultado observado. No se utilizan para simular avances anteriores ni una instalación en otro PC.
-
-| Grupo | Comprobación |
-| --- | --- |
-| Límites de Faker | Cero, cantidades negativas y cantidades superiores al millón se rechazan sin crear clientes. |
-| Precio y stock | Admin acepta el precio mínimo actual de 1 y stock cero; rechaza precio cero, stock negativo y stock no numérico sin guardar el producto. |
-| Compras a proveedores | Admin protege al proveedor asociado a una compra. Borrar la compra elimina sus detalles, pero conserva al proveedor y los productos. |
-| Repetición del catálogo | Repetir la carga mantiene la cantidad de registros de los diez modelos y conserva los datos editados de clientes y el precio, stock y estado de productos. |
-
-La ejecución local final posterior a estos grupos terminó con 36 pruebas aprobadas. Se incorporaron once casos: dos de límites de Faker, cuatro de precio y stock, dos de relaciones de compras y tres de repetición del catálogo. La prueba del precio mínimo comprueba el límite de `MinValueValidator(1)` ya definido en el modelo; no cambia la política ni los precios de los productos del catálogo. Todos los casos utilizan la base temporal de tests; esas pruebas no alteraron los registros de la base principal ni los de las cuatro cargas masivas existentes.
-
-La protección del proveedor se comprueba con un proveedor ficticio nuevo, asociado solamente a una compra. Así se identifica la relación `CompraProveedor.proveedor` con `PROTECT`, sin depender de productos que también impidan su eliminación. La prueba de eliminación utiliza una compra con detalles y verifica el comportamiento de `DetalleCompra.compra` con `CASCADE`. No comprueba un CRUD completo de compras ni una gestión automática del stock.
-
-Las pruebas del catálogo repiten `cargar_catalogo` sobre registros existentes. Un caso compara las cantidades de los diez modelos antes y después; otro conserva el nombre, teléfono y estado editados de un cliente; el tercero conserva el precio, stock cero y estado inactivo de un producto. Se mantienen el correo y el código utilizados como claves de búsqueda por `get_or_create`. La comprobación no afirma que una clave modificada siga identificando el mismo registro inicial.
-
-Tras restaurar los formularios de detalles dentro de boletas y compras, se retiró únicamente el autocompletado. La prueba existente de acceso verifica los diez formularios de creación, los detalles integrados y la presencia de registros relacionados en los selectores normales. También comprueba que no se utilicen campos autocompletados. El subtotal solo se calcula cuando el detalle ya está guardado, para que los formularios vacíos no produzcan errores. La verificación del 9 de octubre de 2026 terminó con las 36 pruebas aprobadas en una base temporal, sin errores de configuración ni cambios pendientes de migración. El ajuste no modifica los modelos, las diez migraciones, el diagrama ni los comandos de Faker y no prepara por sí solo la base de demostración.
-
-### 8.3. Verificación actual y continuidad de etapas
-
-El 13 de octubre de 2026 se ejecutaron 43 pruebas con resultado `OK`; `manage.py check` y `pip check` no informaron errores, y `makemigrations core --check --dry-run` no detectó cambios pendientes. Las bases locales verificadas conservaron diez tablas y diez migraciones de `core`, integridad correcta y ninguna referencia rota. La base separada de Faker contiene los cuatro lotes de 100, 1.000, 100.000 y 1.000.000 de clientes. Estas comprobaciones no sustituyen la defensa ni la ejecución de las cargas con el docente.
-
-Los diagramas de flujo, mockups, prototipo HTML y documentos de E1 vuelven a incluirse en `evaluacion-2` como antecedentes para consultar las etapas del desarrollo. La rama `evaluacion1` permanece intacta. El README principal distingue esos antecedentes de la documentación vigente de E2. La restauración no modifica modelos, migraciones, Admin, comandos de Faker, datos locales ni la interfaz Django.
+Las bases SQLite y la carpeta `work/` no se publican en GitHub. Cada descarga requiere aplicar las migraciones, cargar los datos y crear su administrador. Las comprobaciones locales no sustituyen las cuatro cargas con el docente ni la defensa presencial.
