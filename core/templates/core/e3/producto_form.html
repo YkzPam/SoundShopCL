@@ -1,0 +1,15 @@
+{% extends 'core/e3/base_gestion.html' %}{% load l10n %}
+{% block gestion %}<h1>{{ titulo }}</h1>{% include 'core/e3/errores.html' %}
+<form method="post" class="row g-3">{% csrf_token %}
+<div class="col-md-4"><label for="codigo" class="form-label">Código</label><input class="form-control" id="codigo" name="codigo" value="{{ producto.codigo }}" maxlength="30" required></div>
+<div class="col-md-8"><label for="nombre" class="form-label">Nombre</label><input class="form-control" id="nombre" name="nombre" value="{{ producto.nombre }}" maxlength="80" required></div>
+<div class="col-12"><label for="descripcion" class="form-label">Descripción</label><textarea class="form-control" id="descripcion" name="descripcion" maxlength="500" required>{{ producto.descripcion }}</textarea></div>
+<div class="col-md-6"><label for="precio" class="form-label">Precio (sin punto de miles)</label><input class="form-control" type="number" id="precio" name="precio" step="0.01" min="1" value="{{ producto.precio|default_if_none:''|unlocalize }}" required></div>
+<div class="col-md-6"><label for="stock" class="form-label">Stock</label><input class="form-control" type="number" id="stock" name="stock" min="0" value="{{ producto.stock|default_if_none:0|unlocalize }}" required></div>
+<div class="col-md-4"><label for="categoria" class="form-label">Categoría</label><select class="form-select" id="categoria" name="categoria" required><option value="">Seleccionar</option>{% for c in categorias %}<option value="{{ c.pk }}" {% if producto.categoria_id|stringformat:'s' == c.pk|stringformat:'s' %}selected{% endif %}>{{ c.nombre }}</option>{% endfor %}</select></div>
+<div class="col-md-4"><label for="marca" class="form-label">Marca</label><select class="form-select" id="marca" name="marca" required><option value="">Seleccionar</option>{% for m in marcas %}<option value="{{ m.pk }}" {% if producto.marca_id|stringformat:'s' == m.pk|stringformat:'s' %}selected{% endif %}>{{ m.nombre }}</option>{% endfor %}</select></div>
+<div class="col-md-4"><label for="proveedor" class="form-label">Proveedor</label><select class="form-select" id="proveedor" name="proveedor" required><option value="">Seleccionar</option>{% for p in proveedores %}<option value="{{ p.pk }}" {% if producto.proveedor_id|stringformat:'s' == p.pk|stringformat:'s' %}selected{% endif %}>{{ p.nombre }}</option>{% endfor %}</select></div>
+<div class="col-12"><label for="imagen" class="form-label">Ruta de imagen en static</label><input class="form-control" id="imagen" name="imagen" value="{{ producto.imagen }}" maxlength="200" placeholder="img/productos/equipo.webp"></div>
+<div class="col-12 form-check ms-2"><input class="form-check-input" type="checkbox" id="activo" name="activo" {% if producto.activo %}checked{% endif %}><label class="form-check-label" for="activo">Producto activo</label></div>
+<div class="col-12"><button class="btn btn-primary">Guardar producto</button> <a class="btn btn-outline-primary" href="{% url 'core:gestion_productos' %}">Cancelar</a></div>
+</form>{% endblock %}

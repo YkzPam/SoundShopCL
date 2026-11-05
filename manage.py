@@ -23,7 +23,7 @@ def main():
             elif ':' in argumento and argumento.rsplit(':', 1)[-1].isdigit():
                 direccion = argumento
         print(f'\nTienda: http://{direccion}/', flush=True)
-        print(f'Administrador: http://{direccion}/admin/\n', flush=True)
+        print(f'Panel de administración: http://{direccion}/gestion/\n', flush=True)
 
     execute_from_command_line(sys.argv)
 

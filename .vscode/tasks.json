@@ -1,19 +1,17 @@
 {
   "version": "2.0.0",
   "tasks": [
-    {"label": "E2: instalar dependencias del ejemplo docente", "type": "process", "command": "${workspaceFolder}/venv/Scripts/python.exe", "args": ["-m", "pip", "install", "-r", "requirements.txt"], "problemMatcher": []},
-    {"label": "E2: verificar dependencias instaladas", "type": "process", "command": "${workspaceFolder}/venv/Scripts/python.exe", "args": ["-m", "pip", "check"], "problemMatcher": []},
-    {"label": "E2: ver versiones instaladas", "type": "process", "command": "${workspaceFolder}/venv/Scripts/python.exe", "args": ["-m", "pip", "freeze"], "problemMatcher": []},
-    {"label": "E2: revisar configuración", "type": "process", "command": "${workspaceFolder}/venv/Scripts/python.exe", "args": ["manage.py", "check"], "problemMatcher": []},
-    {"label": "E2: aplicar migraciones", "type": "process", "command": "${workspaceFolder}/venv/Scripts/python.exe", "args": ["manage.py", "migrate"], "problemMatcher": []},
-    {"label": "E2: ver historial de migraciones", "type": "process", "command": "${workspaceFolder}/venv/Scripts/python.exe", "args": ["manage.py", "showmigrations", "core"], "problemMatcher": []},
-    {"label": "E2: cargar catálogo inicial", "type": "process", "command": "${workspaceFolder}/venv/Scripts/python.exe", "args": ["manage.py", "cargar_catalogo"], "problemMatcher": []},
-    {"label": "E2: crear administrador privado", "type": "process", "command": "${workspaceFolder}/venv/Scripts/python.exe", "args": ["manage.py", "createsuperuser"], "problemMatcher": []},
-    {"label": "E2: ejecutar pruebas", "type": "process", "command": "${workspaceFolder}/venv/Scripts/python.exe", "args": ["manage.py", "test", "core", "--verbosity", "2"], "problemMatcher": [], "group": "test"},
-    {"label": "E2: generar clientes con Faker", "type": "process", "command": "${workspaceFolder}/venv/Scripts/python.exe", "args": ["manage.py", "generar_clientes", "--cantidad", "${input:cantidadClientes}"], "problemMatcher": []},
-    {"label": "E2: abrir tienda y Admin", "type": "process", "command": "${workspaceFolder}/venv/Scripts/python.exe", "args": ["manage.py", "runserver", "127.0.0.1:8000", "--noreload"], "isBackground": true, "problemMatcher": []}
+    {"label": "E3: instalar dependencias", "type": "process", "command": "${workspaceFolder}/venv/Scripts/python.exe", "args": ["-m", "pip", "install", "-r", "requirements.txt"], "problemMatcher": []},
+    {"label": "E3: revisar configuración", "type": "process", "command": "${workspaceFolder}/venv/Scripts/python.exe", "args": ["manage.py", "check"], "options": {"env": {"MYSQL_USER": "${input:usuarioMySQL}", "MYSQL_PASSWORD": "${input:claveMySQL}", "MYSQL_PORT": "${input:puertoMySQL}"}}, "problemMatcher": []},
+    {"label": "E3: aplicar migraciones", "type": "process", "command": "${workspaceFolder}/venv/Scripts/python.exe", "args": ["manage.py", "migrate"], "options": {"env": {"MYSQL_USER": "${input:usuarioMySQL}", "MYSQL_PASSWORD": "${input:claveMySQL}", "MYSQL_PORT": "${input:puertoMySQL}"}}, "problemMatcher": []},
+    {"label": "E3: cargar catálogo", "type": "process", "command": "${workspaceFolder}/venv/Scripts/python.exe", "args": ["manage.py", "cargar_catalogo"], "options": {"env": {"MYSQL_USER": "${input:usuarioMySQL}", "MYSQL_PASSWORD": "${input:claveMySQL}", "MYSQL_PORT": "${input:puertoMySQL}"}}, "problemMatcher": []},
+    {"label": "E3: crear cuenta administradora", "type": "process", "command": "${workspaceFolder}/venv/Scripts/python.exe", "args": ["manage.py", "createsuperuser"], "options": {"env": {"MYSQL_USER": "${input:usuarioMySQL}", "MYSQL_PASSWORD": "${input:claveMySQL}", "MYSQL_PORT": "${input:puertoMySQL}"}}, "problemMatcher": []},
+    {"label": "E3: ejecutar pruebas", "type": "process", "command": "${workspaceFolder}/venv/Scripts/python.exe", "args": ["manage.py", "test", "core"], "options": {"env": {"MYSQL_USER": "${input:usuarioMySQL}", "MYSQL_PASSWORD": "${input:claveMySQL}", "MYSQL_PORT": "${input:puertoMySQL}"}}, "problemMatcher": [], "group": "test"},
+    {"label": "E3: iniciar tienda y panel", "type": "process", "command": "${workspaceFolder}/venv/Scripts/python.exe", "args": ["manage.py", "runserver", "127.0.0.1:8000"], "options": {"env": {"MYSQL_USER": "${input:usuarioMySQL}", "MYSQL_PASSWORD": "${input:claveMySQL}", "MYSQL_PORT": "${input:puertoMySQL}"}}, "problemMatcher": [], "isBackground": true}
   ],
   "inputs": [
-    {"id": "cantidadClientes", "type": "pickString", "description": "Cantidad de clientes ficticios que se agregarán", "options": ["100", "1000", "100000", "1000000"], "default": "100"}
+    {"id": "usuarioMySQL", "type": "promptString", "description": "Usuario de MySQL local", "default": "root"},
+    {"id": "claveMySQL", "type": "promptString", "description": "Contraseña de MySQL local (no es la del panel)", "password": true},
+    {"id": "puertoMySQL", "type": "promptString", "description": "Puerto del servidor MySQL local", "default": "3306"}
   ]
 }

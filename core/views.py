@@ -1,21 +1,19 @@
-"""La tienda consulta SQLite; la gestión persistente se realiza en Django Admin.
-
-El recorrido de cuenta y carrito de la entrega anterior sigue siendo una
-simulación. No genera cuentas de Django, ventas ni cobros.
-"""
-import json
-from pathlib import Path
+"""Tienda de E2 continuada en E3: autenticación y páginas propias de gestión."""
+from datetime import date
 from django.contrib import messages
+from django.contrib.auth import authenticate, login as iniciar_login, logout, update_session_auth_hash
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
+from django.core.paginator import Paginator
+from django.db.models import F, Sum
+from django.db.models.deletion import ProtectedError
+from django.http import HttpResponseForbidden, HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404, redirect, render
-from .forms import LoginForm, RegistroForm
-from .models import Categoria, Producto
-
-DATA_DIR = Path(__file__).resolve().parent / "data"
-
-
-def leer_json(nombre):
-    with (DATA_DIR / nombre).open(encoding="utf-8") as archivo:
-        return json.load(archivo)
+from django.utils.http import url_has_allowed_host_and_scheme
+from django.utils.text import slugify
+from .models import Categoria, Marca, Proveedor, Sucursal, Cliente, Producto, Boleta, DetalleBoleta
 
 
 def producto_datos(producto):
@@ -76,47 +74,37 @@ def nosotros(request):
 
 
 def login(request, acceso_admin=False):
-    if acceso_admin:
-        return redirect("admin:index")
-    formulario = LoginForm(request.POST if request.method == "POST" else None)
-    if request.method == "POST" and formulario.is_valid():
-        correo = formulario.cleaned_data["correo"].lower()
-        clave = formulario.cleaned_data["clave"]
-        for usuario in leer_json("usuarios.json"):
-            if (usuario["correo"] == correo and usuario.get("clave_demo") == clave
-                    and usuario["activo"] and usuario["rol"] == "cliente"):
-                request.session["nombre"] = usuario["nombre"]
-                request.session["rol"] = "cliente"
-                messages.success(request, "Sesión iniciada.")
-                return redirect("core:cliente")
-        formulario.add_error(None, "El correo o la contraseña no son correctos.")
-    return render(request, "core/login.html", {"formulario": formulario, "titulo": "Iniciar sesión"})
+    siguiente = request.POST.get("next") or request.GET.get("next", "")
+    if not url_has_allowed_host_and_scheme(siguiente, {request.get_host()}, require_https=request.is_secure()):
+        siguiente = ""
+    if request.user.is_authenticated:
+        return redirect(siguiente or "core:gestion")
+    error = ""
+    if request.method == "POST":
+        usuario = authenticate(request, username=request.POST.get("username", ""), password=request.POST.get("password", ""))
+        if usuario is not None:
+            iniciar_login(request, usuario)
+            return redirect(siguiente or "core:gestion")
+        error = "El usuario o la contraseña no son correctos."
+    return render(request, "core/login.html", {"titulo": "Iniciar sesión", "error": error,
+        "siguiente": siguiente, "nombre_usuario": request.POST.get("username", "")})
 
 
 def registro(request):
-    formulario = RegistroForm(request.POST if request.method == "POST" else None)
-    resultado = None
-    if request.method == "POST" and formulario.is_valid():
-        correo = formulario.cleaned_data["correo"].lower()
-        if any(u["correo"] == correo for u in leer_json("usuarios.json")):
-            formulario.add_error("correo", "Ese correo no está disponible.")
-        else:
-            resultado = {"nombre": formulario.cleaned_data["nombre"], "correo": correo}
-            messages.success(request, "Datos de registro validados. No se creó una cuenta permanente.")
-    return render(request, "core/registro.html", {"formulario": formulario, "resultado": resultado, "titulo": "Crear cuenta"})
+    messages.info(request, "Las cuentas de acceso se crean desde la gestión de usuarios.")
+    return redirect("core:login")
 
 
+@login_required
 def salir(request):
-    if request.method == "POST":
-        request.session.pop("rol", None)
-        request.session.pop("nombre", None)
-        messages.success(request, "Sesión cerrada.")
-    return redirect("core:inicio")
+    if request.method != "POST":
+        return HttpResponseNotAllowed(["POST"])
+    logout(request)
+    return redirect("core:login")
 
 
+@login_required
 def cliente(request):
-    if not request.session.get("rol"):
-        return redirect("core:login")
     return render(request, "core/cliente.html", {"titulo": "Mi cuenta"})
 
 
@@ -156,12 +144,10 @@ def quitar_carrito(request, producto_id):
     return redirect("core:carrito")
 
 
+@login_required
 def confirmar(request):
     if request.method != "POST":
         return redirect("core:carrito")
-    if not request.session.get("rol"):
-        messages.info(request, "Para continuar debe iniciar sesión.")
-        return redirect("core:login")
     if not request.session.get("carrito"):
         messages.warning(request, "El carrito está vacío.")
         return redirect("core:carrito")
@@ -169,20 +155,291 @@ def confirmar(request):
     return render(request, "core/confirmacion.html", {"titulo": "Confirmación"})
 
 
-# Compatibilidad con los enlaces de la entrega anterior; el CRUD está en Admin.
+def errores_modelo(objeto):
+    """Las reglas del modelo también se validan cuando no se utiliza forms.py."""
+    try:
+        objeto.full_clean()
+    except ValidationError as error:
+        return error.message_dict
+    return {}
+
+
+@login_required
 def gestion(request):
-    return redirect("admin:index")
+    return render(request, "core/gestion.html", {"titulo": "Panel de administración",
+        "total_productos": Producto.objects.count(), "sin_stock": Producto.objects.filter(stock=0).count(),
+        "total_clientes": Cliente.objects.count(), "total_ventas": Boleta.objects.count()})
 
 
+@login_required
 def gestion_productos(request):
-    return redirect("admin:core_producto_changelist")
+    productos = Producto.objects.select_related("categoria", "marca").order_by("codigo")
+    busqueda = request.GET.get("q", "").strip()
+    categoria_id = request.GET.get("categoria", "")
+    if busqueda:
+        productos = productos.filter(nombre__icontains=busqueda)
+    if categoria_id.isdigit():
+        productos = productos.filter(categoria_id=categoria_id)
+    pagina = Paginator(productos, 25).get_page(request.GET.get("page"))
+    return render(request, "core/e3/productos.html", {"titulo": "Productos", "pagina": pagina,
+        "categorias": Categoria.objects.order_by("nombre"), "busqueda": busqueda, "categoria_actual": categoria_id})
 
 
+@login_required
 def producto_formulario(request, producto_id=None):
-    if producto_id is None:
-        return redirect("admin:core_producto_add")
-    return redirect("admin:core_producto_change", producto_id)
+    producto = get_object_or_404(Producto, pk=producto_id) if producto_id else Producto()
+    errores = {}
+    if request.method == "POST":
+        producto.codigo = request.POST.get("codigo", "").strip()
+        producto.nombre = request.POST.get("nombre", "").strip()
+        producto.descripcion = request.POST.get("descripcion", "").strip()
+        producto.precio = request.POST.get("precio", "")
+        producto.stock = request.POST.get("stock", "")
+        producto.categoria_id = request.POST.get("categoria") or None
+        producto.marca_id = request.POST.get("marca") or None
+        producto.proveedor_id = request.POST.get("proveedor") or None
+        producto.imagen = request.POST.get("imagen", "").strip()
+        producto.activo = request.POST.get("activo") == "on"
+        errores = errores_modelo(producto)
+        if not errores:
+            producto.save()
+            messages.success(request, "Producto guardado.")
+            return redirect("core:gestion_productos")
+    return render(request, "core/e3/producto_form.html", {"titulo": "Editar producto" if producto_id else "Nuevo producto",
+        "producto": producto, "datos": request.POST if request.method == "POST" else {}, "errores": errores,
+        "categorias": Categoria.objects.order_by("nombre"), "marcas": Marca.objects.order_by("nombre"),
+        "proveedores": Proveedor.objects.order_by("nombre")})
 
 
+@login_required
+def producto_eliminar(request, producto_id):
+    producto = get_object_or_404(Producto, pk=producto_id)
+    if request.method == "POST":
+        try:
+            producto.delete()
+            messages.success(request, "Producto eliminado.")
+        except ProtectedError:
+            messages.error(request, "El producto está utilizado en ventas o compras. Puede desactivarlo en lugar de borrarlo.")
+        return redirect("core:gestion_productos")
+    return render(request, "core/e3/confirmar_eliminacion.html", {"titulo": "Eliminar producto", "objeto": producto,
+        "volver": "core:gestion_productos"})
+
+
+@login_required
 def gestion_usuarios(request):
-    return redirect("admin:core_cliente_changelist")
+    if not request.user.is_staff:
+        return HttpResponseForbidden("Solo el administrador puede gestionar cuentas de acceso.")
+    usuarios = User.objects.order_by("username")
+    busqueda = request.GET.get("q", "").strip()
+    if busqueda:
+        usuarios = usuarios.filter(username__icontains=busqueda)
+    return render(request, "core/e3/usuarios.html", {"titulo": "Usuarios", "busqueda": busqueda,
+        "pagina": Paginator(usuarios, 25).get_page(request.GET.get("page"))})
+
+
+@login_required
+def usuario_formulario(request, usuario_id=None):
+    if not request.user.is_staff:
+        return HttpResponseForbidden("Solo el administrador puede gestionar cuentas de acceso.")
+    usuario = get_object_or_404(User, pk=usuario_id) if usuario_id else User()
+    errores = {}
+    if request.method == "POST":
+        usuario.username = request.POST.get("username", "").strip()
+        usuario.first_name = request.POST.get("first_name", "").strip()
+        usuario.last_name = request.POST.get("last_name", "").strip()
+        usuario.email = request.POST.get("email", "").strip().lower()
+        usuario.is_active = request.POST.get("is_active") == "on"
+        clave = request.POST.get("password", "")
+        if not usuario_id and not clave:
+            errores["password"] = ["La contraseña es obligatoria al crear una cuenta."]
+        if clave:
+            if clave != request.POST.get("confirmar", ""):
+                errores["password"] = ["Las contraseñas no coinciden."]
+            try:
+                validate_password(clave, usuario)
+            except ValidationError as error:
+                errores["password"] = error.messages
+            usuario.set_password(clave)
+        if usuario_id == request.user.pk and not usuario.is_active:
+            errores["is_active"] = ["No puede desactivar su propia cuenta mientras administra la tienda."]
+        errores.update(errores_modelo(usuario))
+        if not errores:
+            usuario.save()
+            if usuario.pk == request.user.pk and clave:
+                update_session_auth_hash(request, usuario)
+            messages.success(request, "Cuenta guardada. Las contraseñas se almacenan mediante el sistema de Django.")
+            return redirect("core:gestion_usuarios")
+    return render(request, "core/e3/usuario_form.html", {"titulo": "Editar usuario" if usuario_id else "Nuevo usuario",
+        "usuario": usuario, "errores": errores, "nuevo": usuario_id is None})
+
+
+@login_required
+def usuario_desactivar(request, usuario_id):
+    if not request.user.is_staff:
+        return HttpResponseForbidden("Solo el administrador puede gestionar cuentas de acceso.")
+    usuario = get_object_or_404(User, pk=usuario_id)
+    if request.method == "POST":
+        if usuario.pk == request.user.pk:
+            messages.error(request, "No puede desactivar su propia cuenta.")
+        else:
+            usuario.is_active = False
+            usuario.save(update_fields=["is_active"])
+            messages.success(request, "Cuenta desactivada; ya no puede iniciar sesión.")
+        return redirect("core:gestion_usuarios")
+    return render(request, "core/e3/confirmar_eliminacion.html", {"titulo": "Desactivar usuario", "objeto": usuario,
+        "volver": "core:gestion_usuarios", "desactivar": True})
+
+
+@login_required
+def gestion_categorias(request):
+    return render(request, "core/e3/categorias.html", {"titulo": "Categorías", "categorias": Categoria.objects.order_by("nombre")})
+
+
+@login_required
+def categoria_formulario(request, categoria_id=None):
+    categoria = get_object_or_404(Categoria, pk=categoria_id) if categoria_id else Categoria()
+    errores = {}
+    if request.method == "POST":
+        categoria.nombre = request.POST.get("nombre", "").strip()
+        categoria.slug = slugify(request.POST.get("slug", "").strip() or categoria.nombre)
+        categoria.descripcion = request.POST.get("descripcion", "").strip()
+        errores = errores_modelo(categoria)
+        if not errores:
+            categoria.save()
+            messages.success(request, "Categoría guardada.")
+            return redirect("core:gestion_categorias")
+    return render(request, "core/e3/categoria_form.html", {"titulo": "Editar categoría" if categoria_id else "Nueva categoría",
+        "categoria": categoria, "errores": errores})
+
+
+@login_required
+def categoria_eliminar(request, categoria_id):
+    categoria = get_object_or_404(Categoria, pk=categoria_id)
+    if request.method == "POST":
+        try:
+            categoria.delete()
+            messages.success(request, "Categoría eliminada.")
+        except ProtectedError:
+            messages.error(request, "La categoría tiene productos asociados y no puede eliminarse.")
+        return redirect("core:gestion_categorias")
+    return render(request, "core/e3/confirmar_eliminacion.html", {"titulo": "Eliminar categoría", "objeto": categoria,
+        "volver": "core:gestion_categorias"})
+
+
+@login_required
+def gestion_clientes(request):
+    clientes = Cliente.objects.order_by("nombre", "id")
+    busqueda = request.GET.get("q", "").strip()
+    if busqueda:
+        clientes = clientes.filter(nombre__icontains=busqueda)
+    return render(request, "core/e3/clientes.html", {"titulo": "Clientes", "busqueda": busqueda,
+        "pagina": Paginator(clientes, 25).get_page(request.GET.get("page"))})
+
+
+@login_required
+def cliente_formulario(request, cliente_id=None):
+    persona = get_object_or_404(Cliente, pk=cliente_id) if cliente_id else Cliente()
+    errores = {}
+    if request.method == "POST":
+        persona.nombre = request.POST.get("nombre", "").strip()
+        persona.correo = request.POST.get("correo", "").strip().lower()
+        persona.telefono = request.POST.get("telefono", "").strip()
+        persona.activo = request.POST.get("activo") == "on"
+        errores = errores_modelo(persona)
+        if not errores:
+            persona.save()
+            messages.success(request, "Cliente guardado.")
+            return redirect("core:gestion_clientes")
+    return render(request, "core/e3/cliente_form.html", {"titulo": "Editar cliente" if cliente_id else "Nuevo cliente",
+        "persona": persona, "errores": errores})
+
+
+@login_required
+def cliente_eliminar(request, cliente_id):
+    persona = get_object_or_404(Cliente, pk=cliente_id)
+    if request.method == "POST":
+        try:
+            persona.delete()
+            messages.success(request, "Cliente eliminado.")
+        except ProtectedError:
+            messages.error(request, "El cliente tiene ventas asociadas. Puede desactivarlo sin borrar su historial.")
+        return redirect("core:gestion_clientes")
+    return render(request, "core/e3/confirmar_eliminacion.html", {"titulo": "Eliminar cliente", "objeto": persona,
+        "volver": "core:gestion_clientes"})
+
+
+@login_required
+def gestion_ventas(request):
+    ventas = Boleta.objects.select_related("cliente", "sucursal").annotate(
+        total=Sum(F("detalleboleta__cantidad") * F("detalleboleta__precio_unitario"), default=0)
+    ).order_by("-fecha", "-numero")
+    return render(request, "core/e3/ventas.html", {"titulo": "Ventas",
+        "pagina": Paginator(ventas, 25).get_page(request.GET.get("page"))})
+
+
+@login_required
+def venta_formulario(request, venta_id=None):
+    venta = get_object_or_404(Boleta, pk=venta_id) if venta_id else Boleta(fecha=date.today())
+    errores = {}
+    if request.method == "POST":
+        venta.numero = request.POST.get("numero", "")
+        venta.fecha = request.POST.get("fecha", "")
+        venta.cliente_id = request.POST.get("cliente") or None
+        venta.sucursal_id = request.POST.get("sucursal") or None
+        errores = errores_modelo(venta)
+        if not errores:
+            venta.save()
+            messages.success(request, "Venta guardada. Puede incorporar sus productos en el detalle.")
+            return redirect("core:venta_detalle", venta_id=venta.pk)
+    return render(request, "core/e3/venta_form.html", {"titulo": "Editar venta" if venta_id else "Nueva venta", "venta": venta,
+        "errores": errores, "fecha_formulario": request.POST.get("fecha", "") if request.method == "POST" else venta.fecha.isoformat(),
+        "clientes": Cliente.objects.order_by("nombre"), "sucursales": Sucursal.objects.order_by("nombre")})
+
+
+@login_required
+def venta_detalle(request, venta_id):
+    venta = get_object_or_404(Boleta.objects.select_related("cliente", "sucursal"), pk=venta_id)
+    detalles = DetalleBoleta.objects.filter(boleta=venta).select_related("producto").order_by("id")
+    total = detalles.aggregate(total=Sum(F("cantidad") * F("precio_unitario"), default=0))["total"]
+    return render(request, "core/e3/venta_detalle.html", {"titulo": f"Venta {venta.numero}", "venta": venta,
+        "detalles": detalles, "total": total})
+
+
+@login_required
+def detalle_formulario(request, venta_id, detalle_id=None):
+    venta = get_object_or_404(Boleta, pk=venta_id)
+    detalle = get_object_or_404(DetalleBoleta, pk=detalle_id, boleta=venta) if detalle_id else DetalleBoleta(boleta=venta)
+    errores = {}
+    if request.method == "POST":
+        detalle.producto_id = request.POST.get("producto") or None
+        detalle.cantidad = request.POST.get("cantidad", "")
+        detalle.precio_unitario = request.POST.get("precio_unitario", "")
+        errores = errores_modelo(detalle)
+        if not errores:
+            detalle.save()
+            messages.success(request, "Detalle guardado con el precio histórico indicado.")
+            return redirect("core:venta_detalle", venta_id=venta.pk)
+    return render(request, "core/e3/detalle_form.html", {"titulo": "Editar detalle" if detalle_id else "Agregar producto a la venta",
+        "venta": venta, "detalle": detalle, "errores": errores, "productos": Producto.objects.order_by("nombre")})
+
+
+@login_required
+def detalle_eliminar(request, venta_id, detalle_id):
+    detalle = get_object_or_404(DetalleBoleta, pk=detalle_id, boleta_id=venta_id)
+    if request.method == "POST":
+        detalle.delete()
+        messages.success(request, "Detalle eliminado.")
+        return redirect("core:venta_detalle", venta_id=venta_id)
+    return render(request, "core/e3/confirmar_eliminacion.html", {"titulo": "Eliminar detalle", "objeto": detalle,
+        "venta_id": venta_id})
+
+
+@login_required
+def venta_eliminar(request, venta_id):
+    venta = get_object_or_404(Boleta, pk=venta_id)
+    if request.method == "POST":
+        venta.delete()
+        messages.success(request, "Venta y detalles eliminados. El cliente y los productos se conservaron.")
+        return redirect("core:gestion_ventas")
+    return render(request, "core/e3/confirmar_eliminacion.html", {"titulo": "Eliminar venta y sus detalles", "objeto": venta,
+        "volver": "core:gestion_ventas"})

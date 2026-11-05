@@ -8,11 +8,12 @@
   <link rel="icon" href="{% static 'img/favicon.svg' %}" type="image/svg+xml">
   <link rel="stylesheet" href="{% static 'vendor/bootstrap/bootstrap.min.css' %}">
   <link rel="stylesheet" href="{% static 'css/tienda.css' %}">
+  {% block estilos %}{% endblock %}
   <script src="{% static 'vendor/bootstrap/bootstrap.bundle.min.js' %}" defer></script>
   <script src="{% static 'js/tienda.js' %}" defer></script>
   <noscript><style>.navbar-collapse{display:block!important}.navbar-toggler{display:none}</style></noscript>
 </head>
-<body>
+<body class="{% block clase_body %}{% endblock %}">
   <a class="visually-hidden-focusable" href="#contenido">Saltar al contenido</a>
   <header class="site-header">
     <nav class="navbar navbar-expand-lg container" aria-label="Navegación principal">
@@ -25,8 +26,7 @@
           <a class="nav-link" href="{% url 'core:categorias' %}">Categorías</a>
           <a class="nav-link" href="{% url 'core:nosotros' %}">Nosotros</a>
           <a class="nav-link" href="{% url 'core:carrito' %}">Carrito</a>
-          {% if request.user.is_staff %}<a class="nav-link" href="{% url 'admin:index' %}">Panel de administración</a>{% endif %}
-          {% if request.session.rol %}<a class="nav-link" href="{% url 'core:cliente' %}">Mi cuenta</a>{% else %}<a class="nav-link" href="{% url 'core:login' %}">Iniciar sesión</a>{% endif %}
+          {% if request.user.is_authenticated %}<a class="nav-link" href="{% url 'core:gestion' %}">Panel de administración</a><a class="nav-link" href="{% url 'core:cliente' %}">Mi cuenta</a>{% else %}<a class="nav-link" href="{% url 'core:login' %}">Iniciar sesión</a>{% endif %}
         </div>
         <button class="tema ms-lg-3" type="button" id="cambiar-tema" aria-label="Cambiar a modo oscuro">◐</button>
       </div>
@@ -36,6 +36,6 @@
     {% for mensaje in messages %}<div class="alert {% if mensaje.tags == 'error' %}alert-danger{% else %}alert-{{ mensaje.tags }}{% endif %}" role="status">{{ mensaje }}</div>{% endfor %}
     {% block contenido %}{% endblock %}
   </main>
-  <footer class="site-footer"><div class="container d-flex flex-wrap justify-content-between gap-3 py-4"><span>SoundShop CL · Música, audio y tecnología</span><a href="{% url 'core:nosotros' %}">Sobre la tienda</a><a href="{% url 'admin:index' %}">Panel de administración</a></div></footer>
+  <footer class="site-footer"><div class="container d-flex flex-wrap justify-content-between gap-3 py-4"><span>SoundShop CL · Música, audio y tecnología</span><a href="{% url 'core:nosotros' %}">Sobre la tienda</a><a href="{% url 'core:gestion' %}">Panel de administración</a></div></footer>
 </body>
 </html>

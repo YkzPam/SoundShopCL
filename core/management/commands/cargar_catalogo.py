@@ -1,4 +1,4 @@
-"""Carga inicial sin sobrescribir registros ya editados en Admin."""
+"""Carga inicial sin sobrescribir registros ya editados en la tienda."""
 import json
 from decimal import Decimal
 from pathlib import Path

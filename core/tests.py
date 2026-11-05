@@ -1,495 +1,315 @@
-"""Pruebas de SQLite, modelos y operaciones del administrador de Django."""
-import json
+"""Pruebas funcionales de E3 sobre la base MySQL de pruebas de Django."""
+from datetime import date, timedelta
 from decimal import Decimal
-from io import StringIO
-from pathlib import Path
-from django.apps import apps
-from django.contrib import admin
 from django.contrib.auth.models import User
-from django.core.management import call_command
-from django.core.management.base import CommandError
 from django.db import connection
-from django.db.models.deletion import ProtectedError
-from django.test import SimpleTestCase, TestCase
+from django.test import Client, TestCase
 from django.urls import reverse
-from .templatetags.moneda import pesos
-from .models import (
-    Categoria, Cliente, Producto, Boleta, DetalleBoleta,
-    Proveedor, CompraProveedor, DetalleCompra,
-)
+from .models import Categoria, Marca, Proveedor, Sucursal, Cliente, Producto, Boleta, DetalleBoleta
 
 
-class Evaluacion2Tests(TestCase):
+class Evaluacion3Tests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.admin = User.objects.create_superuser('administracion', 'admin@example.test', 'Madera!Sonido9f2026')
+        cls.operador = User.objects.create_user('operador', password='Madera!Sonido9f2026')
+        cls.categoria = Categoria.objects.create(nombre='Instrumentos', slug='instrumentos')
+        cls.otra_categoria = Categoria.objects.create(nombre='Audio', slug='audio')
+        cls.marca = Marca.objects.create(nombre='Marca musical')
+        cls.proveedor = Proveedor.objects.create(nombre='Distribuidor', correo='proveedor@example.test')
+        cls.sucursal = Sucursal.objects.create(nombre='Centro', direccion='Calle 10', comuna='Santiago')
+        cls.ana = Cliente.objects.create(nombre='Ana', correo='ana@example.test')
+        cls.beto = Cliente.objects.create(nombre='Beto', correo='beto@example.test')
+        cls.sin_compras = Cliente.objects.create(nombre='Sin compras', correo='sin@example.test', activo=False)
+        cls.guitarra = Producto.objects.create(codigo='P1', nombre='Guitarra', descripcion='Guitarra musical', precio=100, stock=10, categoria=cls.categoria, marca=cls.marca, proveedor=cls.proveedor)
+        cls.audifonos = Producto.objects.create(codigo='P2', nombre='Audífonos', descripcion='Audio musical', precio=50, stock=3, categoria=cls.otra_categoria, marca=cls.marca, proveedor=cls.proveedor)
+        cls.inactivo = Producto.objects.create(codigo='P3', nombre='Piano', descripcion='Piano musical', precio=300, stock=0, activo=False, categoria=cls.categoria, marca=cls.marca, proveedor=cls.proveedor)
+        cls.sin_venta = Producto.objects.create(codigo='P4', nombre='Cable', descripcion='Cable musical', precio=25, stock=4, categoria=cls.otra_categoria, marca=cls.marca, proveedor=cls.proveedor)
+        cls.hoy = date.today()
+        cls.mes_anterior = cls.hoy.replace(day=1) - timedelta(days=1)
+        cls.anio_anterior = date(cls.hoy.year - 1, 1, 1)
+        cls.venta = Boleta.objects.create(numero=1, fecha=cls.hoy, cliente=cls.ana, sucursal=cls.sucursal)
+        cls.detalle = DetalleBoleta.objects.create(boleta=cls.venta, producto=cls.guitarra, cantidad=2, precio_unitario=80)
+        DetalleBoleta.objects.create(boleta=cls.venta, producto=cls.audifonos, cantidad=1, precio_unitario=50)
+        cls.segunda = Boleta.objects.create(numero=2, fecha=cls.hoy, cliente=cls.ana, sucursal=cls.sucursal)
+        DetalleBoleta.objects.create(boleta=cls.segunda, producto=cls.guitarra, cantidad=1, precio_unitario=90)
+        tercera = Boleta.objects.create(numero=3, fecha=cls.mes_anterior, cliente=cls.beto, sucursal=cls.sucursal)
+        DetalleBoleta.objects.create(boleta=tercera, producto=cls.audifonos, cantidad=4, precio_unitario=40)
+        cuarta = Boleta.objects.create(numero=4, fecha=cls.anio_anterior, cliente=cls.beto, sucursal=cls.sucursal)
+        DetalleBoleta.objects.create(boleta=cuarta, producto=cls.guitarra, cantidad=3, precio_unitario=70)
+
     def setUp(self):
-        call_command("cargar_catalogo", stdout=StringIO())
-        self.usuario = User.objects.create_superuser(
-            username="admin_tests", email="admin@example.test", password="SoloParaPruebas2026")
-        self.producto = Producto.objects.first()
-        self.client.force_login(self.usuario)
+        self.client.force_login(self.admin)
 
     def datos_producto(self):
-        return {
-            "codigo": "SS-TEST", "nombre": "Audífonos de prueba",
-            "descripcion": "Equipo ficticio para comprobar el administrador.",
-            "precio": "50000.00", "stock": "4", "activo": "on",
-            "categoria": str(self.producto.categoria_id),
-            "marca": str(self.producto.marca_id),
-            "proveedor": str(self.producto.proveedor_id), "imagen": "",
-        }
+        return {'codigo': 'NUEVO', 'nombre': 'Bajo nuevo', 'descripcion': 'Bajo para la tienda', 'precio': '20990.00', 'stock': '5', 'categoria': self.categoria.pk, 'marca': self.marca.pk, 'proveedor': self.proveedor.pk, 'activo': 'on', 'imagen': ''}
 
-    def datos_cliente(self):
-        return {
-            "nombre": "Cliente de prueba E2", "correo": "crud-cliente@example.test",
-            "telefono": "+56911112222", "activo": "on",
-        }
+    def test_mysql_y_tablas_heredadas(self):
+        self.assertEqual(connection.vendor, 'mysql')
+        tablas = connection.introspection.table_names()
+        self.assertEqual(len([t for t in tablas if t.startswith('core_')]), 10)
+        self.assertIn('auth_user', tablas)
 
-    def test_conexion_sqlite_y_diez_tablas(self):
-        self.assertEqual(connection.vendor, "sqlite")
-        tablas = [t for t in connection.introspection.table_names() if t.startswith("core_")]
-        self.assertEqual(len(tablas), 10)
-        with connection.cursor() as cursor:
-            cursor.execute("PRAGMA foreign_keys")
-            self.assertEqual(cursor.fetchone()[0], 1)
-
-    def test_diez_modelos_registrados_y_con_datos(self):
-        modelos = list(apps.get_app_config("core").get_models())
-        self.assertEqual(len(modelos), 10)
-        for modelo in modelos:
-            with self.subTest(modelo=modelo.__name__):
-                self.assertIn(modelo, admin.site._registry)
-                self.assertTrue(modelo.objects.exists())
-
-    def test_diez_migraciones_aplicadas_y_sin_cambios_pendientes(self):
-        ruta = Path(__file__).resolve().parent / "migrations"
-        self.assertEqual(len(list(ruta.glob("[0-9]*.py"))), 10)
-        with connection.cursor() as cursor:
-            cursor.execute("SELECT COUNT(*) FROM django_migrations WHERE app = 'core'")
-            self.assertEqual(cursor.fetchone()[0], 10)
-        call_command("makemigrations", "core", check=True, dry_run=True, stdout=StringIO())
-
-    def test_diagrama_corresponde_a_los_modelos(self):
-        ruta = Path(__file__).resolve().parents[1] / "docs" / "evaluacion-2" / "esquema.json"
-        with ruta.open(encoding="utf-8") as archivo:
-            esquema = json.load(archivo)
-        self.assertEqual(len(esquema), 10)
-        for tabla in esquema:
-            modelo = apps.get_model("core", tabla["modelo"])
-            self.assertEqual(tabla["tabla"], modelo._meta.db_table)
-            self.assertEqual(
-                [campo["columna"] for campo in tabla["campos"]],
-                [campo.column for campo in modelo._meta.fields],
-            )
-            for dato, campo in zip(tabla["campos"], modelo._meta.fields):
-                self.assertEqual(dato["tipo"], campo.db_type(connection))
-                self.assertEqual(dato["pk"], campo.primary_key)
-                destino = campo.related_model._meta.model_name if campo.is_relation else None
-                self.assertEqual(dato["fk"], destino)
-
-    def test_acceso_admin_y_listados(self):
-        self.assertContains(self.client.get(reverse("admin:index")), "SoundShop CL")
-        detalles_integrados = {
-            Boleta: DetalleBoleta,
-            CompraProveedor: DetalleCompra,
-        }
-        for modelo in apps.get_app_config("core").get_models():
-            ruta = reverse("admin:core_" + modelo._meta.model_name + "_changelist")
-            self.assertEqual(self.client.get(ruta).status_code, 200)
-            configuracion = admin.site._registry[modelo]
-            self.assertEqual(configuracion.autocomplete_fields, ())
-            ruta = reverse("admin:core_" + modelo._meta.model_name + "_add")
-            respuesta = self.client.get(ruta)
-            self.assertEqual(respuesta.status_code, 200)
-            self.assertNotContains(respuesta, 'class="admin-autocomplete"')
-            formularios = respuesta.context["inline_admin_formsets"]
-            if modelo in detalles_integrados:
-                self.assertEqual(len(formularios), 1)
-                self.assertEqual(formularios[0].opts.model, detalles_integrados[modelo])
-                self.assertEqual(formularios[0].opts.autocomplete_fields, ())
-            else:
-                self.assertEqual(configuracion.inlines, ())
-                self.assertEqual(formularios, [])
-
-        respuesta = self.client.get(reverse("admin:core_boleta_add"))
-        self.assertContains(respuesta, '<select name="cliente"')
-        respuesta = self.client.get(reverse("admin:core_detalleboleta_add"))
-        self.assertContains(respuesta, '<select name="boleta"')
-        self.assertContains(respuesta, '<select name="producto"')
-        respuesta = self.client.get(reverse("admin:core_compraproveedor_add"))
-        self.assertContains(respuesta, '<select name="proveedor"')
-        respuesta = self.client.get(reverse("admin:core_detallecompra_add"))
-        self.assertContains(respuesta, '<select name="compra"')
-        self.assertContains(respuesta, '<select name="producto"')
-
-        relaciones = (
-            ("boleta", "cliente", Cliente.objects.first()),
-            ("detalleboleta", "boleta", Boleta.objects.first()),
-            ("detalleboleta", "producto", self.producto),
-            ("detallecompra", "compra", CompraProveedor.objects.first()),
-            ("detallecompra", "producto", self.producto),
-        )
-        for nombre_modelo, campo, registro in relaciones:
-            respuesta = self.client.get(reverse("admin:core_" + nombre_modelo + "_add"))
-            self.assertContains(respuesta, '<select name="' + campo + '"')
-            self.assertContains(respuesta, f'<option value="{registro.pk}">{registro}</option>')
-
-    def test_invitado_no_entra_admin(self):
+    def test_todas_las_rutas_de_gestion_exigen_sesion(self):
         self.client.logout()
-        respuesta = self.client.get(reverse("admin:index"))
-        self.assertEqual(respuesta.status_code, 302)
-        self.assertIn("/admin/login/", respuesta.url)
+        rutas = [('gestion', []), ('gestion_productos', []), ('producto_nuevo', []), ('producto_editar', [self.guitarra.pk]), ('producto_eliminar', [self.guitarra.pk]), ('gestion_categorias', []), ('categoria_nueva', []), ('categoria_editar', [self.categoria.pk]), ('categoria_eliminar', [self.categoria.pk]), ('gestion_clientes', []), ('cliente_nuevo', []), ('cliente_editar', [self.ana.pk]), ('cliente_eliminar', [self.ana.pk]), ('gestion_ventas', []), ('venta_nueva', []), ('venta_editar', [self.venta.pk]), ('venta_detalle', [self.venta.pk]), ('venta_eliminar', [self.venta.pk]), ('detalle_nuevo', [self.venta.pk]), ('detalle_editar', [self.venta.pk, self.detalle.pk]), ('detalle_eliminar', [self.venta.pk, self.detalle.pk]), ('gestion_usuarios', []), ('usuario_nuevo', []), ('usuario_editar', [self.operador.pk]), ('usuario_desactivar', [self.operador.pk]), ('reportes', [])]
+        for nombre, args in rutas:
+            for metodo in ('get', 'post'):
+                with self.subTest(ruta=nombre, metodo=metodo):
+                    respuesta = getattr(self.client, metodo)(reverse('core:' + nombre, args=args))
+                    self.assertEqual(respuesta.status_code, 302)
+                    self.assertTrue(respuesta.url.startswith(reverse('core:login') + '?next='))
+        self.assertEqual(Producto.objects.count(), 4)
 
-    def test_cliente_sin_staff_no_entra_admin(self):
-        cliente = User.objects.create_user(username="sin_permisos", password="SoloTests2026")
-        self.client.force_login(cliente)
-        self.assertEqual(self.client.get(reverse("admin:index")).status_code, 302)
+    def test_login_y_logout_reales(self):
+        self.client.logout()
+        url = reverse('core:login')
+        self.assertContains(self.client.post(url, {'username': 'operador', 'password': 'incorrecta'}), 'no son correctos')
+        respuesta = self.client.post(url, {'username': 'operador', 'password': 'Madera!Sonido9f2026'})
+        self.assertRedirects(respuesta, reverse('core:gestion'))
+        self.assertEqual(self.client.get(reverse('core:salir')).status_code, 405)
+        self.client.post(reverse('core:salir'))
+        self.assertEqual(self.client.get(reverse('core:gestion')).status_code, 302)
+        self.operador.is_active = False
+        self.operador.save()
+        self.client.post(url, {'username': 'operador', 'password': 'Madera!Sonido9f2026'})
+        self.assertNotIn('_auth_user_id', self.client.session)
 
-    def test_crear_cliente_desde_admin(self):
-        respuesta = self.client.post(reverse("admin:core_cliente_add"), self.datos_cliente())
-        self.assertEqual(respuesta.status_code, 302)
-        nuevo = Cliente.objects.get(correo="crud-cliente@example.test")
-        self.assertEqual(nuevo.nombre, "Cliente de prueba E2")
-        self.assertEqual(nuevo.telefono, "+56911112222")
-        self.assertTrue(nuevo.activo)
+    def test_login_no_redirige_a_otro_sitio(self):
+        self.client.logout()
+        respuesta = self.client.post(reverse('core:login'), {'username': 'operador', 'password': 'Madera!Sonido9f2026', 'next': 'https://example.org/externo'})
+        self.assertEqual(respuesta.url, reverse('core:gestion'))
 
-    def test_consulta_busqueda_y_filtro_clientes_admin(self):
-        cliente = Cliente.objects.create(
-            nombre="Cliente consulta E2", correo="consulta-cliente@example.test",
-            telefono="", activo=False,
-        )
-        respuesta = self.client.get(reverse("admin:core_cliente_changelist"), {"q": cliente.correo})
-        self.assertContains(respuesta, cliente.nombre)
-        self.assertEqual(respuesta.context["cl"].result_count, 1)
-        respuesta = self.client.get(reverse("admin:core_cliente_changelist"), {"activo__exact": "0"})
-        self.assertContains(respuesta, cliente.nombre)
-        self.assertEqual(respuesta.context["cl"].result_count, 1)
+    def test_csrf_exigido_para_modificar(self):
+        navegador = Client(enforce_csrf_checks=True)
+        navegador.force_login(self.admin)
+        respuesta = navegador.post(reverse('core:producto_nuevo'), self.datos_producto())
+        self.assertEqual(respuesta.status_code, 403)
+        self.assertFalse(Producto.objects.filter(codigo='NUEVO').exists())
 
-    def test_modificar_cliente_desde_admin(self):
-        self.client.post(reverse("admin:core_cliente_add"), self.datos_cliente())
-        cliente = Cliente.objects.get(correo="crud-cliente@example.test")
-        datos = self.datos_cliente()
-        datos["nombre"] = "Cliente actualizado"
-        datos["telefono"] = "+56933334444"
-        del datos["activo"]
-        respuesta = self.client.post(reverse("admin:core_cliente_change", args=[cliente.id]), datos)
-        self.assertEqual(respuesta.status_code, 302)
-        cliente.refresh_from_db()
-        self.assertEqual(cliente.nombre, "Cliente actualizado")
-        self.assertEqual(cliente.telefono, "+56933334444")
-        self.assertFalse(cliente.activo)
-        self.assertContains(
-            self.client.get(reverse("admin:core_cliente_change", args=[cliente.id])),
-            "Cliente actualizado",
-        )
+    def test_pantallas_de_gestion_renderizan(self):
+        rutas = [('gestion', []), ('gestion_productos', []), ('producto_nuevo', []), ('producto_editar', [self.guitarra.pk]), ('producto_eliminar', [self.guitarra.pk]), ('gestion_categorias', []), ('categoria_nueva', []), ('categoria_editar', [self.categoria.pk]), ('gestion_clientes', []), ('cliente_nuevo', []), ('cliente_editar', [self.ana.pk]), ('gestion_ventas', []), ('venta_nueva', []), ('venta_editar', [self.venta.pk]), ('venta_detalle', [self.venta.pk]), ('venta_eliminar', [self.venta.pk]), ('detalle_nuevo', [self.venta.pk]), ('detalle_editar', [self.venta.pk, self.detalle.pk]), ('detalle_eliminar', [self.venta.pk, self.detalle.pk]), ('gestion_usuarios', []), ('usuario_nuevo', []), ('usuario_editar', [self.operador.pk]), ('usuario_desactivar', [self.operador.pk])]
+        for nombre, args in rutas:
+            with self.subTest(ruta=nombre):
+                self.assertEqual(self.client.get(reverse('core:' + nombre, args=args)).status_code, 200)
 
-    def test_eliminar_cliente_desde_admin(self):
-        antes = Cliente.objects.count()
-        self.client.post(reverse("admin:core_cliente_add"), self.datos_cliente())
-        cliente = Cliente.objects.get(correo="crud-cliente@example.test")
-        respuesta = self.client.post(reverse("admin:core_cliente_delete", args=[cliente.id]), {"post": "yes"})
-        self.assertEqual(respuesta.status_code, 302)
-        self.assertFalse(Cliente.objects.filter(correo="crud-cliente@example.test").exists())
-        self.assertEqual(Cliente.objects.count(), antes)
+    def test_tienda_conservada_y_admin_django_no_publicado(self):
+        self.client.logout()
+        for nombre in ('inicio', 'catalogo', 'categorias', 'nosotros', 'carrito', 'login'):
+            self.assertEqual(self.client.get(reverse('core:' + nombre)).status_code, 200)
+        self.assertEqual(self.client.get(reverse('core:detalle_producto', args=[self.guitarra.pk])).status_code, 200)
+        self.assertEqual(self.client.get('/admin/').status_code, 404)
 
-    def test_cliente_admin_rechaza_correo_invalido(self):
-        antes = Cliente.objects.count()
-        datos = self.datos_cliente()
-        datos["correo"] = "correo-sin-formato"
-        respuesta = self.client.post(reverse("admin:core_cliente_add"), datos)
-        self.assertEqual(respuesta.status_code, 200)
-        self.assertIn("correo", respuesta.context["adminform"].form.errors)
-        self.assertEqual(Cliente.objects.count(), antes)
-
-    def test_cliente_admin_rechaza_correo_duplicado(self):
-        antes = Cliente.objects.count()
-        existente = Cliente.objects.first()
-        datos = self.datos_cliente()
-        datos["correo"] = existente.correo
-        respuesta = self.client.post(reverse("admin:core_cliente_add"), datos)
-        self.assertEqual(respuesta.status_code, 200)
-        self.assertIn("correo", respuesta.context["adminform"].form.errors)
-        self.assertEqual(Cliente.objects.filter(correo=existente.correo).count(), 1)
-        self.assertEqual(Cliente.objects.count(), antes)
-
-    def test_admin_no_elimina_cliente_con_boleta(self):
-        boleta = Boleta.objects.first()
-        cliente = boleta.cliente
-        antes = Cliente.objects.count()
-        respuesta = self.client.post(reverse("admin:core_cliente_delete", args=[cliente.id]), {"post": "yes"})
-        self.assertEqual(respuesta.status_code, 200)
-        self.assertTrue(respuesta.context["protected"])
-        self.assertTrue(Cliente.objects.filter(id=cliente.id).exists())
-        self.assertTrue(Boleta.objects.filter(id=boleta.id).exists())
-        self.assertEqual(Cliente.objects.count(), antes)
-
-    def test_admin_elimina_boleta_y_detalles_sin_borrar_cliente_ni_productos(self):
-        boleta = Boleta.objects.first()
-        cliente_id = boleta.cliente_id
-        productos_antes = Producto.objects.count()
-        self.assertTrue(DetalleBoleta.objects.filter(boleta_id=boleta.id).exists())
-        respuesta = self.client.post(reverse("admin:core_boleta_delete", args=[boleta.id]), {"post": "yes"})
-        self.assertEqual(respuesta.status_code, 302)
-        self.assertFalse(Boleta.objects.filter(id=boleta.id).exists())
-        self.assertFalse(DetalleBoleta.objects.filter(boleta_id=boleta.id).exists())
-        self.assertTrue(Cliente.objects.filter(id=cliente_id).exists())
-        self.assertEqual(Producto.objects.count(), productos_antes)
-
-    def test_admin_no_elimina_proveedor_con_compra(self):
-        proveedor = Proveedor.objects.create(
-            nombre="Proveedor protegido E2", correo="proveedor-prueba@example.test",
-        )
-        compra = CompraProveedor.objects.create(
-            numero=2, proveedor=proveedor, sucursal=CompraProveedor.objects.first().sucursal,
-        )
-        respuesta = self.client.post(reverse("admin:core_proveedor_delete", args=[proveedor.id]), {"post": "yes"})
-        self.assertEqual(respuesta.status_code, 200)
-        self.assertTrue(respuesta.context["protected"])
-        self.assertTrue(Proveedor.objects.filter(id=proveedor.id).exists())
-        self.assertTrue(CompraProveedor.objects.filter(id=compra.id).exists())
-
-    def test_admin_elimina_compra_y_detalles_sin_borrar_proveedor_ni_productos(self):
-        compra = CompraProveedor.objects.first()
-        proveedor_id = compra.proveedor_id
-        productos_antes = Producto.objects.count()
-        self.assertTrue(DetalleCompra.objects.filter(compra_id=compra.id).exists())
-        respuesta = self.client.post(reverse("admin:core_compraproveedor_delete", args=[compra.id]), {"post": "yes"})
-        self.assertEqual(respuesta.status_code, 302)
-        self.assertFalse(CompraProveedor.objects.filter(id=compra.id).exists())
-        self.assertFalse(DetalleCompra.objects.filter(compra_id=compra.id).exists())
-        self.assertTrue(Proveedor.objects.filter(id=proveedor_id).exists())
-        self.assertEqual(Producto.objects.count(), productos_antes)
-
-    def test_crear_producto_desde_admin(self):
-        respuesta = self.client.post(reverse("admin:core_producto_add"), self.datos_producto())
-        self.assertEqual(respuesta.status_code, 302)
-        nuevo = Producto.objects.get(codigo="SS-TEST")
-        self.assertEqual(nuevo.stock, 4)
-        self.assertEqual(nuevo.nombre, "Audífonos de prueba")
-
-    def test_consulta_busqueda_y_filtro_admin(self):
-        respuesta = self.client.get(reverse("admin:core_producto_changelist"), {"q": self.producto.codigo})
-        self.assertContains(respuesta, self.producto.nombre)
-        self.assertEqual(respuesta.context["cl"].result_count, 1)
-        respuesta = self.client.get(reverse("admin:core_producto_changelist"), {"activo__exact": "0"})
-        self.assertEqual(respuesta.context["cl"].result_count, 0)
-
-    def test_modificar_producto_y_reflejar_en_tienda(self):
+    def test_producto_crud_y_catalogo(self):
         datos = self.datos_producto()
-        datos["codigo"] = self.producto.codigo
-        datos["nombre"] = "Nombre actualizado"
-        respuesta = self.client.post(reverse("admin:core_producto_change", args=[self.producto.id]), datos)
-        self.assertEqual(respuesta.status_code, 302)
-        self.producto.refresh_from_db()
-        self.assertEqual(self.producto.nombre, "Nombre actualizado")
-        self.assertContains(self.client.get(reverse("core:catalogo")), "Nombre actualizado")
+        self.assertEqual(self.client.post(reverse('core:producto_nuevo'), datos).status_code, 302)
+        producto = Producto.objects.get(codigo='NUEVO')
+        self.assertEqual(producto.precio, Decimal('20990'))
+        datos['nombre'] = 'Bajo editado'
+        datos['precio'] = '22990'
+        self.client.post(reverse('core:producto_editar', args=[producto.pk]), datos)
+        producto.refresh_from_db()
+        self.assertEqual(producto.nombre, 'Bajo editado')
+        self.assertContains(self.client.get(reverse('core:catalogo')), 'Bajo editado')
+        self.assertContains(self.client.get(reverse('core:gestion_productos'), {'q': 'Bajo editado'}), '22.990')
+        self.client.get(reverse('core:producto_eliminar', args=[producto.pk]))
+        self.assertTrue(Producto.objects.filter(pk=producto.pk).exists())
+        self.client.post(reverse('core:producto_eliminar', args=[producto.pk]))
+        self.assertFalse(Producto.objects.filter(pk=producto.pk).exists())
 
-    def test_eliminar_producto_desde_admin(self):
-        self.client.post(reverse("admin:core_producto_add"), self.datos_producto())
-        nuevo = Producto.objects.get(codigo="SS-TEST")
-        respuesta = self.client.post(reverse("admin:core_producto_delete", args=[nuevo.id]), {"post": "yes"})
-        self.assertEqual(respuesta.status_code, 302)
-        self.assertFalse(Producto.objects.filter(codigo="SS-TEST").exists())
+    def test_producto_rechaza_valores_invalidos(self):
+        for cambio in ({'precio': '-1'}, {'stock': '-1'}, {'codigo': 'P1'}, {'categoria': '999999'}, {'categoria': 'texto'}, {'precio': 'NaN'}, {'nombre': ''}):
+            datos = self.datos_producto()
+            datos.update(cambio)
+            with self.subTest(cambio=cambio):
+                respuesta = self.client.post(reverse('core:producto_nuevo'), datos)
+                self.assertEqual(respuesta.status_code, 200)
+                self.assertTrue(respuesta.context['errores'])
+        self.assertEqual(Producto.objects.count(), 4)
 
-    def test_validaciones_admin_precio_y_codigo(self):
+    def test_producto_vendido_protegido_y_desactivable(self):
+        self.client.post(reverse('core:producto_eliminar', args=[self.guitarra.pk]))
+        self.assertTrue(Producto.objects.filter(pk=self.guitarra.pk).exists())
         datos = self.datos_producto()
-        datos["precio"] = "-1"
-        respuesta = self.client.post(reverse("admin:core_producto_add"), datos)
-        self.assertEqual(respuesta.status_code, 200)
-        self.assertIn("precio", respuesta.context["adminform"].form.errors)
-        self.assertFalse(Producto.objects.filter(codigo="SS-TEST").exists())
-        datos["precio"] = "50000"
-        datos["codigo"] = self.producto.codigo
-        respuesta = self.client.post(reverse("admin:core_producto_add"), datos)
-        self.assertIn("codigo", respuesta.context["adminform"].form.errors)
+        datos.update(codigo='P1', nombre='Guitarra', activo='')
+        self.client.post(reverse('core:producto_editar', args=[self.guitarra.pk]), datos)
+        self.guitarra.refresh_from_db()
+        self.assertFalse(self.guitarra.activo)
+        self.assertEqual(self.client.get(reverse('core:detalle_producto', args=[self.guitarra.pk])).status_code, 404)
 
-    def test_producto_admin_acepta_precio_minimo_y_stock_cero(self):
-        datos = self.datos_producto()
-        datos["precio"] = "1.00"
-        datos["stock"] = "0"
-        respuesta = self.client.post(reverse("admin:core_producto_add"), datos)
-        self.assertEqual(respuesta.status_code, 302)
-        nuevo = Producto.objects.get(codigo="SS-TEST")
-        self.assertEqual(nuevo.precio, 1)
-        self.assertEqual(nuevo.stock, 0)
+    def test_categoria_crud_y_proteccion(self):
+        self.client.post(reverse('core:categoria_nueva'), {'nombre': 'Micrófonos', 'descripcion': 'Voces'})
+        categoria = Categoria.objects.get(slug='microfonos')
+        self.client.post(reverse('core:categoria_editar', args=[categoria.pk]), {'nombre': 'Estudio', 'slug': 'estudio', 'descripcion': 'Grabación'})
+        categoria.refresh_from_db()
+        self.assertEqual(categoria.nombre, 'Estudio')
+        self.client.post(reverse('core:categoria_eliminar', args=[categoria.pk]))
+        self.assertFalse(Categoria.objects.filter(pk=categoria.pk).exists())
+        self.client.post(reverse('core:categoria_eliminar', args=[self.categoria.pk]))
+        self.assertTrue(Categoria.objects.filter(pk=self.categoria.pk).exists())
 
-    def test_producto_admin_rechaza_precio_cero(self):
-        datos = self.datos_producto()
-        datos["precio"] = "0"
-        respuesta = self.client.post(reverse("admin:core_producto_add"), datos)
-        self.assertEqual(respuesta.status_code, 200)
-        self.assertIn("precio", respuesta.context["adminform"].form.errors)
-        self.assertFalse(Producto.objects.filter(codigo="SS-TEST").exists())
+    def test_cliente_crud_validacion_y_proteccion(self):
+        datos = {'nombre': 'Carla', 'correo': 'carla@example.test', 'telefono': '123', 'activo': 'on'}
+        self.client.post(reverse('core:cliente_nuevo'), datos)
+        persona = Cliente.objects.get(correo='carla@example.test')
+        datos['nombre'] = 'Carla editada'
+        self.client.post(reverse('core:cliente_editar', args=[persona.pk]), datos)
+        persona.refresh_from_db()
+        self.assertEqual(persona.nombre, 'Carla editada')
+        self.assertTrue(self.client.post(reverse('core:cliente_nuevo'), datos).context['errores'])
+        datos['correo'] = 'no-es-correo'
+        self.assertTrue(self.client.post(reverse('core:cliente_nuevo'), datos).context['errores'])
+        self.client.post(reverse('core:cliente_eliminar', args=[persona.pk]))
+        self.assertFalse(Cliente.objects.filter(pk=persona.pk).exists())
+        self.client.post(reverse('core:cliente_eliminar', args=[self.ana.pk]))
+        self.assertTrue(Cliente.objects.filter(pk=self.ana.pk).exists())
 
-    def test_producto_admin_rechaza_stock_negativo(self):
-        datos = self.datos_producto()
-        datos["stock"] = "-1"
-        respuesta = self.client.post(reverse("admin:core_producto_add"), datos)
-        self.assertEqual(respuesta.status_code, 200)
-        self.assertIn("stock", respuesta.context["adminform"].form.errors)
-        self.assertFalse(Producto.objects.filter(codigo="SS-TEST").exists())
-
-    def test_producto_admin_rechaza_stock_no_numerico(self):
-        datos = self.datos_producto()
-        datos["stock"] = "sin-stock"
-        respuesta = self.client.post(reverse("admin:core_producto_add"), datos)
-        self.assertEqual(respuesta.status_code, 200)
-        self.assertIn("stock", respuesta.context["adminform"].form.errors)
-        self.assertFalse(Producto.objects.filter(codigo="SS-TEST").exists())
-
-    def test_relaciones_y_precio_historico(self):
-        detalle = DetalleBoleta.objects.first()
-        historico = detalle.subtotal
-        detalle.producto.precio += 10000
-        detalle.producto.save()
+    def test_venta_y_detalles_crud(self):
+        datos = {'numero': '99', 'fecha': self.hoy.isoformat(), 'cliente': self.ana.pk, 'sucursal': self.sucursal.pk}
+        self.client.post(reverse('core:venta_nueva'), datos)
+        venta = Boleta.objects.get(numero=99)
+        datos['numero'] = '100'
+        self.client.post(reverse('core:venta_editar', args=[venta.pk]), datos)
+        venta.refresh_from_db()
+        self.assertEqual(venta.numero, 100)
+        linea = {'producto': self.guitarra.pk, 'cantidad': '2', 'precio_unitario': '20990'}
+        self.client.post(reverse('core:detalle_nuevo', args=[venta.pk]), linea)
+        detalle = DetalleBoleta.objects.get(boleta=venta)
+        self.assertEqual(detalle.subtotal, Decimal('41980'))
+        self.assertContains(self.client.get(reverse('core:venta_detalle', args=[venta.pk])), '41.980')
+        linea['cantidad'] = '3'
+        self.client.post(reverse('core:detalle_editar', args=[venta.pk, detalle.pk]), linea)
         detalle.refresh_from_db()
-        self.assertEqual(detalle.subtotal, historico)
-        self.assertIn(detalle.producto, detalle.boleta.productos.all())
-        with self.assertRaises(ProtectedError):
-            detalle.producto.delete()
+        self.assertEqual(detalle.cantidad, 3)
+        self.client.post(reverse('core:detalle_eliminar', args=[venta.pk, detalle.pk]))
+        self.assertFalse(DetalleBoleta.objects.filter(pk=detalle.pk).exists())
+        self.client.post(reverse('core:detalle_nuevo', args=[venta.pk]), linea)
+        self.client.post(reverse('core:venta_eliminar', args=[venta.pk]))
+        self.assertFalse(Boleta.objects.filter(pk=venta.pk).exists())
+        self.assertFalse(DetalleBoleta.objects.filter(boleta_id=venta.pk).exists())
+        self.assertTrue(Producto.objects.filter(pk=self.guitarra.pk).exists())
 
-    def test_seed_no_duplica_ni_sobrescribe(self):
-        self.producto.nombre = "Edición conservada"
-        self.producto.save()
-        call_command("cargar_catalogo", stdout=StringIO())
-        self.producto.refresh_from_db()
-        self.assertEqual(self.producto.nombre, "Edición conservada")
-        self.assertEqual(Producto.objects.count(), 10)
-        self.assertEqual(Categoria.objects.count(), 5)
+    def test_venta_y_detalle_invalidos_no_se_guardan(self):
+        respuesta = self.client.post(reverse('core:venta_nueva'), {'numero': '1', 'fecha': 'incorrecta', 'cliente': '999999', 'sucursal': ''})
+        self.assertTrue(respuesta.context['errores'])
+        for cambio in ({'cantidad': '0'}, {'precio_unitario': '-1'}, {'producto': '999999'}, {'producto': self.guitarra.pk}):
+            datos = {'producto': self.sin_venta.pk, 'cantidad': '2', 'precio_unitario': '10'}
+            datos.update(cambio)
+            respuesta = self.client.post(reverse('core:detalle_nuevo', args=[self.venta.pk]), datos)
+            self.assertTrue(respuesta.context['errores'])
+        self.assertEqual(Boleta.objects.count(), 4)
+        self.assertEqual(DetalleBoleta.objects.count(), 5)
+        self.assertEqual(self.client.get(reverse('core:detalle_editar', args=[self.segunda.pk, self.detalle.pk])).status_code, 404)
 
-    def test_catalogo_repetido_no_duplica_los_diez_modelos(self):
-        modelos = list(apps.get_app_config("core").get_models())
-        antes = {}
-        for modelo in modelos:
-            antes[modelo.__name__] = modelo.objects.count()
-        call_command("cargar_catalogo", stdout=StringIO())
-        for modelo in modelos:
-            self.assertEqual(modelo.objects.count(), antes[modelo.__name__], modelo.__name__)
+    def test_precios_historicos_no_cambian_con_catalogo(self):
+        self.guitarra.precio = 99999
+        self.guitarra.save()
+        self.detalle.refresh_from_db()
+        self.assertEqual(self.detalle.precio_unitario, Decimal('80'))
+        respuesta = self.client.get(reverse('core:reportes'), {'reporte': 10, 'fecha': self.hoy.isoformat()})
+        self.assertEqual(list(respuesta.context['filas'])[0][1], Decimal('300'))
 
-    def test_catalogo_conserva_datos_editados_del_cliente(self):
-        cliente = Cliente.objects.first()
-        cliente.nombre = "Cliente conservado"
-        cliente.telefono = "+56900001111"
-        cliente.activo = False
-        cliente.save()
-        call_command("cargar_catalogo", stdout=StringIO())
-        cliente.refresh_from_db()
-        self.assertEqual(cliente.nombre, "Cliente conservado")
-        self.assertEqual(cliente.telefono, "+56900001111")
-        self.assertFalse(cliente.activo)
+    def test_operador_no_administra_usuarios(self):
+        self.client.force_login(self.operador)
+        for nombre, args in [('gestion_usuarios', []), ('usuario_nuevo', []), ('usuario_editar', [self.admin.pk]), ('usuario_desactivar', [self.admin.pk])]:
+            for metodo in ('get', 'post'):
+                self.assertEqual(getattr(self.client, metodo)(reverse('core:' + nombre, args=args)).status_code, 403)
 
-    def test_catalogo_conserva_precio_stock_y_estado_del_producto(self):
-        self.producto.precio = 64990
-        self.producto.stock = 0
-        self.producto.activo = False
-        self.producto.save()
-        call_command("cargar_catalogo", stdout=StringIO())
-        self.producto.refresh_from_db()
-        self.assertEqual(self.producto.precio, 64990)
-        self.assertEqual(self.producto.stock, 0)
-        self.assertFalse(self.producto.activo)
+    def test_usuario_creacion_edicion_desactivacion(self):
+        datos = {'username': 'nuevo_usuario', 'email': 'nuevo@example.test', 'first_name': 'Camila', 'last_name': 'Lagos', 'password': 'Cedro!Musica7z2026', 'confirmar': 'Cedro!Musica7z2026', 'is_active': 'on', 'is_staff': 'on', 'is_superuser': 'on'}
+        respuesta = self.client.post(reverse('core:usuario_nuevo'), datos)
+        self.assertEqual(respuesta.status_code, 302)
+        cuenta = User.objects.get(username='nuevo_usuario')
+        self.assertTrue(cuenta.check_password(datos['password']))
+        self.assertNotEqual(cuenta.password, datos['password'])
+        self.assertFalse(cuenta.is_staff)
+        self.assertFalse(cuenta.is_superuser)
+        datos.update(first_name='Camila editada', password='', confirmar='')
+        self.client.post(reverse('core:usuario_editar', args=[cuenta.pk]), datos)
+        cuenta.refresh_from_db()
+        self.assertEqual(cuenta.first_name, 'Camila editada')
+        self.assertTrue(cuenta.check_password('Cedro!Musica7z2026'))
+        self.client.post(reverse('core:usuario_desactivar', args=[cuenta.pk]))
+        cuenta.refresh_from_db()
+        self.assertFalse(cuenta.is_active)
 
-    def test_faker_almacena_cantidad(self):
-        antes = Cliente.objects.count()
-        salida = StringIO()
-        call_command("generar_clientes", cantidad=12, stdout=salida)
-        self.assertEqual(Cliente.objects.count() - antes, 12)
-        self.assertIn(f"archivo SQLite: {connection.settings_dict['NAME']}", salida.getvalue())
-        self.assertIn("VERIFICADO", salida.getvalue())
+    def test_usuario_contrasena_invalida_y_autodesactivacion(self):
+        datos = {'username': 'otra_cuenta', 'password': '123', 'confirmar': 'diferente', 'is_active': 'on'}
+        respuesta = self.client.post(reverse('core:usuario_nuevo'), datos)
+        self.assertTrue(respuesta.context['errores'])
+        self.assertFalse(User.objects.filter(username='otra_cuenta').exists())
+        self.client.post(reverse('core:usuario_desactivar', args=[self.admin.pk]))
+        self.admin.refresh_from_db()
+        self.assertTrue(self.admin.is_active)
 
-    def test_faker_rechaza_cantidad_invalida(self):
-        antes = Cliente.objects.count()
-        with self.assertRaises(CommandError):
-            call_command("generar_clientes", cantidad=0, stdout=StringIO())
-        self.assertEqual(Cliente.objects.count(), antes)
+    def test_cambio_de_contrasena_propia_conserva_sesion(self):
+        datos = {'username': self.admin.username, 'email': self.admin.email, 'password': 'Pino!Frecuencia7z2026', 'confirmar': 'Pino!Frecuencia7z2026', 'is_active': 'on'}
+        self.client.post(reverse('core:usuario_editar', args=[self.admin.pk]), datos)
+        self.admin.refresh_from_db()
+        self.assertTrue(self.admin.check_password(datos['password']))
+        self.assertEqual(self.client.get(reverse('core:gestion')).status_code, 200)
 
-    def test_faker_rechaza_cantidad_negativa(self):
-        antes = Cliente.objects.count()
-        with self.assertRaises(CommandError):
-            call_command("generar_clientes", cantidad=-1, stdout=StringIO())
-        self.assertEqual(Cliente.objects.count(), antes)
+    def test_veinte_reportes_con_resultados_conocidos(self):
+        filtros = {2: {'categoria': self.categoria.pk}, 3: {'minimo': 50, 'maximo': 100}, 6: {'cliente': self.ana.pk}, 7: {'cliente': self.ana.pk, 'venta': self.venta.pk}, 8: {'desde': self.hoy.isoformat(), 'hasta': self.hoy.isoformat()}, 10: {'fecha': self.hoy.isoformat()}, 18: {'anio': self.hoy.year}, 19: {'anio': self.hoy.year}}
+        por_mes = {self.hoy.month: Decimal('300')}
+        if self.mes_anterior.year == self.hoy.year:
+            por_mes[self.mes_anterior.month] = Decimal('160')
+        esperados = {
+            1: [('P1', 'Guitarra', Decimal('100'), 10), ('P2', 'Audífonos', Decimal('50'), 3), ('P4', 'Cable', Decimal('25'), 4)],
+            2: [('P1', 'Guitarra', 'Instrumentos', 10), ('P3', 'Piano', 'Instrumentos', 0)],
+            3: [('P2', 'Audífonos', Decimal('50')), ('P1', 'Guitarra', Decimal('100'))],
+            4: [('P3', 'Piano', Decimal('300')), ('P1', 'Guitarra', Decimal('100')), ('P2', 'Audífonos', Decimal('50')), ('P4', 'Cable', Decimal('25'))],
+            5: [(3,)], 6: [(2, self.hoy, 'Ana', Decimal('90')), (1, self.hoy, 'Ana', Decimal('210'))],
+            7: [('Guitarra', 2, Decimal('80'), Decimal('160')), ('Audífonos', 1, Decimal('50'), Decimal('50'))],
+            8: [(self.hoy, self.hoy, 2)], 9: [('P3', 'Piano', 0), ('P2', 'Audífonos', 3), ('P4', 'Cable', 4)],
+            10: [(self.hoy, Decimal('300'))], 11: [('P1', 'Guitarra', 6), ('P2', 'Audífonos', 5)],
+            12: [('Ana', 'ana@example.test', 2), ('Beto', 'beto@example.test', 2)],
+            13: [('Beto', 'beto@example.test', Decimal('370')), ('Ana', 'ana@example.test', Decimal('300')), ('Sin compras', 'sin@example.test', Decimal('0'))],
+            14: [('P3', 'Piano', 0), ('P4', 'Cable', 4)], 15: [(Decimal('167.5'),)], 16: [('Instrumentos', Decimal('460'))],
+            17: [('P1', 'Guitarra', 0), ('P2', 'Audífonos', 4), ('P3', 'Piano', 0), ('P4', 'Cable', 0)],
+            18: [('Ana', 'ana@example.test', Decimal('300'))], 19: sorted(por_mes.items()),
+            20: [('P1', 'Guitarra', Decimal('460')), ('P2', 'Audífonos', Decimal('210'))],
+        }
+        for numero in range(1, 21):
+            with self.subTest(reporte=numero):
+                parametros = {'reporte': numero}
+                parametros.update(filtros.get(numero, {}))
+                respuesta = self.client.get(reverse('core:reportes'), parametros)
+                self.assertEqual(respuesta.status_code, 200)
+                self.assertFalse(respuesta.context['error'])
+                self.assertEqual(list(respuesta.context['filas']), esperados[numero])
 
-    def test_faker_rechaza_cantidad_sobre_el_maximo(self):
-        antes = Cliente.objects.count()
-        with self.assertRaises(CommandError):
-            call_command("generar_clientes", cantidad=1_000_001, stdout=StringIO())
-        self.assertEqual(Cliente.objects.count(), antes)
+    def test_reportes_rechazan_filtros_invalidos(self):
+        for parametros in ({'reporte': 2, 'categoria': '999999'}, {'reporte': 3, 'minimo': 'NaN', 'maximo': '100'}, {'reporte': 3, 'minimo': '200', 'maximo': '100'}, {'reporte': 7, 'cliente': self.beto.pk, 'venta': self.venta.pk}, {'reporte': 8, 'desde': '2026-02-10', 'hasta': '2026-01-01'}, {'reporte': 10, 'fecha': 'sin-fecha'}, {'reporte': 18, 'anio': '10000'}):
+            with self.subTest(parametros=parametros):
+                respuesta = self.client.get(reverse('core:reportes'), parametros)
+                self.assertEqual(respuesta.status_code, 200)
+                self.assertTrue(respuesta.context['error'])
+        self.assertEqual(self.client.get(reverse('core:reportes'), {'reporte': 21}).status_code, 400)
 
-    def test_paginas_y_enlaces_anteriores(self):
-        for nombre in ("inicio", "catalogo", "categorias", "nosotros", "login", "registro", "carrito"):
-            self.assertEqual(self.client.get(reverse("core:" + nombre)).status_code, 200)
-        self.assertRedirects(self.client.get(reverse("core:gestion")), reverse("admin:index"))
-        self.assertRedirects(self.client.get(reverse("core:login_admin")), reverse("admin:index"))
+    def test_reportes_sin_ventas(self):
+        Boleta.objects.all().delete()
+        for numero in (6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20):
+            with self.subTest(reporte=numero):
+                respuesta = self.client.get(reverse('core:reportes'), {'reporte': numero, 'cliente': self.ana.pk})
+                self.assertEqual(respuesta.status_code, 200)
+        respuesta = self.client.get(reverse('core:reportes'), {'reporte': 15})
+        self.assertEqual(list(respuesta.context['filas']), [(Decimal('0'),)])
 
-    def test_precio_admin_con_puntos_y_formulario_numerico(self):
-        self.producto.precio = Decimal("20990.00")
-        self.producto.save()
-        respuesta = self.client.get(reverse("admin:core_producto_changelist"))
-        self.assertContains(respuesta, "20.990")
-        configuracion = admin.site._registry[Producto]
-        self.assertEqual(configuracion.precio_pesos.admin_order_field, "precio")
-        respuesta = self.client.get(reverse("admin:core_producto_change", args=[self.producto.id]))
-        self.assertEqual(respuesta.context["adminform"].form["precio"].value(), Decimal("20990.00"))
-        self.producto.refresh_from_db()
-        self.assertEqual(self.producto.precio, Decimal("20990.00"))
+    def test_paginacion_conserva_filtros(self):
+        for numero in range(30):
+            Cliente.objects.create(nombre='Cliente paginado', correo=f'paginado{numero}@example.test')
+        respuesta = self.client.get(reverse('core:gestion_clientes'), {'q': 'paginado'})
+        self.assertEqual(len(respuesta.context['pagina']), 25)
+        self.assertContains(respuesta, 'q=paginado&amp;page=2')
+        respuesta = self.client.get(reverse('core:gestion_clientes'), {'q': 'paginado', 'page': 2})
+        self.assertEqual(len(respuesta.context['pagina']), 5)
+        respuesta = self.client.get(reverse('core:reportes'), {'reporte': 13, 'page': 2})
+        self.assertEqual(respuesta.status_code, 200)
+        self.assertContains(respuesta, 'reporte=13&amp;page=1')
 
-    def test_ficha_muestra_precio_stock_detalles_y_formulario_actual(self):
-        self.producto.precio = Decimal("20990.00")
-        self.producto.stock = 3
-        self.producto.save()
-        respuesta = self.client.get(reverse("core:detalle_producto", args=[self.producto.id]))
-        self.assertContains(respuesta, self.producto.nombre)
-        self.assertContains(respuesta, "$20.990")
-        self.assertContains(respuesta, "3 unidades en stock")
-        self.assertContains(respuesta, "<details>", count=2)
-        self.assertContains(respuesta, "csrfmiddlewaretoken")
-        self.assertContains(
-            respuesta,
-            'action="' + reverse("core:agregar_carrito", args=[self.producto.id]) + '" method="post"',
-        )
-
-    def test_ficha_sin_stock_no_ofrece_agregar_al_carrito(self):
-        self.producto.stock = 0
-        self.producto.save()
-        respuesta = self.client.get(reverse("core:detalle_producto", args=[self.producto.id]))
-        self.assertContains(respuesta, "Producto agotado")
-        self.assertContains(respuesta, 'type="button" disabled')
-        self.assertNotContains(respuesta, 'action="' + reverse("core:agregar_carrito", args=[self.producto.id]) + '"')
-
-    def test_carrito_invitado_conserva_limite_stock_y_calculos(self):
-        self.client.logout()
-        self.producto.precio = Decimal("20990.00")
-        self.producto.stock = 1
-        self.producto.save()
-        ruta = reverse("core:agregar_carrito", args=[self.producto.id])
-        self.assertRedirects(self.client.post(ruta), reverse("core:carrito"))
-        self.assertRedirects(self.client.post(ruta), reverse("core:carrito"))
-        self.assertEqual(self.client.session["carrito"][str(self.producto.id)], 1)
-        respuesta = self.client.get(reverse("core:carrito"))
-        self.assertEqual(respuesta.context["total"], Decimal("20990.00"))
-        self.assertContains(respuesta, "$20.990")
-        self.producto.refresh_from_db()
-        self.assertEqual(self.producto.stock, 1)
-        self.assertEqual(self.producto.precio, Decimal("20990.00"))
-
-    def test_inicio_conserva_seleccion_y_accesos(self):
-        respuesta = self.client.get(reverse("core:inicio"))
-        self.assertContains(respuesta, 'id="inicio-titulo"')
-        self.assertContains(respuesta, "El sonido")
-        self.assertEqual(len(respuesta.context["productos"]), 4)
-        for nombre in ("catalogo", "categorias", "nosotros"):
-            self.assertContains(respuesta, 'href="' + reverse("core:" + nombre) + '"')
-
-    def test_nosotros_presenta_tienda_y_enlaces_existentes(self):
-        respuesta = self.client.get(reverse("core:nosotros"))
-        self.assertContains(respuesta, 'id="nosotros-titulo"')
-        self.assertContains(respuesta, "tienda digital")
-        self.assertContains(respuesta, "portada-astra-panorama.webp")
-        self.assertContains(respuesta, 'href="' + reverse("core:catalogo") + '"')
-        self.assertContains(respuesta, 'href="' + reverse("core:categorias") + '"')
-
-
-class FormatoMonedaTests(SimpleTestCase):
-    def test_pesos_con_puntos_y_decimales_sin_alterar_valores(self):
-        self.assertEqual(pesos(Decimal("20990.00")), "20.990")
-        self.assertEqual(pesos(Decimal("1000000.00")), "1.000.000")
-        self.assertEqual(pesos(Decimal("20990.50")), "20.990,50")
-        self.assertEqual(pesos(0), "0")
+    def test_fecha_valida_se_conserva_si_otro_campo_falla(self):
+        datos = {'numero': 1, 'fecha': '2026-09-15', 'cliente': self.ana.pk, 'sucursal': self.sucursal.pk}
+        respuesta = self.client.post(reverse('core:venta_nueva'), datos)
+        self.assertTrue(respuesta.context['errores'])
+        self.assertContains(respuesta, 'value="2026-09-15"')

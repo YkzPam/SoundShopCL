@@ -1,0 +1,7 @@
+{% extends 'core/e3/base_gestion.html' %}
+{% block gestion %}
+<section class="acceso"><h1>{{ titulo }}</h1><p>{{ objeto }}</p>
+{% if desactivar %}<p>La cuenta se conservará, pero no podrá iniciar sesión.</p>{% else %}<p>La operación se realizará solamente al confirmar este formulario.</p>{% endif %}
+<form method="post">{% csrf_token %}<button class="btn btn-danger">{% if desactivar %}Desactivar{% else %}Confirmar eliminación{% endif %}</button>
+{% if venta_id %}<a class="btn btn-outline-primary" href="{% url 'core:venta_detalle' venta_id %}">Cancelar</a>{% else %}<a class="btn btn-outline-primary" href="{% url volver %}">Cancelar</a>{% endif %}
+</form></section>{% endblock %}

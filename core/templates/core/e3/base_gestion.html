@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block estilos %}<link rel="stylesheet" href="{% static 'css/gestion.css' %}">{% endblock %}
+{% block clase_body %}panel-administrativo{% endblock %}
+{% block contenido %}
+<div class="gestion-layout">
+  {% include 'core/admin_menu.html' %}
+  <div class="gestion-contenido">{% block gestion %}{% endblock %}</div>
+</div>
+{% endblock %}

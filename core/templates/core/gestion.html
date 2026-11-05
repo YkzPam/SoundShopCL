@@ -1,6 +1,12 @@
-{% extends 'base.html' %}
-{% block contenido %}
-{% include 'core/admin_menu.html' %}
-<div class="cabecera"><p class="eyebrow">SoundShop CL / Administración</p><h1>Panel de administración</h1><p>Revisa los productos y usuarios de la tienda desde este panel.</p></div>
-<div class="row g-4"><div class="col-md-6"><section class="franja"><p class="eyebrow">{{ total_productos }} productos · {{ sin_stock }} sin stock</p><h2>Productos</h2><p>Revisar el catálogo y validar una ficha nueva o modificada.</p><a class="btn btn-primary" href="{% url 'core:gestion_productos' %}">Administrar productos</a></section></div><div class="col-md-6"><section class="franja"><p class="eyebrow">{{ total_usuarios }} usuarios</p><h2>Usuarios</h2><p>Revisar los roles y validar los datos de un usuario.</p><a class="btn btn-outline-primary" href="{% url 'core:gestion_usuarios' %}">Administrar usuarios</a></section></div></div>
+{% extends 'core/e3/base_gestion.html' %}
+{% block gestion %}
+
+<div class="gestion-entrada"><div><p class="eyebrow">SoundShop CL / Administración</p><h1>Todo en su lugar.</h1><p>El catálogo, los clientes y las ventas de la tienda, en un mismo espacio.</p></div><span class="gestion-sello" aria-hidden="true">s.</span></div>
+<div class="gestion-metricas">
+<section class="gestion-metrica"><span>Productos en catálogo</span><strong>{{ total_productos }}</strong><a href="{% url 'core:gestion_productos' %}">Ver productos ↗</a></section>
+<section class="gestion-metrica"><span>Clientes registrados</span><strong>{{ total_clientes }}</strong><a href="{% url 'core:gestion_clientes' %}">Ver clientes ↗</a></section>
+<section class="gestion-metrica"><span>Ventas registradas</span><strong>{{ total_ventas }}</strong><a href="{% url 'core:gestion_ventas' %}">Ver ventas ↗</a></section>
+</div>
+<div class="row g-4"><div class="col-md-7"><section class="franja"><p class="eyebrow">El movimiento de la tienda</p><h2>Los datos también suenan.</h2><p class="small">Consultar productos más vendidos, ingresos y compras de cada cliente.</p><a class="btn btn-primary" href="{% url 'core:reportes' %}">Explorar reportes ↗</a></section></div>
+<div class="col-md-5"><section class="franja"><p class="eyebrow">Catálogo al día</p><h2>{{ sin_stock }} sin stock</h2><p class="small">Revisar precios, existencias y productos activos antes de seguir vendiendo.</p><a class="btn btn-outline-primary" href="{% url 'core:gestion_productos' %}">Actualizar catálogo</a></section></div></div>
 {% endblock %}

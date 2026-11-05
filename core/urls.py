@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views
+from . import views, reportes
 
 app_name = "core"
 urlpatterns = [
@@ -21,5 +21,26 @@ urlpatterns = [
     path("gestion/productos/", views.gestion_productos, name="gestion_productos"),
     path("gestion/productos/nuevo/", views.producto_formulario, name="producto_nuevo"),
     path("gestion/productos/<int:producto_id>/", views.producto_formulario, name="producto_editar"),
+    path("gestion/productos/<int:producto_id>/eliminar/", views.producto_eliminar, name="producto_eliminar"),
     path("gestion/usuarios/", views.gestion_usuarios, name="gestion_usuarios"),
+    path("gestion/usuarios/nuevo/", views.usuario_formulario, name="usuario_nuevo"),
+    path("gestion/usuarios/<int:usuario_id>/editar/", views.usuario_formulario, name="usuario_editar"),
+    path("gestion/usuarios/<int:usuario_id>/desactivar/", views.usuario_desactivar, name="usuario_desactivar"),
+    path("gestion/categorias/", views.gestion_categorias, name="gestion_categorias"),
+    path("gestion/categorias/nueva/", views.categoria_formulario, name="categoria_nueva"),
+    path("gestion/categorias/<int:categoria_id>/editar/", views.categoria_formulario, name="categoria_editar"),
+    path("gestion/categorias/<int:categoria_id>/eliminar/", views.categoria_eliminar, name="categoria_eliminar"),
+    path("gestion/clientes/", views.gestion_clientes, name="gestion_clientes"),
+    path("gestion/clientes/nuevo/", views.cliente_formulario, name="cliente_nuevo"),
+    path("gestion/clientes/<int:cliente_id>/editar/", views.cliente_formulario, name="cliente_editar"),
+    path("gestion/clientes/<int:cliente_id>/eliminar/", views.cliente_eliminar, name="cliente_eliminar"),
+    path("gestion/ventas/", views.gestion_ventas, name="gestion_ventas"),
+    path("gestion/ventas/nueva/", views.venta_formulario, name="venta_nueva"),
+    path("gestion/ventas/<int:venta_id>/", views.venta_detalle, name="venta_detalle"),
+    path("gestion/ventas/<int:venta_id>/editar/", views.venta_formulario, name="venta_editar"),
+    path("gestion/ventas/<int:venta_id>/eliminar/", views.venta_eliminar, name="venta_eliminar"),
+    path("gestion/ventas/<int:venta_id>/productos/agregar/", views.detalle_formulario, name="detalle_nuevo"),
+    path("gestion/ventas/<int:venta_id>/productos/<int:detalle_id>/editar/", views.detalle_formulario, name="detalle_editar"),
+    path("gestion/ventas/<int:venta_id>/productos/<int:detalle_id>/eliminar/", views.detalle_eliminar, name="detalle_eliminar"),
+    path("gestion/reportes/", reportes.reportes, name="reportes"),
 ]

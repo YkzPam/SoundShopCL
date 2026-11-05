@@ -1,4 +1,4 @@
-"""Configuración local de SoundShop CL con SQLite."""
+"""Evaluación 3: tienda, sesiones de Django y MySQL local."""
 import os
 import secrets
 from pathlib import Path
@@ -11,7 +11,6 @@ DEBUG = True
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "testserver"]
 
 INSTALLED_APPS = [
-    "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -46,10 +45,18 @@ TEMPLATES = [
 WSGI_APPLICATION = "soundshop.wsgi.application"
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / os.environ.get("SOUNDSHOP_DB", "db.sqlite3"),
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": os.environ.get("MYSQL_DATABASE", "soundshop_e3"),
+        "USER": os.environ.get("MYSQL_USER", "root"),
+        "PASSWORD": os.environ.get("MYSQL_PASSWORD", ""),
+        "HOST": os.environ.get("MYSQL_HOST", "127.0.0.1"),
+        "PORT": os.environ.get("MYSQL_PORT", "3306"),
+        "OPTIONS": {"charset": "utf8mb4", "init_command": "SET sql_mode='STRICT_TRANS_TABLES'"},
     }
 }
+LOGIN_URL = "core:login"
+LOGIN_REDIRECT_URL = "core:gestion"
+LOGOUT_REDIRECT_URL = "core:login"
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},

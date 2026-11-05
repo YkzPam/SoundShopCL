@@ -1,0 +1,26 @@
+{% extends 'core/e3/base_gestion.html' %}
+{% load moneda %}
+{% block gestion %}
+
+<div class="cabecera"><p class="eyebrow">Administración</p><h1>Reportes de la tienda</h1><p>Productos, clientes y ventas consultados desde la base de datos.</p></div>
+<form method="get" class="form-panel mb-4">
+<label class="form-label" for="reporte">Consulta</label><select class="form-select mb-3" id="reporte" name="reporte">{% for indice, texto in preguntas %}<option value="{{ indice }}" {% if numero == indice %}selected{% endif %}>{{ indice }}. {{ texto }}</option>{% endfor %}</select>
+{% if numero == 2 %}<label class="form-label" for="categoria">Categoría</label><select class="form-select mb-3" id="categoria" name="categoria" required><option value="">Seleccionar categoría</option>{% for categoria in categorias %}<option value="{{ categoria.id }}" {% if filtros.categoria == categoria.id|stringformat:'s' %}selected{% endif %}>{{ categoria.nombre }}</option>{% endfor %}</select>{% endif %}
+{% if numero == 3 %}<div class="row g-3 mb-3"><div class="col-md-6"><label class="form-label" for="minimo">Precio mínimo</label><input class="form-control" type="number" id="minimo" name="minimo" min="0" step="0.01" value="{{ filtros.minimo }}" required></div><div class="col-md-6"><label class="form-label" for="maximo">Precio máximo</label><input class="form-control" type="number" id="maximo" name="maximo" min="0" step="0.01" value="{{ filtros.maximo }}" required></div></div>{% endif %}
+{% if numero == 6 or numero == 7 %}<label class="form-label" for="cliente">Cliente</label><select class="form-select mb-3" id="cliente" name="cliente" required><option value="">Seleccionar cliente</option>{% for persona in clientes %}<option value="{{ persona.id }}" {% if filtros.cliente == persona.id|stringformat:'s' %}selected{% endif %}>{{ persona.nombre }} · {{ persona.correo }}</option>{% endfor %}</select>{% endif %}
+{% if numero == 7 %}<label class="form-label" for="venta">Venta del cliente seleccionado</label><select class="form-select mb-3" id="venta" name="venta" required><option value="">Seleccionar venta</option>{% for venta in ventas %}<option value="{{ venta.id }}" {% if filtros.venta == venta.id|stringformat:'s' %}selected{% endif %}>N.º {{ venta.numero }} · {{ venta.cliente.nombre }} · {{ venta.fecha|date:'d/m/Y' }}</option>{% endfor %}</select>{% endif %}
+{% if numero == 8 %}<div class="row g-3 mb-3"><div class="col-md-6"><label class="form-label" for="desde">Desde</label><input class="form-control" type="date" id="desde" name="desde" value="{{ filtros.desde }}" required></div><div class="col-md-6"><label class="form-label" for="hasta">Hasta</label><input class="form-control" type="date" id="hasta" name="hasta" value="{{ filtros.hasta }}" required></div></div>{% endif %}
+{% if numero == 10 %}<label class="form-label" for="fecha">Día de venta</label><input class="form-control mb-3" type="date" id="fecha" name="fecha" value="{{ filtros.fecha }}" required>{% endif %}
+{% if numero == 18 or numero == 19 %}<label class="form-label" for="anio">Año</label><input class="form-control mb-3" type="number" id="anio" name="anio" min="1" max="9999" value="{{ filtros.anio }}" required>{% endif %}
+<button class="btn btn-primary" type="submit">Consultar</button>
+</form>
+<h2 class="h4">{{ numero }}. {{ pregunta }}</h2>
+{% if error %}<div class="alert alert-danger" role="alert">{{ error }}</div>{% else %}
+{% if informacion %}<p>{{ informacion }}</p>{% endif %}
+<div class="table-responsive"><table class="table"><thead><tr>{% for columna in columnas %}<th>{{ columna }}</th>{% endfor %}</tr></thead><tbody>
+{% for fila in filas %}<tr>{% for valor in fila %}<td>{% if forloop.counter0 in monedas %}${{ valor|pesos }}{% else %}{{ valor }}{% endif %}</td>{% endfor %}</tr>{% empty %}<tr><td>No hay resultados para esta consulta.</td></tr>{% endfor %}
+</tbody></table></div>
+{% include 'core/e3/paginacion.html' %}
+{% endif %}
+<script>document.getElementById('reporte').addEventListener('change', function () { window.location.href = '?reporte=' + this.value; });</script>
+{% endblock %}
