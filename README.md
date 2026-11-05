@@ -65,6 +65,8 @@ El carrito público conserva el recorrido anterior: su confirmación vacía la s
 
 Los veinte reportes se abren desde **Reportes** dentro del panel y exigen iniciar sesión. Utilizan consultas ORM de Django con filtros, ordenamientos, conteos, sumas, promedios y agrupaciones. La [guía de consultas de E3](docs/evaluacion-3/README.md) identifica cada reporte y sus filtros.
 
+El resumen del panel presenta gráficos de ingresos mensuales y de los cinco productos más vendidos del año seleccionado, junto con indicadores, accesos rápidos y un aviso de stock bajo. Los gráficos utilizan HTML y CSS, sin agregar librerías, y consultan los mismos registros de la tienda. Sus cifras se actualizan al volver a abrir el resumen después de modificar una venta o un producto; los meses sin ventas aparecen con cero.
+
 ```text
 soundshop/settings.py            Conexión a MySQL y autenticación
 soundshop/urls.py                Rutas del proyecto sin Django Admin

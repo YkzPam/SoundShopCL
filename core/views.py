@@ -7,7 +7,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
-from django.db.models import F, Sum
+from django.db.models import F, Q, Sum
+from django.db.models.functions import ExtractMonth
 from django.db.models.deletion import ProtectedError
 from django.http import HttpResponseForbidden, HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404, redirect, render
@@ -166,9 +167,44 @@ def errores_modelo(objeto):
 
 @login_required
 def gestion(request):
+    anio = request.GET.get("anio", str(date.today().year))
+    if not anio.isdigit() or not 1 <= int(anio) <= 9999:
+        messages.error(request, "El año debe estar entre 1 y 9999.")
+        return redirect("core:gestion")
+    anio = int(anio)
+    ventas = Boleta.objects.filter(fecha__year=anio)
+    detalles = DetalleBoleta.objects.filter(boleta__fecha__year=anio)
+
+    # Se conservan los precios de cada venta, aunque cambie el catálogo.
+    ingresos = detalles.aggregate(total=Sum(F("cantidad") * F("precio_unitario"), default=0))["total"]
+    ingresos_por_mes = detalles.annotate(mes=ExtractMonth("boleta__fecha")).values("mes").annotate(
+        total=Sum(F("cantidad") * F("precio_unitario"))
+    ).order_by("mes")
+    totales = {fila["mes"]: fila["total"] for fila in ingresos_por_mes}
+    nombres_meses = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
+    mayor_monto = max(totales.values(), default=0)
+    meses = []
+    for numero, nombre in enumerate(nombres_meses, 1):
+        monto = totales.get(numero, 0)
+        altura = round(monto * 100 / mayor_monto, 2) if mayor_monto else 0
+        meses.append({"nombre": nombre, "monto": monto, "altura": altura})
+
+    # La altura y el ancho de las barras representan los valores consultados.
+    productos_vendidos = list(Producto.objects.annotate(
+        unidades=Sum("detalleboleta__cantidad", filter=Q(detalleboleta__boleta__fecha__year=anio), default=0)
+    ).filter(unidades__gt=0).order_by("-unidades", "codigo")[:5])
+    mayor_cantidad = productos_vendidos[0].unidades if productos_vendidos else 0
+    for producto in productos_vendidos:
+        producto.porcentaje = round(producto.unidades * 100 / mayor_cantidad, 2)
+
+    stock_bajo = Producto.objects.filter(activo=True, stock__lt=5).order_by("stock", "codigo")
+    anios = {fecha.year for fecha in Boleta.objects.dates("fecha", "year")}
+    anios.update([date.today().year, anio])
     return render(request, "core/gestion.html", {"titulo": "Panel de administración",
-        "total_productos": Producto.objects.count(), "sin_stock": Producto.objects.filter(stock=0).count(),
-        "total_clientes": Cliente.objects.count(), "total_ventas": Boleta.objects.count()})
+        "total_productos": Producto.objects.count(),
+        "total_clientes": Cliente.objects.count(), "total_ventas": ventas.count(), "ingresos": ingresos,
+        "anio": anio, "anios": sorted(anios, reverse=True), "meses": meses, "mayor_monto": mayor_monto,
+        "productos_vendidos": productos_vendidos, "cantidad_stock_bajo": stock_bajo.count()})
 
 
 @login_required

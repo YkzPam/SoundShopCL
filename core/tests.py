@@ -313,3 +313,47 @@ class Evaluacion3Tests(TestCase):
         respuesta = self.client.post(reverse('core:venta_nueva'), datos)
         self.assertTrue(respuesta.context['errores'])
         self.assertContains(respuesta, 'value="2026-09-15"')
+
+    def test_resumen_anual_graficos_e_indicadores(self):
+        respuesta = self.client.get(reverse('core:gestion'), {'anio': self.hoy.year})
+        datos = respuesta.context
+        total_esperado = Decimal('300')
+        ventas_esperadas = 2
+        if self.mes_anterior.year == self.hoy.year:
+            total_esperado += Decimal('160')
+            ventas_esperadas += 1
+        self.assertEqual(datos['ingresos'], total_esperado)
+        self.assertEqual(datos['total_ventas'], ventas_esperadas)
+        self.assertEqual(len(datos['meses']), 12)
+        self.assertEqual(datos['meses'][self.hoy.month - 1]['monto'], Decimal('300'))
+        self.assertTrue(all(0 <= m['altura'] <= 100 for m in datos['meses']))
+        self.assertEqual(sum(m['monto'] for m in datos['meses']), total_esperado)
+        self.assertEqual(datos['cantidad_stock_bajo'], 2)
+        unidades = {p.codigo: p.unidades for p in datos['productos_vendidos']}
+        self.assertEqual(unidades['P1'], 3)
+        self.assertEqual(unidades['P2'], 5 if self.mes_anterior.year == self.hoy.year else 1)
+        anterior = self.client.get(reverse('core:gestion'), {'anio': self.anio_anterior.year})
+        monto_anterior = Decimal('210') + (Decimal('160') if self.mes_anterior.year == self.anio_anterior.year else 0)
+        self.assertEqual(anterior.context['ingresos'], monto_anterior)
+
+    def test_resumen_sin_ventas_muestra_ceros(self):
+        Boleta.objects.all().delete()
+        respuesta = self.client.get(reverse('core:gestion'))
+        self.assertEqual(respuesta.context['ingresos'], 0)
+        self.assertEqual(respuesta.context['total_ventas'], 0)
+        self.assertEqual(respuesta.context['productos_vendidos'], [])
+        self.assertTrue(all(m['altura'] == 0 and m['monto'] == 0 for m in respuesta.context['meses']))
+        self.assertContains(respuesta, 'Todavía no hay ingresos')
+
+    def test_resumen_rechaza_anios_invalidos(self):
+        for valor in ('texto', '0', '10000'):
+            with self.subTest(anio=valor):
+                respuesta = self.client.get(reverse('core:gestion'), {'anio': valor})
+                self.assertRedirects(respuesta, reverse('core:gestion'))
+
+    def test_resumen_actualiza_ingresos_al_editar_una_venta(self):
+        antes = self.client.get(reverse('core:gestion')).context['ingresos']
+        respuesta = self.client.post(reverse('core:detalle_editar', args=[self.venta.pk, self.detalle.pk]), {'producto': self.guitarra.pk, 'cantidad': '3', 'precio_unitario': '80'})
+        self.assertEqual(respuesta.status_code, 302)
+        despues = self.client.get(reverse('core:gestion')).context['ingresos']
+        self.assertEqual(despues, antes + Decimal('80'))
