@@ -116,3 +116,44 @@
 @media(max-width:767px) { .gestion-widget { padding:1.1rem; } .gestion-widget-titulo h2 { font-size:1.2rem; } .gestion-herramientas { align-items:start; } .gestion-accesos { flex-wrap:wrap; } .gestion-metricas-cuatro .gestion-metrica-ingreso strong { font-size:1.6rem; padding:.15rem 0; } .gestion-aviso-stock { flex-direction:column; align-items:start; } }
 @media(max-width:1000px) { .gestion-layout { grid-template-columns:190px minmax(0,1fr); gap:1.3rem; } .gestion-lateral { padding:1.4rem .8rem; } .gestion-metrica { padding:1rem; } }
 @media(max-width:767px) { .gestion-layout { grid-template-columns:1fr; gap:1rem; } .gestion-lateral { position:static; padding:1rem; } .gestion-marca { margin:0 0 .8rem; } .gestion-grupo,.gestion-sesion,.gestion-tienda { display:none; } .gestion-nav { flex-direction:row; flex-wrap:wrap; gap:.2rem; } .gestion-nav a { padding:.5rem .6rem; font-size:.75rem; gap:.4rem; } .gestion-lateral > form { margin-top:.5rem; } .gestion-contenido { padding:.5rem 0; } .gestion-metricas { gap:.55rem; } .gestion-metrica { padding:.8rem; } .gestion-metrica strong { font-size:2rem; } .gestion-metrica span,.gestion-metrica a { font-size:.62rem; } .gestion-sello { display:none; } .gestion-contenido form.form-panel,.gestion-contenido form.row { padding:1.2rem; } .panel-administrativo main.container { padding:1rem!important; } }
+
+/* Movimientos breves compartidos por todas las pantallas del CRUD. */
+@keyframes gestion-aparecer {
+  from { opacity:0; transform:translateY(10px); }
+  to { opacity:1; transform:translateY(0); }
+}
+@keyframes gestion-barra-vertical {
+  from { transform:scaleY(0); }
+  to { transform:scaleY(1); }
+}
+@keyframes gestion-barra-horizontal {
+  from { transform:scaleX(0); }
+  to { transform:scaleX(1); }
+}
+.gestion-entrada,.gestion-contenido > h1,.gestion-contenido > .cabecera,.gestion-contenido > .d-flex { animation:gestion-aparecer .35s ease-out backwards; }
+.gestion-metrica { animation:gestion-aparecer .45s ease-out .04s backwards; transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease; }
+.gestion-metrica:nth-child(2) { animation-delay:.09s; }
+.gestion-metrica:nth-child(3) { animation-delay:.14s; }
+.gestion-metrica:nth-child(4) { animation-delay:.19s; }
+.gestion-widget { animation:gestion-aparecer .5s ease-out .12s backwards; }
+.gestion-graficos .gestion-widget:nth-child(2) { animation-delay:.2s; }
+.gestion-contenido > form,.gestion-contenido > .table-responsive,.gestion-contenido > .acceso { animation:gestion-aparecer .4s ease-out .06s backwards; }
+.gestion-contenido .alert,.panel-administrativo main > .alert { animation:gestion-aparecer .25s ease-out backwards; }
+.gestion-columna { transform-origin:center bottom; animation:gestion-barra-vertical .75s cubic-bezier(.2,.7,.2,1) .2s backwards; }
+.gestion-barra-pista > span { transform-origin:left center; animation:gestion-barra-horizontal .65s cubic-bezier(.2,.7,.2,1) .25s backwards; }
+.gestion-contenido .form-control,.gestion-contenido .form-select { transition:border-color .18s ease,box-shadow .18s ease,background-color .18s ease; }
+.gestion-contenido .table tbody tr { transition:background-color .18s ease; }
+.gestion-contenido .btn { transition:transform .18s ease,box-shadow .18s ease,background-color .18s ease,border-color .18s ease; }
+.gestion-nav a,.gestion-contenido .table td a { transition:transform .18s ease,background-color .18s ease,color .18s ease; }
+.gestion-producto img { transition:transform .25s ease; }
+@media(hover:hover) {
+  .gestion-contenido .btn:hover:not(:disabled):not(.disabled) { transform:translateY(-2px); box-shadow:0 4px 12px #29222f18; }
+  .gestion-contenido .btn:active:not(:disabled):not(.disabled) { transform:translateY(0) scale(.98); box-shadow:none; }
+  .gestion-metrica:hover { transform:translateY(-3px); border-color:var(--oro); box-shadow:0 7px 18px #29222f0d; }
+  .gestion-nav a:hover,.gestion-contenido .table td a:hover { transform:translateX(2px); }
+  .gestion-producto:hover img { transform:scale(1.07); }
+}
+@media(prefers-reduced-motion:reduce) {
+  .panel-administrativo *,.panel-administrativo *::before,.panel-administrativo *::after { animation:none!important; transition:none!important; }
+  .gestion-contenido .btn:hover,.gestion-contenido .btn:active,.gestion-metrica:hover,.gestion-nav a:hover,.gestion-contenido .table td a:hover,.gestion-producto:hover img { transform:none!important; }
+}
