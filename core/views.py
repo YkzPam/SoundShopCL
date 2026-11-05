@@ -204,7 +204,8 @@ def gestion(request):
         "total_productos": Producto.objects.count(),
         "total_clientes": Cliente.objects.count(), "total_ventas": ventas.count(), "ingresos": ingresos,
         "anio": anio, "anios": sorted(anios, reverse=True), "meses": meses, "mayor_monto": mayor_monto,
-        "productos_vendidos": productos_vendidos, "cantidad_stock_bajo": stock_bajo.count()})
+        "productos_vendidos": productos_vendidos, "cantidad_stock_bajo": stock_bajo.count(),
+        "categorias": Categoria.objects.order_by("nombre")})
 
 
 @login_required

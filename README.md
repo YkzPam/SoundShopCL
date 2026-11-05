@@ -69,6 +69,8 @@ El resumen del panel presenta gráficos de ingresos mensuales y de los cinco pro
 
 Las pantallas del CRUD comparten animaciones breves en formularios, listados, indicadores, avisos y gráficos, junto con respuestas visuales de botones y campos. Se realizan con CSS y se desactivan cuando el sistema tiene activada la preferencia de reducir movimiento.
 
+El catálogo administrativo incluye accesos por categoría musical, botones de acción con iconos y avisos para productos sin foto, con stock bajo, agotados o desactivados. El formulario de producto está organizado por secciones y cuenta con una vista previa de fotografía, nombre, marca, categoría, código, precio y estado. La vista previa utiliza JavaScript del proyecto y solo refleja los campos que se están editando; los cambios se guardan al enviar el formulario.
+
 ```text
 soundshop/settings.py            Conexión a MySQL y autenticación
 soundshop/urls.py                Rutas del proyecto sin Django Admin

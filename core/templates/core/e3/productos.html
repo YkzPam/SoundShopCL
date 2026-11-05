@@ -1,7 +1,23 @@
-{% extends 'core/e3/base_gestion.html' %}{% load moneda static %}
+{% extends 'core/e3/base_gestion.html' %}
+{% load moneda static %}
 {% block gestion %}
-<div class="d-flex justify-content-between align-items-center mb-4"><h1>Productos</h1><a class="btn btn-primary" href="{% url 'core:producto_nuevo' %}">Nuevo producto</a></div>
-<form method="get" class="row g-2 mb-4"><div class="col-md-5"><label class="form-label" for="q">Buscar por nombre</label><input class="form-control" id="q" name="q" value="{{ busqueda }}"></div><div class="col-md-5"><label for="categoria" class="form-label">Categoría</label><select class="form-select" id="categoria" name="categoria"><option value="">Todas</option>{% for c in categorias %}<option value="{{ c.pk }}" {% if categoria_actual == c.pk|stringformat:'s' %}selected{% endif %}>{{ c.nombre }}</option>{% endfor %}</select></div><div class="col-md-2 d-flex align-items-end"><button class="btn btn-outline-primary">Buscar</button></div></form>
+<div class="d-flex justify-content-between align-items-center mb-4"><div><p class="eyebrow">El sonido de la tienda</p><h1>Productos</h1></div><a class="btn btn-primary" href="{% url 'core:producto_nuevo' %}">+ Nuevo producto</a></div>
+{% include 'core/e3/accesos_categorias.html' with mostrar_todos=True %}
+<form method="get" class="row g-2 mb-4">
+  <div class="col-md-5"><label class="form-label" for="q">Buscar por nombre</label><input class="form-control" id="q" name="q" value="{{ busqueda }}" placeholder="Nombre del equipo"></div>
+  <div class="col-md-5"><label for="categoria" class="form-label">Categoría</label><select class="form-select" id="categoria" name="categoria"><option value="">Todas</option>{% for c in categorias %}<option value="{{ c.pk }}" {% if categoria_actual == c.pk|stringformat:'s' %}selected{% endif %}>{{ c.nombre }}</option>{% endfor %}</select></div>
+  <div class="col-md-2 d-flex align-items-end"><button class="btn btn-outline-primary">Buscar</button></div>
+</form>
 <div class="table-responsive"><table class="table align-middle"><thead><tr><th>Código</th><th>Producto</th><th>Categoría</th><th>Precio</th><th>Stock</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>
-{% for p in pagina %}<tr><td><small class="gestion-codigo">{{ p.codigo }}</small></td><td><div class="gestion-producto">{% if p.imagen %}<img src="{% static p.imagen %}" alt="" loading="lazy">{% endif %}<div><strong>{{ p.nombre }}</strong><small>{{ p.marca.nombre }}</small></div></div></td><td>{{ p.categoria }}</td><td class="text-nowrap">${{ p.precio|pesos }}</td><td><span class="gestion-estado {% if p.stock == 0 %}estado-agotado{% endif %}">{{ p.stock }}</span></td><td><span class="gestion-estado {% if not p.activo %}estado-inactivo{% endif %}">{{ p.activo|yesno:'Activo,Inactivo' }}</span></td><td><a href="{% url 'core:producto_editar' p.pk %}">Editar</a> · <a href="{% url 'core:producto_eliminar' p.pk %}">Eliminar</a></td></tr>{% empty %}<tr><td colspan="7">No hay productos para esta búsqueda.</td></tr>{% endfor %}
-</tbody></table></div>{% include 'core/e3/paginacion.html' %}{% endblock %}
+{% for p in pagina %}
+  <tr><td><small class="gestion-codigo">{{ p.codigo }}</small></td>
+    <td><div class="gestion-producto">{% if p.imagen %}<img src="{% static p.imagen %}" alt="" loading="lazy">{% else %}<span class="gestion-miniatura-vacia">{% include 'core/e3/icono.html' with nombre='imagen' %}</span>{% endif %}<div><strong>{{ p.nombre }}</strong><small>{{ p.marca.nombre }}</small>{% if not p.imagen %}<span class="gestion-aviso-foto">Sin foto</span>{% endif %}</div></div></td>
+    <td>{{ p.categoria }}</td><td class="text-nowrap">${{ p.precio|pesos }}</td>
+    <td><span class="gestion-estado {% if p.stock == 0 %}estado-agotado{% elif p.stock < 5 %}estado-bajo{% endif %}">{{ p.stock }}</span>{% if p.stock == 0 %}<small class="gestion-stock-nota">Agotado</small>{% elif p.stock < 5 %}<small class="gestion-stock-nota">Stock bajo</small>{% endif %}</td>
+    <td><span class="gestion-estado {% if not p.activo %}estado-inactivo{% endif %}">{{ p.activo|yesno:'Activo,Desactivado' }}</span></td>
+    <td class="gestion-acciones-celda">{% if p.activo %}<a class="accion-crud accion-consultar" href="{% url 'core:detalle_producto' p.pk %}" target="_blank" rel="noopener" aria-label="Ver ficha de {{ p.nombre }}">{% include 'core/e3/icono.html' with nombre='ver' %}Ver ficha</a>{% endif %}<a class="accion-crud" href="{% url 'core:producto_editar' p.pk %}" aria-label="Editar {{ p.nombre }}">{% include 'core/e3/icono.html' with nombre='editar' %}Editar</a><a class="accion-crud accion-peligro" href="{% url 'core:producto_eliminar' p.pk %}" aria-label="Eliminar {{ p.nombre }}">{% include 'core/e3/icono.html' with nombre='eliminar' %}Eliminar</a></td>
+  </tr>
+{% empty %}<tr><td colspan="7">No hay productos para esta búsqueda.</td></tr>{% endfor %}
+</tbody></table></div>
+{% include 'core/e3/paginacion.html' %}
+{% endblock %}
