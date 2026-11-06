@@ -1,0 +1,451 @@
+[
+  {
+    "tabla": "core_categoria",
+    "campos": [
+      {
+        "nombre": "id",
+        "tipo": "integer",
+        "pk": true,
+        "unique": true,
+        "destino": null
+      },
+      {
+        "nombre": "nombre",
+        "tipo": "varchar(100)",
+        "pk": false,
+        "unique": true,
+        "destino": null
+      },
+      {
+        "nombre": "slug",
+        "tipo": "varchar(80)",
+        "pk": false,
+        "unique": true,
+        "destino": null
+      },
+      {
+        "nombre": "descripcion",
+        "tipo": "text",
+        "pk": false,
+        "unique": false,
+        "destino": null
+      }
+    ]
+  },
+  {
+    "tabla": "core_marca",
+    "campos": [
+      {
+        "nombre": "id",
+        "tipo": "integer",
+        "pk": true,
+        "unique": true,
+        "destino": null
+      },
+      {
+        "nombre": "nombre",
+        "tipo": "varchar(80)",
+        "pk": false,
+        "unique": true,
+        "destino": null
+      },
+      {
+        "nombre": "pais",
+        "tipo": "varchar(60)",
+        "pk": false,
+        "unique": false,
+        "destino": null
+      }
+    ]
+  },
+  {
+    "tabla": "core_proveedor",
+    "campos": [
+      {
+        "nombre": "id",
+        "tipo": "integer",
+        "pk": true,
+        "unique": true,
+        "destino": null
+      },
+      {
+        "nombre": "nombre",
+        "tipo": "varchar(120)",
+        "pk": false,
+        "unique": false,
+        "destino": null
+      },
+      {
+        "nombre": "correo",
+        "tipo": "varchar(254)",
+        "pk": false,
+        "unique": false,
+        "destino": null
+      },
+      {
+        "nombre": "telefono",
+        "tipo": "varchar(20)",
+        "pk": false,
+        "unique": false,
+        "destino": null
+      },
+      {
+        "nombre": "activo",
+        "tipo": "bool",
+        "pk": false,
+        "unique": false,
+        "destino": null
+      }
+    ]
+  },
+  {
+    "tabla": "core_sucursal",
+    "campos": [
+      {
+        "nombre": "id",
+        "tipo": "integer",
+        "pk": true,
+        "unique": true,
+        "destino": null
+      },
+      {
+        "nombre": "nombre",
+        "tipo": "varchar(80)",
+        "pk": false,
+        "unique": false,
+        "destino": null
+      },
+      {
+        "nombre": "direccion",
+        "tipo": "varchar(180)",
+        "pk": false,
+        "unique": false,
+        "destino": null
+      },
+      {
+        "nombre": "comuna",
+        "tipo": "varchar(60)",
+        "pk": false,
+        "unique": false,
+        "destino": null
+      },
+      {
+        "nombre": "activo",
+        "tipo": "bool",
+        "pk": false,
+        "unique": false,
+        "destino": null
+      }
+    ]
+  },
+  {
+    "tabla": "core_cliente",
+    "campos": [
+      {
+        "nombre": "id",
+        "tipo": "integer",
+        "pk": true,
+        "unique": true,
+        "destino": null
+      },
+      {
+        "nombre": "rut",
+        "tipo": "varchar(20)",
+        "pk": false,
+        "unique": true,
+        "destino": null
+      },
+      {
+        "nombre": "nombre",
+        "tipo": "varchar(150)",
+        "pk": false,
+        "unique": false,
+        "destino": null
+      },
+      {
+        "nombre": "email",
+        "tipo": "varchar(150)",
+        "pk": false,
+        "unique": true,
+        "destino": null
+      },
+      {
+        "nombre": "telefono",
+        "tipo": "varchar(30)",
+        "pk": false,
+        "unique": false,
+        "destino": null
+      },
+      {
+        "nombre": "activo",
+        "tipo": "bool",
+        "pk": false,
+        "unique": false,
+        "destino": null
+      }
+    ]
+  },
+  {
+    "tabla": "core_producto",
+    "campos": [
+      {
+        "nombre": "id",
+        "tipo": "integer",
+        "pk": true,
+        "unique": true,
+        "destino": null
+      },
+      {
+        "nombre": "sku",
+        "tipo": "varchar(50)",
+        "pk": false,
+        "unique": true,
+        "destino": null
+      },
+      {
+        "nombre": "nombre",
+        "tipo": "varchar(150)",
+        "pk": false,
+        "unique": false,
+        "destino": null
+      },
+      {
+        "nombre": "descripcion",
+        "tipo": "text",
+        "pk": false,
+        "unique": false,
+        "destino": null
+      },
+      {
+        "nombre": "precio",
+        "tipo": "decimal(12,2)",
+        "pk": false,
+        "unique": false,
+        "destino": null
+      },
+      {
+        "nombre": "stock",
+        "tipo": "integer",
+        "pk": false,
+        "unique": false,
+        "destino": null
+      },
+      {
+        "nombre": "categoria_id",
+        "tipo": "bigint",
+        "pk": false,
+        "unique": false,
+        "destino": "core_categoria"
+      },
+      {
+        "nombre": "marca_id",
+        "tipo": "bigint",
+        "pk": false,
+        "unique": false,
+        "destino": "core_marca"
+      },
+      {
+        "nombre": "proveedor_id",
+        "tipo": "bigint",
+        "pk": false,
+        "unique": false,
+        "destino": "core_proveedor"
+      },
+      {
+        "nombre": "imagen",
+        "tipo": "varchar(200)",
+        "pk": false,
+        "unique": false,
+        "destino": null
+      },
+      {
+        "nombre": "activo",
+        "tipo": "bool",
+        "pk": false,
+        "unique": false,
+        "destino": null
+      }
+    ]
+  },
+  {
+    "tabla": "core_boleta",
+    "campos": [
+      {
+        "nombre": "id",
+        "tipo": "integer",
+        "pk": true,
+        "unique": true,
+        "destino": null
+      },
+      {
+        "nombre": "numero",
+        "tipo": "integer",
+        "pk": false,
+        "unique": true,
+        "destino": null
+      },
+      {
+        "nombre": "fecha",
+        "tipo": "datetime",
+        "pk": false,
+        "unique": false,
+        "destino": null
+      },
+      {
+        "nombre": "estado",
+        "tipo": "varchar(25)",
+        "pk": false,
+        "unique": false,
+        "destino": null
+      },
+      {
+        "nombre": "total",
+        "tipo": "decimal(14,2)",
+        "pk": false,
+        "unique": false,
+        "destino": null
+      },
+      {
+        "nombre": "cliente_id",
+        "tipo": "bigint",
+        "pk": false,
+        "unique": false,
+        "destino": "core_cliente"
+      },
+      {
+        "nombre": "sucursal_id",
+        "tipo": "bigint",
+        "pk": false,
+        "unique": false,
+        "destino": "core_sucursal"
+      }
+    ]
+  },
+  {
+    "tabla": "core_detalleboleta",
+    "campos": [
+      {
+        "nombre": "id",
+        "tipo": "integer",
+        "pk": true,
+        "unique": true,
+        "destino": null
+      },
+      {
+        "nombre": "boleta_id",
+        "tipo": "bigint",
+        "pk": false,
+        "unique": false,
+        "destino": "core_boleta"
+      },
+      {
+        "nombre": "producto_id",
+        "tipo": "bigint",
+        "pk": false,
+        "unique": false,
+        "destino": "core_producto"
+      },
+      {
+        "nombre": "cantidad",
+        "tipo": "integer",
+        "pk": false,
+        "unique": false,
+        "destino": null
+      },
+      {
+        "nombre": "precio_unitario",
+        "tipo": "decimal(12,2)",
+        "pk": false,
+        "unique": false,
+        "destino": null
+      },
+      {
+        "nombre": "subtotal",
+        "tipo": "decimal(14,2)",
+        "pk": false,
+        "unique": false,
+        "destino": null
+      }
+    ]
+  },
+  {
+    "tabla": "core_compraproveedor",
+    "campos": [
+      {
+        "nombre": "id",
+        "tipo": "integer",
+        "pk": true,
+        "unique": true,
+        "destino": null
+      },
+      {
+        "nombre": "numero",
+        "tipo": "integer",
+        "pk": false,
+        "unique": true,
+        "destino": null
+      },
+      {
+        "nombre": "fecha",
+        "tipo": "date",
+        "pk": false,
+        "unique": false,
+        "destino": null
+      },
+      {
+        "nombre": "proveedor_id",
+        "tipo": "bigint",
+        "pk": false,
+        "unique": false,
+        "destino": "core_proveedor"
+      },
+      {
+        "nombre": "sucursal_id",
+        "tipo": "bigint",
+        "pk": false,
+        "unique": false,
+        "destino": "core_sucursal"
+      }
+    ]
+  },
+  {
+    "tabla": "core_detallecompra",
+    "campos": [
+      {
+        "nombre": "id",
+        "tipo": "integer",
+        "pk": true,
+        "unique": true,
+        "destino": null
+      },
+      {
+        "nombre": "compra_id",
+        "tipo": "bigint",
+        "pk": false,
+        "unique": false,
+        "destino": "core_compraproveedor"
+      },
+      {
+        "nombre": "producto_id",
+        "tipo": "bigint",
+        "pk": false,
+        "unique": false,
+        "destino": "core_producto"
+      },
+      {
+        "nombre": "cantidad",
+        "tipo": "integer",
+        "pk": false,
+        "unique": false,
+        "destino": null
+      },
+      {
+        "nombre": "precio_costo",
+        "tipo": "decimal(10,2)",
+        "pk": false,
+        "unique": false,
+        "destino": null
+      }
+    ]
+  }
+]

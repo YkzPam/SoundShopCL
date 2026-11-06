@@ -2,10 +2,12 @@ from datetime import date
 
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.db.models import Sum
+from django.utils import timezone
 
 
 class Categoria(models.Model):
-    nombre = models.CharField(max_length=80, unique=True)
+    nombre = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(max_length=80, unique=True)
     descripcion = models.TextField(blank=True)
 
@@ -48,9 +50,10 @@ class Sucursal(models.Model):
 
 
 class Cliente(models.Model):
-    nombre = models.CharField(max_length=100)
-    correo = models.EmailField(unique=True)
-    telefono = models.CharField(max_length=20, blank=True)
+    rut = models.CharField(max_length=20, unique=True, null=True, blank=True)
+    nombre = models.CharField(max_length=150)
+    correo = models.EmailField(max_length=150, unique=True, db_column="email")
+    telefono = models.CharField(max_length=30, blank=True)
     activo = models.BooleanField(default=True)
 
     def __str__(self):
@@ -58,11 +61,13 @@ class Cliente(models.Model):
 
 
 class Producto(models.Model):
-    codigo = models.CharField(max_length=30, unique=True)
-    nombre = models.CharField(max_length=80)
+    codigo = models.CharField(max_length=50, unique=True, db_column="sku")
+    nombre = models.CharField(max_length=150)
     descripcion = models.TextField(max_length=500)
     precio = models.DecimalField(
-        max_digits=10, decimal_places=2, validators=[MinValueValidator(1)],
+        max_digits=12,
+        decimal_places=2,
+        validators=[MinValueValidator(1)],
     )
     stock = models.PositiveIntegerField(default=0)
     categoria = models.ForeignKey(Categoria, on_delete=models.PROTECT)
@@ -76,8 +81,16 @@ class Producto(models.Model):
 
 
 class Boleta(models.Model):
+    ESTADOS = [
+        ("registrada", "Registrada"),
+        ("pendiente", "Pendiente"),
+        ("finalizada", "Finalizada"),
+    ]
+
     numero = models.PositiveIntegerField(unique=True, validators=[MinValueValidator(1)])
-    fecha = models.DateField(default=date.today)
+    fecha = models.DateTimeField(default=timezone.now)
+    estado = models.CharField(max_length=25, choices=ESTADOS, default="registrada")
+    total = models.DecimalField(max_digits=14, decimal_places=2, default=0, editable=False)
     cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT)
     sucursal = models.ForeignKey(Sucursal, on_delete=models.PROTECT)
     productos = models.ManyToManyField(Producto, through="DetalleBoleta")
@@ -85,22 +98,38 @@ class Boleta(models.Model):
     def __str__(self):
         return f"Boleta {self.numero}"
 
+    def actualizar_total(self):
+        self.total = self.detalleboleta_set.aggregate(total=Sum("subtotal", default=0))["total"]
+        self.save(update_fields=["total"])
+
 
 class DetalleBoleta(models.Model):
     boleta = models.ForeignKey(Boleta, on_delete=models.CASCADE)
     producto = models.ForeignKey(Producto, on_delete=models.PROTECT)
     cantidad = models.PositiveIntegerField(validators=[MinValueValidator(1)])
     precio_unitario = models.DecimalField(
-        max_digits=10, decimal_places=2, validators=[MinValueValidator(1)],
+        max_digits=12,
+        decimal_places=2,
+        validators=[MinValueValidator(1)],
     )
+    subtotal = models.DecimalField(max_digits=14, decimal_places=2, default=0, editable=False)
 
     class Meta:
         unique_together = ("boleta", "producto")
         verbose_name_plural = "detalles de boleta"
 
-    @property
-    def subtotal(self):
-        return self.cantidad * self.precio_unitario
+    def save(self, *args, **kwargs):
+        self.subtotal = self.cantidad * self.precio_unitario
+        if kwargs.get("update_fields") is not None:
+            kwargs["update_fields"] = set(kwargs["update_fields"]) | {"subtotal"}
+        super().save(*args, **kwargs)
+        self.boleta.actualizar_total()
+
+    def delete(self, *args, **kwargs):
+        boleta = self.boleta
+        resultado = super().delete(*args, **kwargs)
+        boleta.actualizar_total()
+        return resultado
 
     def __str__(self):
         return f"{self.boleta} / {self.producto}"
@@ -125,7 +154,9 @@ class DetalleCompra(models.Model):
     producto = models.ForeignKey(Producto, on_delete=models.PROTECT)
     cantidad = models.PositiveIntegerField(validators=[MinValueValidator(1)])
     precio_costo = models.DecimalField(
-        max_digits=10, decimal_places=2, validators=[MinValueValidator(1)],
+        max_digits=10,
+        decimal_places=2,
+        validators=[MinValueValidator(1)],
     )
 
     class Meta:

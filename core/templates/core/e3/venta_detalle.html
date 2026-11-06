@@ -4,7 +4,7 @@
     <div class="cabecera">
         <p class="eyebrow">Ventas</p>
         <h1>Venta {{ venta.numero }}</h1>
-        <p>{{ venta.fecha|date:'d/m/Y' }} · {{ venta.cliente.nombre }} · {{ venta.sucursal.nombre }}</p>
+        <p>{{ venta.fecha|date:'d/m/Y H:i' }} · {{ venta.cliente.nombre }} · {{ venta.sucursal.nombre }} · {{ venta.get_estado_display }}</p>
         <a class="btn btn-primary"
            href="{% url 'core:detalle_nuevo' venta.id %}">Agregar producto</a>
         <a class="btn btn-outline-secondary"

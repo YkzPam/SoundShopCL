@@ -15,7 +15,8 @@
             <thead>
                 <tr>
                     <th class="gestion-numero">Número</th>
-                    <th>Fecha</th>
+                    <th>Fecha y hora</th>
+                    <th>Estado</th>
                     <th>Cliente</th>
                     <th>Sucursal</th>
                     <th class="gestion-numero">Total</th>
@@ -26,7 +27,8 @@
                 {% for venta in pagina %}
                     <tr>
                         <td class="gestion-numero">{{ venta.numero }}</td>
-                        <td>{{ venta.fecha|date:'d/m/Y' }}</td>
+                        <td>{{ venta.fecha|date:'d/m/Y H:i' }}</td>
+                        <td>{{ venta.get_estado_display }}</td>
                         <td>{{ venta.cliente.nombre }}</td>
                         <td>{{ venta.sucursal.nombre }}</td>
                         <td class="gestion-numero">${{ venta.total|pesos }}</td>
@@ -43,7 +45,7 @@
                     </tr>
                 {% empty %}
                     <tr>
-                        <td colspan="6">
+                        <td colspan="7">
                             <div class="gestion-vacio gestion-vacio-listado">
                                 <span aria-hidden="true">↗</span>
                                 <h2>Todavía no hay ventas</h2>

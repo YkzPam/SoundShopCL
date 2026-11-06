@@ -1,6 +1,7 @@
 """Tienda de E2 continuada en E3: autenticación y páginas propias de gestión."""
 
 from datetime import date
+from decimal import Decimal
 
 from django.contrib import messages
 from django.contrib.auth import (
@@ -21,6 +22,7 @@ from django.http import HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.text import slugify
+from django.utils import timezone
 
 from .models import Categoria, Marca, Proveedor, Sucursal, Cliente, Producto, Boleta, DetalleBoleta
 from .decorators import grupos_permitidos
@@ -636,6 +638,7 @@ def cliente_formulario(request, cliente_id=None):
     persona = get_object_or_404(Cliente, pk=cliente_id) if cliente_id else Cliente()
     errores = {}
     if request.method == "POST":
+        persona.rut = request.POST.get("rut", "").strip() or None
         persona.nombre = request.POST.get("nombre", "").strip()
         persona.correo = request.POST.get("correo", "").strip().lower()
         persona.telefono = request.POST.get("telefono", "").strip()
@@ -688,13 +691,7 @@ def cliente_eliminar(request, cliente_id):
 @login_required
 @grupos_permitidos("Administrador", "Operador")
 def gestion_ventas(request):
-    ventas = (
-        Boleta.objects.select_related("cliente", "sucursal")
-        .annotate(
-            total=Sum(F("detalleboleta__cantidad") * F("detalleboleta__precio_unitario"), default=0)
-        )
-        .order_by("-fecha", "-numero")
-    )
+    ventas = Boleta.objects.select_related("cliente", "sucursal").order_by("-fecha", "-numero")
     return render(
         request,
         "core/e3/ventas.html",
@@ -705,15 +702,18 @@ def gestion_ventas(request):
 @login_required
 @grupos_permitidos("Administrador", "Operador")
 def venta_formulario(request, venta_id=None):
-    venta = get_object_or_404(Boleta, pk=venta_id) if venta_id else Boleta(fecha=date.today())
+    venta = get_object_or_404(Boleta, pk=venta_id) if venta_id else Boleta()
     errores = {}
     if request.method == "POST":
         venta.numero = request.POST.get("numero", "")
         venta.fecha = request.POST.get("fecha", "")
+        venta.estado = request.POST.get("estado", venta.estado)
         venta.cliente_id = request.POST.get("cliente") or None
         venta.sucursal_id = request.POST.get("sucursal") or None
         errores = errores_modelo(venta)
         if not errores:
+            if timezone.is_naive(venta.fecha):
+                venta.fecha = timezone.make_aware(venta.fecha)
             venta.save()
             messages.success(
                 request, "Venta guardada. Puede incorporar sus productos en el detalle."
@@ -729,8 +729,9 @@ def venta_formulario(request, venta_id=None):
             "fecha_formulario": (
                 request.POST.get("fecha", "")
                 if request.method == "POST"
-                else venta.fecha.isoformat()
+                else timezone.localtime(venta.fecha).strftime("%Y-%m-%dT%H:%M")
             ),
+            "estados": Boleta.ESTADOS,
             "clientes": Cliente.objects.order_by("nombre"),
             "sucursales": Sucursal.objects.order_by("nombre"),
         },
@@ -742,11 +743,15 @@ def venta_formulario(request, venta_id=None):
 def venta_detalle(request, venta_id):
     venta = get_object_or_404(Boleta.objects.select_related("cliente", "sucursal"), pk=venta_id)
     detalles = DetalleBoleta.objects.filter(boleta=venta).select_related("producto").order_by("id")
-    total = detalles.aggregate(total=Sum(F("cantidad") * F("precio_unitario"), default=0))["total"]
     return render(
         request,
         "core/e3/venta_detalle.html",
-        {"titulo": f"Venta {venta.numero}", "venta": venta, "detalles": detalles, "total": total},
+        {
+            "titulo": f"Venta {venta.numero}",
+            "venta": venta,
+            "detalles": detalles,
+            "total": venta.total,
+        },
     )
 
 
@@ -765,6 +770,15 @@ def detalle_formulario(request, venta_id, detalle_id=None):
         detalle.cantidad = request.POST.get("cantidad", "")
         detalle.precio_unitario = request.POST.get("precio_unitario", "")
         errores = errores_modelo(detalle)
+        if not errores:
+            subtotal = detalle.cantidad * detalle.precio_unitario
+            otros_importes = (
+                DetalleBoleta.objects.filter(boleta=venta)
+                .exclude(pk=detalle.pk)
+                .aggregate(total=Sum("subtotal", default=0))["total"]
+            )
+            if subtotal + otros_importes > Decimal("999999999999.99"):
+                errores["cantidad"] = ["El importe supera el máximo permitido para una venta."]
         if not errores:
             detalle.save()
             messages.success(request, "Detalle guardado con el precio histórico indicado.")

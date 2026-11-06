@@ -44,7 +44,13 @@ Desde Usuarios, el Administrador puede editar, desactivar o eliminar otras cuent
 
 ## 3. Continuidad del modelo de la tienda
 
-Las ventas se almacenan en los modelos existentes `Boleta` y `DetalleBoleta`: corresponden a `Venta` y `DetalleVenta` del caso de la guía. No se crean otras tablas para duplicar esa información. El detalle relaciona cada producto con su venta y conserva la cantidad y el precio unitario histórico. El total se calcula con esos valores, por lo que cambiar el precio del catálogo no modifica ventas anteriores.
+Las ventas se almacenan en los modelos existentes `Boleta` y `DetalleBoleta`: corresponden a `Venta` y `DetalleVenta` del caso de la guía. El modelo de E3 incorpora RUT de cliente, fecha y hora de venta, estado, subtotal y total. Las longitudes y los importes de las entidades principales siguen el esquema de Tienda. `Producto.codigo` utiliza la columna `sku` y `Cliente.correo` la columna `email`; se conservan los nombres Python de E2 mediante `db_column`.
+
+Cada detalle guarda `subtotal = cantidad × precio_unitario`. Al guardar o eliminar un detalle se actualiza y guarda el total de la venta. El precio unitario histórico se conserva, por lo que cambiar el precio del catálogo no modifica ventas anteriores. Los estados Registrada, Pendiente y Finalizada permiten describir la venta; no ejecutan cobros ni cambian sus importes.
+
+Las migraciones `0011` y `0012` completan los campos y trasladan los registros anteriores. Las ventas de E2 conservan su día y reciben las 00:00 como hora local; sus subtotales y totales se calculan a partir de los detalles existentes. El RUT es opcional y único cuando se informa; los clientes anteriores permanecen sin RUT hasta que se complete desde el panel.
+
+El [diagrama de E3](docs/evaluacion-3/diagrama-base-datos.png) representa las diez tablas conservadas y sus campos actuales. También está disponible en [SVG](docs/evaluacion-3/diagrama-base-datos.svg) y como [editable de Excalidraw](docs/evaluacion-3/diagrama-base-datos.excalidraw). Los diagramas de `docs/evaluacion-2/` documentan la etapa anterior.
 
 Los otros modelos heredados —marcas, proveedores, sucursales y compras a proveedores— se conservan como parte del proyecto anterior. El CRUD de E3 se concentra en las entidades del caso Tienda. Un producto, categoría o cliente utilizado en otros registros tiene protección de borrado; al eliminar una venta se eliminan sus detalles y se mantienen los productos y el cliente.
 

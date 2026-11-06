@@ -17,12 +17,12 @@
                 <legend>Identidad del producto</legend>
                 <div class="row g-3">
                     <div class="col-sm-4">
-                        <label for="codigo" class="form-label">Código</label>
+                        <label for="codigo" class="form-label">Código / SKU</label>
                         <input class="form-control"
                                id="codigo"
                                name="codigo"
                                value="{{ producto.codigo }}"
-                               maxlength="30"
+                               maxlength="50"
                                required{% if errores.codigo %}
                                aria-invalid="true"
                                aria-describedby="error-codigo"{% endif %}>
@@ -34,7 +34,7 @@
                                id="nombre"
                                name="nombre"
                                value="{{ producto.nombre }}"
-                               maxlength="80"
+                               maxlength="150"
                                required{% if errores.nombre %}
                                aria-invalid="true"
                                aria-describedby="error-nombre"{% endif %}>

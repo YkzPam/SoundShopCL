@@ -23,14 +23,28 @@
                     {% include "core/e3/error_campo.html" with mensajes=errores.numero campo="numero" %}
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label" for="fecha">Fecha</label>
+                    <label class="form-label" for="fecha">Fecha y hora</label>
                     <input class="form-control"
                            id="fecha"
                            name="fecha"
-                           type="date"
+                           type="datetime-local"
                            required
                            value="{{ fecha_formulario }}"{% if errores.fecha %} aria-invalid="true" aria-describedby="error-fecha"{% endif %}>
                     {% include "core/e3/error_campo.html" with mensajes=errores.fecha campo="fecha" %}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="estado">Estado</label>
+                    <select class="form-select"
+                            id="estado"
+                            name="estado"
+                            required
+                            {% if errores.estado %}aria-invalid="true" aria-describedby="error-estado"{% endif %}>
+                        {% for valor, nombre in estados %}
+                            <option value="{{ valor }}"
+                                    {% if venta.estado == valor %}selected{% endif %}>{{ nombre }}</option>
+                        {% endfor %}
+                    </select>
+                    {% include "core/e3/error_campo.html" with mensajes=errores.estado campo="estado" %}
                 </div>
             </div>
         </fieldset>

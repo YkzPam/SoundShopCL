@@ -1,6 +1,6 @@
 """Pruebas funcionales de E3 sobre la base SQLite de pruebas de Django."""
 
-from datetime import date, timedelta
+from datetime import date, datetime, time, timedelta
 from decimal import Decimal
 from django.contrib.auth.models import Group, User
 from django.core.management import call_command
@@ -8,6 +8,7 @@ from io import StringIO
 from django.db import connection
 from django.test import Client, TestCase
 from django.urls import reverse
+from django.utils import timezone
 from .models import Categoria, Marca, Proveedor, Sucursal, Cliente, Producto, Boleta, DetalleBoleta
 
 
@@ -80,8 +81,9 @@ class Evaluacion3Tests(TestCase):
         cls.hoy = date.today()
         cls.mes_anterior = cls.hoy.replace(day=1) - timedelta(days=1)
         cls.anio_anterior = date(cls.hoy.year - 1, 1, 1)
+        fecha_actual = timezone.make_aware(datetime.combine(cls.hoy, time(12)))
         cls.venta = Boleta.objects.create(
-            numero=1, fecha=cls.hoy, cliente=cls.ana, sucursal=cls.sucursal
+            numero=1, fecha=fecha_actual, cliente=cls.ana, sucursal=cls.sucursal
         )
         cls.detalle = DetalleBoleta.objects.create(
             boleta=cls.venta, producto=cls.guitarra, cantidad=2, precio_unitario=80
@@ -90,19 +92,25 @@ class Evaluacion3Tests(TestCase):
             boleta=cls.venta, producto=cls.audifonos, cantidad=1, precio_unitario=50
         )
         cls.segunda = Boleta.objects.create(
-            numero=2, fecha=cls.hoy, cliente=cls.ana, sucursal=cls.sucursal
+            numero=2, fecha=fecha_actual, cliente=cls.ana, sucursal=cls.sucursal
         )
         DetalleBoleta.objects.create(
             boleta=cls.segunda, producto=cls.guitarra, cantidad=1, precio_unitario=90
         )
         tercera = Boleta.objects.create(
-            numero=3, fecha=cls.mes_anterior, cliente=cls.beto, sucursal=cls.sucursal
+            numero=3,
+            fecha=timezone.make_aware(datetime.combine(cls.mes_anterior, time(12))),
+            cliente=cls.beto,
+            sucursal=cls.sucursal,
         )
         DetalleBoleta.objects.create(
             boleta=tercera, producto=cls.audifonos, cantidad=4, precio_unitario=40
         )
         cuarta = Boleta.objects.create(
-            numero=4, fecha=cls.anio_anterior, cliente=cls.beto, sucursal=cls.sucursal
+            numero=4,
+            fecha=timezone.make_aware(datetime.combine(cls.anio_anterior, time(12))),
+            cliente=cls.beto,
+            sucursal=cls.sucursal,
         )
         DetalleBoleta.objects.create(
             boleta=cuarta, producto=cls.guitarra, cantidad=3, precio_unitario=70
@@ -319,6 +327,7 @@ class Evaluacion3Tests(TestCase):
 
     def test_cliente_crud_validacion_y_proteccion(self):
         datos = {
+            "rut": "11111111-1",
             "nombre": "Carla",
             "correo": "carla@example.test",
             "telefono": "123",
@@ -326,6 +335,7 @@ class Evaluacion3Tests(TestCase):
         }
         self.client.post(reverse("core:cliente_nuevo"), datos)
         persona = Cliente.objects.get(correo="carla@example.test")
+        self.assertEqual(persona.rut, "11111111-1")
         datos["nombre"] = "Carla editada"
         self.client.post(reverse("core:cliente_editar", args=[persona.pk]), datos)
         persona.refresh_from_db()
@@ -355,6 +365,8 @@ class Evaluacion3Tests(TestCase):
         self.client.post(reverse("core:detalle_nuevo", args=[venta.pk]), linea)
         detalle = DetalleBoleta.objects.get(boleta=venta)
         self.assertEqual(detalle.subtotal, Decimal("41980"))
+        venta.refresh_from_db()
+        self.assertEqual(venta.total, Decimal("41980"))
         self.assertContains(
             self.client.get(reverse("core:venta_detalle", args=[venta.pk])), "41.980"
         )
@@ -362,8 +374,13 @@ class Evaluacion3Tests(TestCase):
         self.client.post(reverse("core:detalle_editar", args=[venta.pk, detalle.pk]), linea)
         detalle.refresh_from_db()
         self.assertEqual(detalle.cantidad, 3)
+        self.assertEqual(detalle.subtotal, Decimal("62970"))
+        venta.refresh_from_db()
+        self.assertEqual(venta.total, Decimal("62970"))
         self.client.post(reverse("core:detalle_eliminar", args=[venta.pk, detalle.pk]))
         self.assertFalse(DetalleBoleta.objects.filter(pk=detalle.pk).exists())
+        venta.refresh_from_db()
+        self.assertEqual(venta.total, Decimal("0"))
         self.client.post(reverse("core:detalle_nuevo", args=[venta.pk]), linea)
         self.client.post(reverse("core:venta_eliminar", args=[venta.pk]))
         self.assertFalse(Boleta.objects.filter(pk=venta.pk).exists())
@@ -982,3 +999,89 @@ class Evaluacion3Tests(TestCase):
         listado = self.client.get(reverse("core:gestion_usuarios"))
         self.assertNotContains(listado, url)
         self.assertContains(listado, reverse("core:usuario_eliminar", args=[self.operador.pk]))
+
+    def test_campos_del_esquema_y_precision_de_precio(self):
+        self.assertEqual(Cliente._meta.get_field("rut").max_length, 20)
+        self.assertEqual(Cliente._meta.get_field("correo").column, "email")
+        self.assertEqual(Producto._meta.get_field("codigo").column, "sku")
+        self.assertEqual(Boleta._meta.get_field("fecha").get_internal_type(), "DateTimeField")
+        self.assertEqual(Boleta._meta.get_field("total").max_digits, 14)
+        self.assertEqual(DetalleBoleta._meta.get_field("subtotal").max_digits, 14)
+        datos = self.datos_producto()
+        datos.update(codigo="SKU-" + "A" * 46, nombre="G" * 150, precio="100000000.25")
+        respuesta = self.client.post(reverse("core:producto_nuevo"), datos)
+        self.assertEqual(respuesta.status_code, 302)
+        producto = Producto.objects.get(codigo=datos["codigo"])
+        self.assertEqual(producto.precio, Decimal("100000000.25"))
+
+    def test_rut_de_cliente_unico_y_opcional(self):
+        datos = {"rut": "11111111-1", "nombre": "Cliente con RUT", "correo": "rut@example.test"}
+        self.assertEqual(self.client.post(reverse("core:cliente_nuevo"), datos).status_code, 302)
+        datos["correo"] = "otro-rut@example.test"
+        respuesta = self.client.post(reverse("core:cliente_nuevo"), datos)
+        self.assertIn("rut", respuesta.context["errores"])
+        self.assertFalse(Cliente.objects.filter(correo=datos["correo"]).exists())
+        datos["rut"] = ""
+        self.assertEqual(self.client.post(reverse("core:cliente_nuevo"), datos).status_code, 302)
+        self.assertIsNone(Cliente.objects.get(correo=datos["correo"]).rut)
+
+    def test_fecha_hora_estado_y_reportes_incluyen_fin_del_dia(self):
+        fecha = self.hoy.isoformat() + "T23:45"
+        datos = {
+            "numero": 99,
+            "fecha": fecha,
+            "estado": "finalizada",
+            "cliente": self.ana.pk,
+            "sucursal": self.sucursal.pk,
+        }
+        respuesta = self.client.post(reverse("core:venta_nueva"), datos)
+        self.assertEqual(respuesta.status_code, 302)
+        venta = Boleta.objects.get(numero=99)
+        self.assertEqual(venta.estado, "finalizada")
+        self.assertEqual(timezone.localtime(venta.fecha).strftime("%Y-%m-%dT%H:%M"), fecha)
+        self.client.post(
+            reverse("core:detalle_nuevo", args=[venta.pk]),
+            {"producto": self.guitarra.pk, "cantidad": 2, "precio_unitario": 10},
+        )
+        reporte = self.client.get(
+            reverse("core:reportes"),
+            {"reporte": 8, "desde": self.hoy.isoformat(), "hasta": self.hoy.isoformat()},
+        )
+        self.assertEqual(list(reporte.context["filas"])[0][2], 3)
+        reporte = self.client.get(
+            reverse("core:reportes"), {"reporte": 10, "fecha": self.hoy.isoformat()}
+        )
+        self.assertEqual(list(reporte.context["filas"])[0][1], Decimal("320"))
+        self.assertContains(
+            self.client.get(reverse("core:venta_detalle", args=[venta.pk])), "23:45"
+        )
+        datos.update(numero=100, estado="no_permitido")
+        respuesta = self.client.post(reverse("core:venta_nueva"), datos)
+        self.assertIn("estado", respuesta.context["errores"])
+        self.assertFalse(Boleta.objects.filter(numero=100).exists())
+
+    def test_subtotal_y_total_guardados_al_editar_y_borrar(self):
+        self.detalle.cantidad = 3
+        self.detalle.save(update_fields=["cantidad"])
+        detalle = DetalleBoleta.objects.get(pk=self.detalle.pk)
+        venta = Boleta.objects.get(pk=self.venta.pk)
+        self.assertEqual(detalle.subtotal, Decimal("240"))
+        self.assertEqual(venta.total, Decimal("290"))
+        detalle.delete()
+        venta.refresh_from_db()
+        self.assertEqual(venta.total, Decimal("50"))
+
+    def test_importe_fuera_de_rango_no_modifica_la_venta(self):
+        antes = DetalleBoleta.objects.count()
+        respuesta = self.client.post(
+            reverse("core:detalle_nuevo", args=[self.venta.pk]),
+            {
+                "producto": self.sin_venta.pk,
+                "cantidad": 1000000000,
+                "precio_unitario": "9999999999.99",
+            },
+        )
+        self.assertIn("cantidad", respuesta.context["errores"])
+        self.assertEqual(DetalleBoleta.objects.count(), antes)
+        self.venta.refresh_from_db()
+        self.assertEqual(self.venta.total, Decimal("210"))

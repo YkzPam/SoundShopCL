@@ -11,13 +11,23 @@
         <fieldset>
             <legend>Datos de contacto</legend>
             <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label" for="rut">RUT</label>
+                    <input class="form-control"
+                           id="rut"
+                           name="rut"
+                           value="{{ persona.rut|default_if_none:'' }}"
+                           maxlength="20"
+                           {% if errores.rut %}aria-invalid="true" aria-describedby="error-rut"{% endif %}>
+                    {% include "core/e3/error_campo.html" with mensajes=errores.rut campo="rut" %}
+                </div>
                 <div class="col-12">
                     <label class="form-label" for="nombre">Nombre</label>
                     <input class="form-control"
                            id="nombre"
                            name="nombre"
                            value="{{ persona.nombre }}"
-                           maxlength="100"
+                           maxlength="150"
                            required{% if errores.nombre %}
                            aria-invalid="true"
                            aria-describedby="error-nombre"{% endif %}>
@@ -30,6 +40,7 @@
                            id="correo"
                            name="correo"
                            value="{{ persona.correo }}"
+                           maxlength="150"
                            required{% if errores.correo %}
                            aria-invalid="true"
                            aria-describedby="error-correo"{% endif %}>
@@ -41,7 +52,7 @@
                            id="telefono"
                            name="telefono"
                            value="{{ persona.telefono }}"
-                           maxlength="20"{% if errores.telefono %} aria-invalid="true" aria-describedby="error-telefono"{% endif %}>
+                           maxlength="30"{% if errores.telefono %} aria-invalid="true" aria-describedby="error-telefono"{% endif %}>
                     {% include "core/e3/error_campo.html" with mensajes=errores.telefono campo="telefono" %}
                 </div>
             </div>

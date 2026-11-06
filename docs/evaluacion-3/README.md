@@ -10,6 +10,10 @@ Los grupos nativos de Django se preparan con `python manage.py configurar_grupos
 
 Cada formulario envía una petición POST con CSRF. La vista lee los campos, aplica `full_clean()` al modelo y guarda mediante el ORM cuando los datos son válidos. Los errores vuelven al formulario. Los borrados requieren confirmación con POST y respetan las relaciones protegidas. El Administrador puede desactivar o eliminar otras cuentas de acceso; no puede desactivar ni eliminar su propia cuenta durante la gestión. Borrar una cuenta no elimina los registros comerciales de clientes, productos o ventas.
 
+El formulario de cliente incluye RUT opcional y único. Las ventas incluyen fecha con hora y un estado descriptivo. Los detalles guardan el subtotal calculado con su cantidad y precio histórico; al guardar o eliminar un detalle se actualiza el total almacenado de la venta. Los filtros por día y período consideran el día local completo, incluyendo las ventas registradas a última hora.
+
+La continuidad con E2 conserva los nombres `Boleta` y `DetalleBoleta` para Venta y DetalleVenta. `codigo` se almacena en la columna `sku`, y `correo` en `email`. El [diagrama actual de la base](diagrama-base-datos.png) muestra los campos y relaciones de E3; puede consultarse en [SVG](diagrama-base-datos.svg) o abrirse como [archivo Excalidraw](diagrama-base-datos.excalidraw). Las migraciones de E2 permanecen y E3 añade las migraciones `0011` y `0012`.
+
 La primera cuenta se prepara con `createsuperuser`, pero la gestión se realiza en las páginas propias del proyecto. La ruta `/admin/` no está habilitada y `django.contrib.admin` no está instalado en esta rama, de acuerdo con la indicación de la guía de E3 de utilizar un administrador propio. El registro de los modelos en Django Admin corresponde a la etapa E2 conservada en su rama. Las actividades de aplicación adjuntas se incorporan a E3 en lo relativo al CRUD, las peticiones POST, CSRF, los grupos, el decorador propio y el control de acceso.
 
 ## 2. Correspondencia de las veinte consultas ORM

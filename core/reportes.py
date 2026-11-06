@@ -10,7 +10,7 @@ from decimal import Decimal, InvalidOperation
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Avg, Count, F, Q, Sum
-from django.db.models.functions import ExtractMonth
+from django.db.models.functions import ExtractMonth, TruncDate
 from django.http import HttpResponseBadRequest
 from django.shortcuts import render
 
@@ -119,7 +119,7 @@ def reportes(request):
                 or not maximo.is_finite()
                 or minimo < 0
                 or maximo < minimo
-                or maximo > Decimal("99999999.99")
+                or maximo > Decimal("9999999999.99")
             ):
                 raise ValueError("Debe indicar un rango de precios válido, sin puntos de miles.")
             columnas = ["Código", "Producto", "Precio"]
@@ -149,14 +149,9 @@ def reportes(request):
             monedas = [3]
             filas = (
                 Boleta.objects.filter(cliente_id=cliente)
-                .annotate(
-                    total=Sum(
-                        F("detalleboleta__cantidad") * F("detalleboleta__precio_unitario"),
-                        default=0,
-                    )
-                )
+                .annotate(fecha_compra=TruncDate("fecha"))
                 .order_by("-fecha", "-numero")
-                .values_list("numero", "fecha", "cliente__nombre", "total")
+                .values_list("numero", "fecha_compra", "cliente__nombre", "total")
             )
 
         # 7. Se comprueba también que la venta corresponde al cliente.
@@ -173,7 +168,9 @@ def reportes(request):
         # 8. Cuenta ventas, no líneas de detalle.
         elif numero == 8:
             columnas = ["Desde", "Hasta", "Ventas realizadas"]
-            filas = [(desde, hasta, Boleta.objects.filter(fecha__range=(desde, hasta)).count())]
+            filas = [
+                (desde, hasta, Boleta.objects.filter(fecha__date__range=(desde, hasta)).count())
+            ]
 
         # 9. Incluye productos sin stock.
         elif numero == 9:
@@ -188,7 +185,7 @@ def reportes(request):
         elif numero == 10:
             columnas = ["Fecha", "Total vendido"]
             monedas = [1]
-            total = DetalleBoleta.objects.filter(boleta__fecha=fecha).aggregate(
+            total = DetalleBoleta.objects.filter(boleta__fecha__date=fecha).aggregate(
                 total=Sum(F("cantidad") * F("precio_unitario"), default=0)
             )["total"]
             filas = [(fecha, total)]
@@ -276,7 +273,7 @@ def reportes(request):
                 Producto.objects.annotate(
                     unidades=Sum(
                         "detalleboleta__cantidad",
-                        filter=Q(detalleboleta__boleta__fecha__range=(inicio_mes, fin_mes)),
+                        filter=Q(detalleboleta__boleta__fecha__date__range=(inicio_mes, fin_mes)),
                         default=0,
                     )
                 )

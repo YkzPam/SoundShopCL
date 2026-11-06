@@ -27,6 +27,7 @@
         <table class="table">
             <thead>
                 <tr>
+                    <th>RUT</th>
                     <th>Nombre</th>
                     <th>Correo</th>
                     <th>Teléfono</th>
@@ -37,6 +38,7 @@
             <tbody>
                 {% for c in pagina %}
                     <tr>
+                        <td>{{ c.rut|default_if_none:'—' }}</td>
                         <td>{{ c.nombre }}</td>
                         <td>{{ c.correo }}</td>
                         <td>{{ c.telefono }}</td>
@@ -52,7 +54,7 @@
                     </tr>
                 {% empty %}
                     <tr>
-                        <td colspan="5">
+                        <td colspan="6">
                             <div class="gestion-vacio gestion-vacio-listado">
                                 <span aria-hidden="true">○</span>
                                 {% if busqueda %}
