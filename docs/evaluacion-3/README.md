@@ -1,6 +1,6 @@
 # Evaluación 3 — Gestión y consultas de la tienda
 
-SoundShop CL conserva el caso Tienda de la etapa anterior. La interfaz de gestión utiliza formularios HTML y vistas de función, siguiendo el estilo del ejercicio entregado por el docente. La guía de E3 se aplica al panel propio, la autenticación nativa, MySQL y los reportes ORM. La lista de Tienda contiene veinte preguntas; se implementan las veinte confirmadas para este proyecto.
+SoundShop CL conserva el caso Tienda y SQLite como base de datos de la etapa anterior. La interfaz de gestión utiliza formularios HTML y vistas de función, siguiendo el estilo del ejercicio entregado por el docente. La guía de E3 se aplica al panel propio, la autenticación nativa y los reportes ORM. La lista de Tienda contiene veinte preguntas; se implementan las veinte confirmadas para este proyecto.
 
 ## 1. Gestión de información y acceso
 
@@ -43,6 +43,6 @@ Los reportes se implementan en `core/reportes.py`. La interpretación de «últi
 
 ## 3. Recorrido de demostración
 
-La demostración comienza con MySQL activo, las migraciones aplicadas y una cuenta creada. Una visita anónima a `/gestion/` conduce al inicio de sesión. Después de ingresar, se crea un producto, se consulta, se modifica y se elimina un registro sin referencias. El mismo recorrido está disponible para categorías y clientes; una venta permite mantener su encabezado y sus detalles.
+La demostración comienza con la base `db.sqlite3` preparada mediante las migraciones y una cuenta creada. Una visita anónima a `/gestion/` conduce al inicio de sesión. Después de ingresar, se crea un producto, se consulta, se modifica y se elimina un registro sin referencias. El mismo recorrido está disponible para categorías y clientes; una venta permite mantener su encabezado y sus detalles.
 
 Desde Usuarios se puede crear una cuenta, editar sus datos, desactivarla o eliminarla con confirmación. Desde Reportes se seleccionan las preguntas y los filtros que correspondan. Al cerrar sesión, volver a una URL administrativa exige ingresar otra vez. Para explicar el código conviene ubicar `settings.py`, `models.py`, `urls.py`, `views.py`, `reportes.py` y las plantillas utilizadas en el recorrido.

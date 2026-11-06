@@ -1,12 +1,12 @@
 # SoundShop CL — Tienda musical
 
-La Evaluación 3 continúa la misma tienda de E2. Conserva el catálogo, las imágenes, los estilos, los diez modelos y el historial de migraciones. Esta etapa utiliza MySQL local y agrega un panel propio con autenticación de Django, gestión de productos, categorías, clientes, ventas y usuarios, y veinte consultas ORM del caso Tienda. Los formularios están escritos en HTML y se procesan en las vistas con `request.POST`, sin `forms.py` ni Django Admin.
+La Evaluación 3 continúa la misma tienda de E2. Conserva el catálogo, las imágenes, los estilos, los diez modelos, el historial de migraciones y SQLite como base de datos. Esta etapa agrega un panel propio con autenticación de Django, gestión de productos, categorías, clientes, ventas y usuarios, y veinte consultas ORM del caso Tienda. Los formularios están escritos en HTML y se procesan en las vistas con `request.POST`, sin `forms.py` ni Django Admin.
 
-## 1. Preparación del entorno y de MySQL
+## 1. Preparación del entorno
 
-Abrir en Visual Studio Code la carpeta que contiene `manage.py`. Se requiere Python y un servidor MySQL local activo. La conexión se verificó con MySQL Community Server 8.4 y `mysqlclient` 2.2.8. La descarga del proyecto no incluye el servidor de base de datos, el entorno virtual ni contraseñas.
+Abrir en Visual Studio Code la carpeta que contiene `manage.py`. Se requiere Python; SQLite está incluido en Python y guarda la información en el archivo `db.sqlite3`, junto a `manage.py`. Ese archivo se crea al ejecutar las migraciones. La descarga del proyecto no incluye el entorno virtual, una base con datos locales ni contraseñas.
 
-La carga inicial utiliza datos de muestra definidos directamente, sin bibliotecas para generar personas ficticias. El resumen y los reportes calculan sus cifras desde los registros de MySQL; las ventas de demostración son datos locales y no forman parte de la descarga del repositorio.
+La carga inicial utiliza datos de muestra definidos directamente, sin bibliotecas para generar personas ficticias. El resumen y los reportes calculan sus cifras desde los registros de SQLite; las ventas de demostración son datos locales y no forman parte de la descarga del repositorio.
 
 En la terminal integrada seleccionar **Command Prompt / Símbolo del sistema (CMD)**. Los siguientes comandos corresponden a CMD; se ejecutan uno por uno:
 
@@ -16,27 +16,9 @@ venv\Scripts\activate
 python -m pip install -r requirements.txt
 ```
 
-En MySQL Workbench, o en la consola de MySQL, crear la base antes de aplicar las migraciones:
-
-```sql
-CREATE DATABASE soundshop_e3 CHARACTER SET utf8mb4;
-```
-
-En la misma terminal CMD donde está activo `venv`, indicar los datos de la conexión local. Sustituir `USUARIO_MYSQL` y `CLAVE_MYSQL` por los datos elegidos al configurar MySQL. El usuario de la base y el usuario que inicia sesión en la tienda son cuentas diferentes.
-
-```bat
-set MYSQL_DATABASE=soundshop_e3
-set MYSQL_HOST=127.0.0.1
-set MYSQL_PORT=3306
-set MYSQL_USER=USUARIO_MYSQL
-set MYSQL_PASSWORD=CLAVE_MYSQL
-```
-
-Si el usuario local de MySQL no tiene contraseña, usar `set MYSQL_PASSWORD=`. Si MySQL escucha en otro puerto, cambiar `MYSQL_PORT`. Estos valores duran mientras permanezca abierta esa terminal; no se deben guardar contraseñas en archivos publicados.
-
 ## 2. Preparación y ejecución de la tienda
 
-Con MySQL activo y las variables anteriores configuradas, ejecutar:
+En la misma terminal, con `venv` activo, ejecutar:
 
 ```bat
 python manage.py migrate
@@ -46,7 +28,7 @@ python manage.py configurar_grupos
 python manage.py runserver
 ```
 
-`migrate` aplica el historial existente sobre la base MySQL nueva. No se vuelve a ejecutar `startproject` ni `startapp` al descargar un proyecto ya creado. `cargar_catalogo` incorpora los equipos y los registros ficticios relacionados sin sobrescribir los que ya fueron editados. La base SQLite usada en E2 se conserva fuera de esta entrega y no se transforma automáticamente en MySQL.
+`migrate` crea o actualiza la base SQLite aplicando el historial existente. No se vuelve a ejecutar `startproject` ni `startapp` al descargar un proyecto ya creado. `cargar_catalogo` incorpora los equipos y los registros ficticios relacionados sin sobrescribir los que ya fueron editados. Cada computador conserva sus datos en su propio archivo `db.sqlite3`.
 
 `createsuperuser` crea la primera cuenta de administración. Se eligen el nombre, correo y contraseña; la contraseña no aparece mientras se escribe. Esta cuenta ingresa al panel propio de E3. No se publica una contraseña administrativa predeterminada ni se habilita la ruta de Django Admin.
 
@@ -81,7 +63,7 @@ Los listados muestran el número de registros y distinguen entre una lista vací
 El catálogo administrativo incluye accesos por categoría musical, botones de acción con iconos y avisos para productos sin foto, con stock bajo, agotados o desactivados. El formulario de producto está organizado por secciones y cuenta con una vista previa de fotografía, nombre, marca, categoría, código, precio y estado. La vista previa utiliza JavaScript del proyecto y solo refleja los campos que se están editando; los cambios se guardan al enviar el formulario.
 
 ```text
-soundshop/settings.py            Conexión a MySQL y autenticación
+soundshop/settings.py            Conexión a SQLite y autenticación
 soundshop/urls.py                Rutas del proyecto sin Django Admin
 core/models.py                  Modelo de datos conservado de E2
 core/migrations/                Historial conservado de E2
@@ -100,7 +82,7 @@ Las páginas administrativas y las operaciones están protegidas con `login_requ
 
 ## 5. Comprobación y conservación de las entregas
 
-Para revisar la configuración, comprobar que no faltan migraciones y ejecutar las pruebas en otra base temporal de MySQL:
+Para revisar la configuración, comprobar que no faltan migraciones y ejecutar las pruebas en una base temporal de SQLite:
 
 ```bat
 python manage.py check
@@ -109,8 +91,8 @@ python manage.py makemigrations core --check --dry-run
 python manage.py test core
 ```
 
-El usuario MySQL utilizado para las pruebas debe poder crear y eliminar la base `test_soundshop_e3`. Las pruebas verifican sesiones, rutas protegidas, CRUD, validaciones, persistencia y resultados conocidos de los veinte reportes. No reemplazan la demostración presencial ni la explicación del código.
+Las pruebas utilizan una base temporal de SQLite y no modifican los registros de `db.sqlite3`. Verifican sesiones, rutas protegidas, CRUD, validaciones, persistencia y resultados conocidos de los veinte reportes. No reemplazan la demostración presencial ni la explicación del código.
 
-La rama `evaluacion-3` continúa el trabajo de `evaluacion-2`. La primera entrega se conserva en `evaluacion1` y la segunda en `evaluacion-2`; sus archivos e historiales no se sustituyen. Los materiales de `docs/evaluacion-2/`, los diagramas de flujo y los mockups anteriores permanecen como antecedentes de esas etapas. Sus instrucciones sobre SQLite y Django Admin corresponden a E2; la instalación vigente de esta rama es la descrita aquí.
+La rama `evaluacion-3` continúa el trabajo de `evaluacion-2`. La primera entrega se conserva en `evaluacion1` y la segunda en `evaluacion-2`; sus archivos e historiales no se sustituyen. Los materiales de `docs/evaluacion-2/`, los diagramas de flujo y los mockups anteriores permanecen como antecedentes de esas etapas. E2 y E3 utilizan SQLite; las instrucciones de Django Admin corresponden a E2 y la instalación vigente de esta rama es la descrita aquí.
 
 La entrega de E3 se debe identificar con la rama y el hash del commit que efectivamente esté publicado en GitHub. Descargar o ejecutar el proyecto local no equivale a publicarlo ni a enviarlo a la plataforma.

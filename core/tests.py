@@ -1,4 +1,4 @@
-"""Pruebas funcionales de E3 sobre la base MySQL de pruebas de Django."""
+"""Pruebas funcionales de E3 sobre la base SQLite de pruebas de Django."""
 
 from datetime import date, timedelta
 from decimal import Decimal
@@ -125,8 +125,8 @@ class Evaluacion3Tests(TestCase):
             "imagen": "",
         }
 
-    def test_mysql_y_tablas_heredadas(self):
-        self.assertEqual(connection.vendor, "mysql")
+    def test_sqlite_y_tablas_heredadas(self):
+        self.assertEqual(connection.vendor, "sqlite")
         tablas = connection.introspection.table_names()
         self.assertEqual(len([t for t in tablas if t.startswith("core_")]), 10)
         self.assertIn("auth_user", tablas)

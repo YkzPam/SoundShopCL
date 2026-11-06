@@ -1,4 +1,4 @@
-"""Evaluación 3: tienda, sesiones de Django y MySQL local."""
+"""Evaluación 3: tienda, sesiones de Django y SQLite."""
 import os
 import secrets
 from pathlib import Path
@@ -46,13 +46,8 @@ TEMPLATES = [
 WSGI_APPLICATION = "soundshop.wsgi.application"
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": os.environ.get("MYSQL_DATABASE", "soundshop_e3"),
-        "USER": os.environ.get("MYSQL_USER", "root"),
-        "PASSWORD": os.environ.get("MYSQL_PASSWORD", ""),
-        "HOST": os.environ.get("MYSQL_HOST", "127.0.0.1"),
-        "PORT": os.environ.get("MYSQL_PORT", "3306"),
-        "OPTIONS": {"charset": "utf8mb4", "init_command": "SET sql_mode='STRICT_TRANS_TABLES'"},
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
     }
 }
 LOGIN_URL = "core:login"

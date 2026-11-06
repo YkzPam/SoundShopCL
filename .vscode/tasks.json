@@ -1,18 +1,92 @@
 {
-  "version": "2.0.0",
-  "tasks": [
-    {"label": "E3: instalar dependencias", "type": "process", "command": "${workspaceFolder}/venv/Scripts/python.exe", "args": ["-m", "pip", "install", "-r", "requirements.txt"], "problemMatcher": []},
-    {"label": "E3: revisar configuración", "type": "process", "command": "${workspaceFolder}/venv/Scripts/python.exe", "args": ["manage.py", "check"], "options": {"env": {"MYSQL_USER": "${input:usuarioMySQL}", "MYSQL_PASSWORD": "${input:claveMySQL}", "MYSQL_PORT": "${input:puertoMySQL}"}}, "problemMatcher": []},
-    {"label": "E3: aplicar migraciones", "type": "process", "command": "${workspaceFolder}/venv/Scripts/python.exe", "args": ["manage.py", "migrate"], "options": {"env": {"MYSQL_USER": "${input:usuarioMySQL}", "MYSQL_PASSWORD": "${input:claveMySQL}", "MYSQL_PORT": "${input:puertoMySQL}"}}, "problemMatcher": []},
-    {"label": "E3: cargar catálogo", "type": "process", "command": "${workspaceFolder}/venv/Scripts/python.exe", "args": ["manage.py", "cargar_catalogo"], "options": {"env": {"MYSQL_USER": "${input:usuarioMySQL}", "MYSQL_PASSWORD": "${input:claveMySQL}", "MYSQL_PORT": "${input:puertoMySQL}"}}, "problemMatcher": []},
-    {"label": "E3: crear cuenta administradora", "type": "process", "command": "${workspaceFolder}/venv/Scripts/python.exe", "args": ["manage.py", "createsuperuser"], "options": {"env": {"MYSQL_USER": "${input:usuarioMySQL}", "MYSQL_PASSWORD": "${input:claveMySQL}", "MYSQL_PORT": "${input:puertoMySQL}"}}, "problemMatcher": []},
-    {"label":"E3: configurar grupos de acceso","type":"process","command":"${workspaceFolder}/venv/Scripts/python.exe","args":["manage.py","configurar_grupos"],"options":{"env":{"MYSQL_USER":"${input:usuarioMySQL}","MYSQL_PASSWORD":"${input:claveMySQL}","MYSQL_PORT":"${input:puertoMySQL}"}},"problemMatcher":[]},
-    {"label": "E3: ejecutar pruebas", "type": "process", "command": "${workspaceFolder}/venv/Scripts/python.exe", "args": ["manage.py", "test", "core"], "options": {"env": {"MYSQL_USER": "${input:usuarioMySQL}", "MYSQL_PASSWORD": "${input:claveMySQL}", "MYSQL_PORT": "${input:puertoMySQL}"}}, "problemMatcher": [], "group": "test"},
-    {"label": "E3: iniciar tienda y panel", "type": "process", "command": "${workspaceFolder}/venv/Scripts/python.exe", "args": ["manage.py", "runserver", "127.0.0.1:8000"], "options": {"env": {"MYSQL_USER": "${input:usuarioMySQL}", "MYSQL_PASSWORD": "${input:claveMySQL}", "MYSQL_PORT": "${input:puertoMySQL}"}}, "problemMatcher": [], "isBackground": true}
-  ],
-  "inputs": [
-    {"id": "usuarioMySQL", "type": "promptString", "description": "Usuario de MySQL local", "default": "root"},
-    {"id": "claveMySQL", "type": "promptString", "description": "Contraseña de MySQL local (no es la del panel)", "password": true},
-    {"id": "puertoMySQL", "type": "promptString", "description": "Puerto del servidor MySQL local", "default": "3306"}
-  ]
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "E3: instalar dependencias",
+            "type": "process",
+            "command": "${workspaceFolder}/venv/Scripts/python.exe",
+            "args": [
+                "-m",
+                "pip",
+                "install",
+                "-r",
+                "requirements.txt"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "E3: revisar configuración",
+            "type": "process",
+            "command": "${workspaceFolder}/venv/Scripts/python.exe",
+            "args": [
+                "manage.py",
+                "check"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "E3: aplicar migraciones",
+            "type": "process",
+            "command": "${workspaceFolder}/venv/Scripts/python.exe",
+            "args": [
+                "manage.py",
+                "migrate"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "E3: cargar catálogo",
+            "type": "process",
+            "command": "${workspaceFolder}/venv/Scripts/python.exe",
+            "args": [
+                "manage.py",
+                "cargar_catalogo"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "E3: crear cuenta administradora",
+            "type": "process",
+            "command": "${workspaceFolder}/venv/Scripts/python.exe",
+            "args": [
+                "manage.py",
+                "createsuperuser"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "E3: configurar grupos de acceso",
+            "type": "process",
+            "command": "${workspaceFolder}/venv/Scripts/python.exe",
+            "args": [
+                "manage.py",
+                "configurar_grupos"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "E3: ejecutar pruebas",
+            "type": "process",
+            "command": "${workspaceFolder}/venv/Scripts/python.exe",
+            "args": [
+                "manage.py",
+                "test",
+                "core"
+            ],
+            "problemMatcher": [],
+            "group": "test"
+        },
+        {
+            "label": "E3: iniciar tienda y panel",
+            "type": "process",
+            "command": "${workspaceFolder}/venv/Scripts/python.exe",
+            "args": [
+                "manage.py",
+                "runserver",
+                "127.0.0.1:8000"
+            ],
+            "problemMatcher": [],
+            "isBackground": true
+        }
+    ]
 }
