@@ -1,4 +1,13 @@
-<nav class="gestion-accesos-categorias" aria-label="Accesos por categoría musical">
-{% if mostrar_todos %}<a class="acceso-categoria {% if not categoria_actual %}categoria-seleccionada{% endif %}" href="{% url 'core:gestion_productos' %}{% querystring categoria='' page=None %}" {% if not categoria_actual %}aria-current="page"{% endif %}>{% include 'core/e3/icono.html' with nombre='categorias' %}<span>Todas las categorías</span></a>{% endif %}
-{% for categoria in categorias %}<a class="acceso-categoria {% if categoria_actual == categoria.pk|stringformat:'s' %}categoria-seleccionada{% endif %}" href="{% url 'core:gestion_productos' %}{% querystring categoria=categoria.pk page=None anio=None %}" {% if categoria_actual == categoria.pk|stringformat:'s' %}aria-current="page"{% endif %}>{% include 'core/e3/icono.html' with nombre=categoria.slug %}<span>{{ categoria.nombre }}</span></a>{% endfor %}
+<nav class="gestion-accesos-categorias"
+     aria-label="Accesos por categoría musical">
+    {% if mostrar_todos %}
+        <a class="acceso-categoria {% if not categoria_actual %}categoria-seleccionada{% endif %}"
+           href="{% url 'core:gestion_productos' %}{% querystring categoria='' page=None %}"
+           {% if not categoria_actual %}aria-current="page"{% endif %}>{% include "core/e3/icono.html" with nombre="categorias" %}<span>Todas las categorías</span></a>
+    {% endif %}
+    {% for categoria in categorias %}
+        <a class="acceso-categoria {% if categoria_actual == categoria.pk|stringformat:'s' %}categoria-seleccionada{% endif %}"
+           href="{% url 'core:gestion_productos' %}{% querystring categoria=categoria.pk page=None anio=None %}"
+           {% if categoria_actual == categoria.pk|stringformat:'s' %}aria-current="page"{% endif %}>{% include "core/e3/icono.html" with nombre=categoria.slug %}<span>{{ categoria.nombre }}</span></a>
+    {% endfor %}
 </nav>

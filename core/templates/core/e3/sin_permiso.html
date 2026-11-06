@@ -1,4 +1,9 @@
-{% extends 'core/e3/base_gestion.html' %}
+{% extends "core/e3/base_gestion.html" %}
 {% block gestion %}
-<section class="gestion-widget"><p class="eyebrow">Permisos de acceso</p><h1>Acceso restringido</h1><p>La cuenta no tiene autorización para esta operación. El acceso también está bloqueado desde el servidor.</p><a class="btn btn-outline-primary" href="{% url 'core:gestion' %}">Volver al resumen</a></section>
+    <section class="gestion-widget">
+        <p class="eyebrow">Permisos de acceso</p>
+        <h1>Acceso restringido</h1>
+        <p>La cuenta no tiene autorización para esta operación. El acceso también está bloqueado desde el servidor.</p>
+        <a class="btn btn-outline-primary" href="{% url 'core:gestion' %}">Volver al resumen</a>
+    </section>
 {% endblock %}

@@ -13,4 +13,8 @@ class Command(BaseCommand):
                 usuario.groups.add(administrador)
             elif not usuario.groups.exists():
                 usuario.groups.add(operador)
-        self.stdout.write(self.style.SUCCESS("Grupos Administrador y Operador preparados. Las contraseñas se conservaron."))
+        self.stdout.write(
+            self.style.SUCCESS(
+                "Grupos Administrador y Operador preparados. Las contraseñas se conservaron."
+            )
+        )

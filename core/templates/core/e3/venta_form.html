@@ -1,18 +1,82 @@
-{% extends 'core/e3/base_gestion.html' %}
+{% extends "core/e3/base_gestion.html" %}
 {% load l10n %}
 {% block gestion %}
-
-<div class="cabecera"><p class="eyebrow">Ventas</p><h1>{{ titulo }}</h1></div>
-{% include 'core/e3/errores.html' %}
-<form method="post" class="form-panel gestion-formulario">{% csrf_token %}
-<fieldset><legend>Identificación de la venta</legend><div class="row g-3">
-<div class="col-md-6"><label class="form-label" for="numero">Número de venta</label><input class="form-control" id="numero" name="numero" type="number" min="1" required value="{{ venta.numero|default_if_none:''|unlocalize }}"{% if errores.numero %} aria-invalid="true" aria-describedby="error-numero"{% endif %}>{% include 'core/e3/error_campo.html' with mensajes=errores.numero campo='numero' %}</div>
-<div class="col-md-6"><label class="form-label" for="fecha">Fecha</label><input class="form-control" id="fecha" name="fecha" type="date" required value="{{ fecha_formulario }}"{% if errores.fecha %} aria-invalid="true" aria-describedby="error-fecha"{% endif %}>{% include 'core/e3/error_campo.html' with mensajes=errores.fecha campo='fecha' %}</div>
-</div></fieldset>
-<fieldset><legend>Cliente y sucursal</legend><div class="row g-3">
-<div class="col-md-6"><label class="form-label" for="cliente">Cliente</label><select class="form-select" id="cliente" name="cliente" required{% if errores.cliente %} aria-invalid="true" aria-describedby="error-cliente"{% endif %}><option value="">Seleccionar cliente</option>{% for persona in clientes %}<option value="{{ persona.id }}" {% if venta.cliente_id|stringformat:'s' == persona.id|stringformat:'s' %}selected{% endif %}>{{ persona.nombre }} · {{ persona.correo }}</option>{% endfor %}</select>{% include 'core/e3/error_campo.html' with mensajes=errores.cliente campo='cliente' %}</div>
-<div class="col-md-6"><label class="form-label" for="sucursal">Sucursal</label><select class="form-select" id="sucursal" name="sucursal" required{% if errores.sucursal %} aria-invalid="true" aria-describedby="error-sucursal"{% endif %}><option value="">Seleccionar sucursal</option>{% for sucursal in sucursales %}<option value="{{ sucursal.id }}" {% if venta.sucursal_id|stringformat:'s' == sucursal.id|stringformat:'s' %}selected{% endif %}>{{ sucursal.nombre }}</option>{% endfor %}</select>{% include 'core/e3/error_campo.html' with mensajes=errores.sucursal campo='sucursal' %}</div>
-</div></fieldset><p class="form-text mt-3">Después de guardar la venta se agregan los productos, las cantidades y el precio de cada línea.</p>
-<div class="gestion-form-acciones"><button class="btn btn-primary" type="submit">{% include 'core/e3/icono.html' with nombre='guardar' %}Guardar venta</button><a class="btn btn-outline-primary" href="{% url 'core:gestion_ventas' %}">Cancelar</a></div>
-</form>
+    <div class="cabecera">
+        <p class="eyebrow">Ventas</p>
+        <h1>{{ titulo }}</h1>
+    </div>
+    {% include "core/e3/errores.html" %}
+    <form method="post" class="form-panel gestion-formulario">
+        {% csrf_token %}
+        <fieldset>
+            <legend>Identificación de la venta</legend>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label" for="numero">Número de venta</label>
+                    <input class="form-control"
+                           id="numero"
+                           name="numero"
+                           type="number"
+                           min="1"
+                           required
+                           value="{{ venta.numero|default_if_none:''|unlocalize }}"{% if errores.numero %} aria-invalid="true" aria-describedby="error-numero"{% endif %}>
+                    {% include "core/e3/error_campo.html" with mensajes=errores.numero campo="numero" %}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="fecha">Fecha</label>
+                    <input class="form-control"
+                           id="fecha"
+                           name="fecha"
+                           type="date"
+                           required
+                           value="{{ fecha_formulario }}"{% if errores.fecha %} aria-invalid="true" aria-describedby="error-fecha"{% endif %}>
+                    {% include "core/e3/error_campo.html" with mensajes=errores.fecha campo="fecha" %}
+                </div>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>Cliente y sucursal</legend>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label" for="cliente">Cliente</label>
+                    <select class="form-select"
+                            id="cliente"
+                            name="cliente"
+                            required{% if errores.cliente %}
+                            aria-invalid="true"
+                            aria-describedby="error-cliente"{% endif %}>
+                        <option value="">Seleccionar cliente</option>
+                        {% for persona in clientes %}
+                            <option value="{{ persona.id }}"
+                                    {% if venta.cliente_id|stringformat:'s' == persona.id|stringformat:'s' %}selected{% endif %}>{{ persona.nombre }} · {{ persona.correo }}</option>
+                        {% endfor %}
+                    </select>
+                    {% include "core/e3/error_campo.html" with mensajes=errores.cliente campo="cliente" %}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="sucursal">Sucursal</label>
+                    <select class="form-select"
+                            id="sucursal"
+                            name="sucursal"
+                            required{% if errores.sucursal %}
+                            aria-invalid="true"
+                            aria-describedby="error-sucursal"{% endif %}>
+                        <option value="">Seleccionar sucursal</option>
+                        {% for sucursal in sucursales %}
+                            <option value="{{ sucursal.id }}"
+                                    {% if venta.sucursal_id|stringformat:'s' == sucursal.id|stringformat:'s' %}selected{% endif %}>{{ sucursal.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                    {% include "core/e3/error_campo.html" with mensajes=errores.sucursal campo="sucursal" %}
+                </div>
+            </div>
+        </fieldset>
+        <p class="form-text mt-3">Después de guardar la venta se agregan los productos, las cantidades y el precio de cada línea.</p>
+        <div class="gestion-form-acciones">
+            <button class="btn btn-primary"
+                    type="submit">{% include "core/e3/icono.html" with nombre="guardar" %}Guardar venta</button>
+            <a class="btn btn-outline-primary"
+               href="{% url 'core:gestion_ventas' %}">Cancelar</a>
+        </div>
+    </form>
 {% endblock %}

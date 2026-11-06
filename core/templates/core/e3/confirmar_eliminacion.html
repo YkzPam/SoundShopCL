@@ -1,21 +1,127 @@
-{% extends 'core/e3/base_gestion.html' %}
+{% extends "core/e3/base_gestion.html" %}
 {% load moneda static %}
 {% block gestion %}
-<section class="acceso gestion-confirmacion"><div class="gestion-confirmacion-identidad">{% if tipo_objeto == 'producto' and objeto.imagen %}<img class="gestion-confirmacion-foto" src="{% static objeto.imagen %}" alt="">{% else %}<span class="gestion-confirmacion-icono">{% if desactivar %}{% include 'core/e3/icono.html' with nombre='desactivar' %}{% else %}{% include 'core/e3/icono.html' with nombre='advertencia' %}{% endif %}</span>{% endif %}<div><p class="eyebrow">Revisar antes de confirmar</p><h1>{{ titulo }}</h1></div></div>
-<dl class="gestion-resumen-registro">
-{% if tipo_objeto == 'producto' %}<dt>Producto</dt><dd>{{ objeto.nombre }}</dd><dt>Código</dt><dd>{{ objeto.codigo }}</dd><dt>Precio</dt><dd>${{ objeto.precio|pesos }}</dd><dt>Stock</dt><dd>{{ objeto.stock }} unidades</dd>
-{% elif tipo_objeto == 'venta' %}<dt>Número de venta</dt><dd>{{ objeto.numero }}</dd><dt>Cliente</dt><dd>{{ objeto.cliente.nombre }}</dd><dt>Fecha</dt><dd>{{ objeto.fecha|date:'d/m/Y' }}</dd><dt>Detalles incluidos</dt><dd>{{ objeto.detalleboleta_set.count }}</dd>
-{% elif tipo_objeto == 'detalle' %}<dt>Venta</dt><dd>{{ objeto.boleta.numero }}</dd><dt>Producto</dt><dd>{{ objeto.producto.nombre }}</dd><dt>Cantidad</dt><dd>{{ objeto.cantidad }}</dd><dt>Subtotal</dt><dd>${{ objeto.subtotal|pesos }}</dd>
-{% elif tipo_objeto == 'cliente' %}<dt>Cliente</dt><dd>{{ objeto.nombre }}</dd><dt>Correo</dt><dd>{{ objeto.correo }}</dd>
-{% elif tipo_objeto == 'categoria' %}<dt>Categoría</dt><dd>{{ objeto.nombre }}</dd><dt>Identificador de URL</dt><dd>{{ objeto.slug }}</dd>
-{% elif tipo_objeto == 'usuario' %}<dt>Usuario</dt><dd>{{ objeto.username }}</dd><dt>Nombre</dt><dd>{{ objeto.get_full_name|default:'Sin nombre registrado' }}</dd>
-{% endif %}
-</dl>
-{% if desactivar %}<p class="gestion-aviso-eliminacion">La cuenta y sus datos se conservarán, pero no podrá iniciar sesión.</p>
-{% elif tipo_objeto == 'usuario' %}<p class="gestion-aviso-eliminacion">Se eliminará esta cuenta de acceso y no podrá iniciar sesión. Los clientes, productos y ventas de la tienda se conservarán. Esta operación no se puede deshacer desde el panel.</p>
-{% elif tipo_objeto == 'venta' %}<p class="gestion-aviso-eliminacion">Se eliminarán esta venta y todos sus detalles. El cliente y los productos del catálogo se conservarán. Esta operación no se puede deshacer desde el panel.</p>
-{% elif tipo_objeto == 'detalle' %}<p class="gestion-aviso-eliminacion">Se quitará esta línea de la venta y se actualizará su total. El producto del catálogo se conservará. Esta operación no se puede deshacer desde el panel.</p>
-{% else %}<p class="gestion-aviso-eliminacion">Esta operación no se puede deshacer desde el panel. Si el registro tiene relaciones protegidas, el sistema impedirá su eliminación.</p>{% endif %}
-<form method="post">{% csrf_token %}<button class="btn btn-danger">{% if desactivar %}Desactivar{% else %}Confirmar eliminación{% endif %}</button>
-{% if venta_id %}<a class="btn btn-outline-primary" href="{% url 'core:venta_detalle' venta_id %}">Cancelar</a>{% else %}<a class="btn btn-outline-primary" href="{% url volver %}">Cancelar</a>{% endif %}
-</form></section>{% endblock %}
+    <section class="acceso gestion-confirmacion">
+        <div class="gestion-confirmacion-identidad">
+            {% if tipo_objeto == "producto" and objeto.imagen %}
+                <img class="gestion-confirmacion-foto"
+                     src="{% static objeto.imagen %}"
+                     alt="">
+            {% else %}
+                <span class="gestion-confirmacion-icono">
+                    {% if desactivar %}
+                        {% include "core/e3/icono.html" with nombre="desactivar" %}
+                    {% else %}
+                        {% include "core/e3/icono.html" with nombre="advertencia" %}
+                    {% endif %}
+                </span>
+            {% endif %}
+            <div>
+                <p class="eyebrow">Revisar antes de confirmar</p>
+                <h1>{{ titulo }}</h1>
+            </div>
+        </div>
+        <dl class="gestion-resumen-registro">
+            {% if tipo_objeto == "producto" %}
+                <dt>Producto</dt>
+                <dd>
+                    {{ objeto.nombre }}
+                </dd>
+                <dt>Código</dt>
+                <dd>
+                    {{ objeto.codigo }}
+                </dd>
+                <dt>Precio</dt>
+                <dd>
+                    ${{ objeto.precio|pesos }}
+                </dd>
+                <dt>Stock</dt>
+                <dd>
+                    {{ objeto.stock }} unidades
+                </dd>
+            {% elif tipo_objeto == "venta" %}
+                <dt>Número de venta</dt>
+                <dd>
+                    {{ objeto.numero }}
+                </dd>
+                <dt>Cliente</dt>
+                <dd>
+                    {{ objeto.cliente.nombre }}
+                </dd>
+                <dt>Fecha</dt>
+                <dd>
+                    {{ objeto.fecha|date:'d/m/Y' }}
+                </dd>
+                <dt>Detalles incluidos</dt>
+                <dd>
+                    {{ objeto.detalleboleta_set.count }}
+                </dd>
+            {% elif tipo_objeto == "detalle" %}
+                <dt>Venta</dt>
+                <dd>
+                    {{ objeto.boleta.numero }}
+                </dd>
+                <dt>Producto</dt>
+                <dd>
+                    {{ objeto.producto.nombre }}
+                </dd>
+                <dt>Cantidad</dt>
+                <dd>
+                    {{ objeto.cantidad }}
+                </dd>
+                <dt>Subtotal</dt>
+                <dd>
+                    ${{ objeto.subtotal|pesos }}
+                </dd>
+            {% elif tipo_objeto == "cliente" %}
+                <dt>Cliente</dt>
+                <dd>
+                    {{ objeto.nombre }}
+                </dd>
+                <dt>Correo</dt>
+                <dd>
+                    {{ objeto.correo }}
+                </dd>
+            {% elif tipo_objeto == "categoria" %}
+                <dt>Categoría</dt>
+                <dd>
+                    {{ objeto.nombre }}
+                </dd>
+                <dt>Identificador de URL</dt>
+                <dd>
+                    {{ objeto.slug }}
+                </dd>
+            {% elif tipo_objeto == "usuario" %}
+                <dt>Usuario</dt>
+                <dd>
+                    {{ objeto.username }}
+                </dd>
+                <dt>Nombre</dt>
+                <dd>
+                    {{ objeto.get_full_name|default:'Sin nombre registrado' }}
+                </dd>
+            {% endif %}
+        </dl>
+        {% if desactivar %}
+            <p class="gestion-aviso-eliminacion">La cuenta y sus datos se conservarán, pero no podrá iniciar sesión.</p>
+        {% elif tipo_objeto == "usuario" %}
+            <p class="gestion-aviso-eliminacion">Se eliminará esta cuenta de acceso y no podrá iniciar sesión. Los clientes, productos y ventas de la tienda se conservarán. Esta operación no se puede deshacer desde el panel.</p>
+        {% elif tipo_objeto == "venta" %}
+            <p class="gestion-aviso-eliminacion">Se eliminarán esta venta y todos sus detalles. El cliente y los productos del catálogo se conservarán. Esta operación no se puede deshacer desde el panel.</p>
+        {% elif tipo_objeto == "detalle" %}
+            <p class="gestion-aviso-eliminacion">Se quitará esta línea de la venta y se actualizará su total. El producto del catálogo se conservará. Esta operación no se puede deshacer desde el panel.</p>
+        {% else %}
+            <p class="gestion-aviso-eliminacion">Esta operación no se puede deshacer desde el panel. Si el registro tiene relaciones protegidas, el sistema impedirá su eliminación.</p>
+        {% endif %}
+        <form method="post">
+            {% csrf_token %}
+            <button class="btn btn-danger">{% if desactivar %}Desactivar{% else %}Confirmar eliminación{% endif %}</button>
+            {% if venta_id %}
+                <a class="btn btn-outline-primary"
+                   href="{% url 'core:venta_detalle' venta_id %}">Cancelar</a>
+            {% else %}
+                <a class="btn btn-outline-primary" href="{% url volver %}">Cancelar</a>
+            {% endif %}
+        </form>
+    </section>
+{% endblock %}

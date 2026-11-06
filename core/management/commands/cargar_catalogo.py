@@ -1,12 +1,21 @@
 """Carga inicial sin sobrescribir registros ya editados en la tienda."""
+
 import json
 from decimal import Decimal
 from pathlib import Path
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from core.models import (
-    Categoria, Marca, Proveedor, Sucursal, Cliente, Producto,
-    Boleta, DetalleBoleta, CompraProveedor, DetalleCompra,
+    Categoria,
+    Marca,
+    Proveedor,
+    Sucursal,
+    Cliente,
+    Producto,
+    Boleta,
+    DetalleBoleta,
+    CompraProveedor,
+    DetalleCompra,
 )
 
 
@@ -39,10 +48,14 @@ class Command(BaseCommand):
             producto, _ = Producto.objects.get_or_create(
                 codigo=f"SS-{datos_producto['id']:04d}",
                 defaults={
-                    "nombre": datos_producto["nombre"], "descripcion": datos_producto["descripcion"],
-                    "precio": datos_producto["precio"], "stock": datos_producto["stock"],
-                    "imagen": datos_producto["imagen"], "marca": marca,
-                    "categoria": categoria, "proveedor": proveedor,
+                    "nombre": datos_producto["nombre"],
+                    "descripcion": datos_producto["descripcion"],
+                    "precio": datos_producto["precio"],
+                    "stock": datos_producto["stock"],
+                    "imagen": datos_producto["imagen"],
+                    "marca": marca,
+                    "categoria": categoria,
+                    "proveedor": proveedor,
                 },
             )
             productos.append(producto)
@@ -55,21 +68,30 @@ class Command(BaseCommand):
             )
             clientes.append(cliente)
         boleta, _ = Boleta.objects.get_or_create(
-            numero=1, defaults={"cliente": clientes[0], "sucursal": sucursal},
+            numero=1,
+            defaults={"cliente": clientes[0], "sucursal": sucursal},
         )
         compra, _ = CompraProveedor.objects.get_or_create(
-            numero=1, defaults={"proveedor": proveedor, "sucursal": sucursal},
+            numero=1,
+            defaults={"proveedor": proveedor, "sucursal": sucursal},
         )
         for producto in productos[:2]:
             DetalleBoleta.objects.get_or_create(
-                boleta=boleta, producto=producto,
+                boleta=boleta,
+                producto=producto,
                 defaults={"cantidad": 1, "precio_unitario": producto.precio},
             )
             DetalleCompra.objects.get_or_create(
-                compra=compra, producto=producto,
-                defaults={"cantidad": 5, "precio_costo": Decimal(producto.precio) * Decimal("0.70")},
+                compra=compra,
+                producto=producto,
+                defaults={
+                    "cantidad": 5,
+                    "precio_costo": Decimal(producto.precio) * Decimal("0.70"),
+                },
             )
-        self.stdout.write(self.style.SUCCESS(
-            f"Catálogo listo: {Producto.objects.count()} productos, {Categoria.objects.count()} categorías. "
-            "Las diez tablas propias contienen datos. No se sobrescribieron registros existentes."
-        ))
+        self.stdout.write(
+            self.style.SUCCESS(
+                f"Catálogo listo: {Producto.objects.count()} productos, {Categoria.objects.count()} categorías. "
+                "Las diez tablas propias contienen datos. No se sobrescribieron registros existentes."
+            )
+        )

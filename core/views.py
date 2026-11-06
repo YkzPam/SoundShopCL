@@ -1,7 +1,14 @@
 """Tienda de E2 continuada en E3: autenticación y páginas propias de gestión."""
+
 from datetime import date
+
 from django.contrib import messages
-from django.contrib.auth import authenticate, login as iniciar_login, logout, update_session_auth_hash
+from django.contrib.auth import (
+    authenticate,
+    login as iniciar_login,
+    logout,
+    update_session_auth_hash,
+)
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group, User
 from django.contrib.auth.password_validation import validate_password
@@ -14,22 +21,37 @@ from django.http import HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.text import slugify
+
 from .models import Categoria, Marca, Proveedor, Sucursal, Cliente, Producto, Boleta, DetalleBoleta
 from .decorators import grupos_permitidos
+
+# Funciones compartidas del catálogo
 
 
 def producto_datos(producto):
     # Mantiene los mismos nombres de variables que usan las plantillas.
-    return {"id": producto.id, "nombre": producto.nombre, "marca": producto.marca.nombre,
-            "categoria": producto.categoria.slug, "descripcion": producto.descripcion,
-            "precio": producto.precio, "stock": producto.stock, "imagen": producto.imagen}
+    return {
+        "id": producto.id,
+        "nombre": producto.nombre,
+        "marca": producto.marca.nombre,
+        "categoria": producto.categoria.slug,
+        "descripcion": producto.descripcion,
+        "precio": producto.precio,
+        "stock": producto.stock,
+        "imagen": producto.imagen,
+    }
 
 
 def datos_catalogo():
     productos = []
-    for producto in Producto.objects.filter(activo=True).select_related("marca", "categoria").order_by("id"):
+    for producto in (
+        Producto.objects.filter(activo=True).select_related("marca", "categoria").order_by("id")
+    ):
         productos.append(producto_datos(producto))
-    return {"productos": productos, "categorias": list(Categoria.objects.values("nombre", "slug", "descripcion"))}
+    return {
+        "productos": productos,
+        "categorias": list(Categoria.objects.values("nombre", "slug", "descripcion")),
+    }
 
 
 def obtener_producto(producto_id):
@@ -37,9 +59,18 @@ def obtener_producto(producto_id):
     return producto_datos(producto)
 
 
+# Tienda pública
+
+
 def inicio(request):
-    productos = Producto.objects.filter(activo=True).select_related("marca", "categoria").order_by("id")[:4]
-    return render(request, "core/inicio.html", {"productos": [producto_datos(p) for p in productos], "titulo": "Inicio"})
+    productos = (
+        Producto.objects.filter(activo=True).select_related("marca", "categoria").order_by("id")[:4]
+    )
+    return render(
+        request,
+        "core/inicio.html",
+        {"productos": [producto_datos(p) for p in productos], "titulo": "Inicio"},
+    )
 
 
 def catalogo(request):
@@ -48,18 +79,27 @@ def catalogo(request):
     categoria = request.GET.get("categoria", "")
     productos = []
     for producto in datos["productos"]:
-        coincide_texto = busqueda.casefold() in (producto["nombre"] + " " + producto["marca"]).casefold()
+        coincide_texto = (
+            busqueda.casefold() in (producto["nombre"] + " " + producto["marca"]).casefold()
+        )
         coincide_categoria = not categoria or producto["categoria"] == categoria
         if coincide_texto and coincide_categoria:
             productos.append(producto)
-    contexto = {"productos": productos, "categorias": datos["categorias"], "busqueda": busqueda,
-                "categoria_actual": categoria, "titulo": "Productos"}
+    contexto = {
+        "productos": productos,
+        "categorias": datos["categorias"],
+        "busqueda": busqueda,
+        "categoria_actual": categoria,
+        "titulo": "Productos",
+    }
     return render(request, "core/catalogo.html", contexto)
 
 
 def detalle_producto(request, producto_id):
     producto = obtener_producto(producto_id)
-    return render(request, "core/detalle.html", {"producto": producto, "titulo": producto["nombre"]})
+    return render(
+        request, "core/detalle.html", {"producto": producto, "titulo": producto["nombre"]}
+    )
 
 
 def categorias(request):
@@ -68,28 +108,47 @@ def categorias(request):
         productos = [p for p in datos["productos"] if p["categoria"] == categoria["slug"]]
         categoria["cantidad"] = len(productos)
         categoria["imagen"] = productos[0]["imagen"] if productos else ""
-    return render(request, "core/categorias.html", {"categorias": datos["categorias"], "titulo": "Categorías"})
+    return render(
+        request, "core/categorias.html", {"categorias": datos["categorias"], "titulo": "Categorías"}
+    )
 
 
 def nosotros(request):
     return render(request, "core/nosotros.html", {"titulo": "Nosotros"})
 
 
+# Inicio y cierre de sesión
+
+
 def login(request, acceso_admin=False):
     siguiente = request.POST.get("next") or request.GET.get("next", "")
-    if not url_has_allowed_host_and_scheme(siguiente, {request.get_host()}, require_https=request.is_secure()):
+    if not url_has_allowed_host_and_scheme(
+        siguiente, {request.get_host()}, require_https=request.is_secure()
+    ):
         siguiente = ""
     if request.user.is_authenticated:
         return redirect(siguiente or "core:gestion")
     error = ""
     if request.method == "POST":
-        usuario = authenticate(request, username=request.POST.get("username", ""), password=request.POST.get("password", ""))
+        usuario = authenticate(
+            request,
+            username=request.POST.get("username", ""),
+            password=request.POST.get("password", ""),
+        )
         if usuario is not None:
             iniciar_login(request, usuario)
             return redirect(siguiente or "core:gestion")
         error = "El usuario o la contraseña no son correctos."
-    return render(request, "core/login.html", {"titulo": "Iniciar sesión", "error": error,
-        "siguiente": siguiente, "nombre_usuario": request.POST.get("username", "")})
+    return render(
+        request,
+        "core/login.html",
+        {
+            "titulo": "Iniciar sesión",
+            "error": error,
+            "siguiente": siguiente,
+            "nombre_usuario": request.POST.get("username", ""),
+        },
+    )
 
 
 def registro(request):
@@ -110,6 +169,9 @@ def cliente(request):
     return render(request, "core/cliente.html", {"titulo": "Mi cuenta"})
 
 
+# Carrito de compras
+
+
 def carrito(request):
     cantidades = request.session.get("carrito", {})
     lineas = []
@@ -120,7 +182,9 @@ def carrito(request):
             subtotal = cantidad * producto["precio"]
             total += subtotal
             lineas.append({"producto": producto, "cantidad": cantidad, "subtotal": subtotal})
-    return render(request, "core/carrito.html", {"lineas": lineas, "total": total, "titulo": "Carrito"})
+    return render(
+        request, "core/carrito.html", {"lineas": lineas, "total": total, "titulo": "Carrito"}
+    )
 
 
 def agregar_carrito(request, producto_id):
@@ -157,6 +221,9 @@ def confirmar(request):
     return render(request, "core/confirmacion.html", {"titulo": "Confirmación"})
 
 
+# Validación de los formularios HTML
+
+
 def errores_modelo(objeto):
     """Las reglas del modelo también se validan cuando no se utiliza forms.py."""
     try:
@@ -164,6 +231,9 @@ def errores_modelo(objeto):
     except ValidationError as error:
         return error.message_dict
     return {}
+
+
+# Resumen del panel
 
 
 @login_required
@@ -178,12 +248,30 @@ def gestion(request):
     detalles = DetalleBoleta.objects.filter(boleta__fecha__year=anio)
 
     # Se conservan los precios de cada venta, aunque cambie el catálogo.
-    ingresos = detalles.aggregate(total=Sum(F("cantidad") * F("precio_unitario"), default=0))["total"]
-    ingresos_por_mes = detalles.annotate(mes=ExtractMonth("boleta__fecha")).values("mes").annotate(
-        total=Sum(F("cantidad") * F("precio_unitario"))
-    ).order_by("mes")
+    ingresos = detalles.aggregate(total=Sum(F("cantidad") * F("precio_unitario"), default=0))[
+        "total"
+    ]
+    ingresos_por_mes = (
+        detalles.annotate(mes=ExtractMonth("boleta__fecha"))
+        .values("mes")
+        .annotate(total=Sum(F("cantidad") * F("precio_unitario")))
+        .order_by("mes")
+    )
     totales = {fila["mes"]: fila["total"] for fila in ingresos_por_mes}
-    nombres_meses = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
+    nombres_meses = [
+        "Ene",
+        "Feb",
+        "Mar",
+        "Abr",
+        "May",
+        "Jun",
+        "Jul",
+        "Ago",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dic",
+    ]
     mayor_monto = max(totales.values(), default=0)
     meses = []
     for numero, nombre in enumerate(nombres_meses, 1):
@@ -192,9 +280,17 @@ def gestion(request):
         meses.append({"nombre": nombre, "monto": monto, "altura": altura})
 
     # La altura y el ancho de las barras representan los valores consultados.
-    productos_vendidos = list(Producto.objects.annotate(
-        unidades=Sum("detalleboleta__cantidad", filter=Q(detalleboleta__boleta__fecha__year=anio), default=0)
-    ).filter(unidades__gt=0).order_by("-unidades", "codigo")[:5])
+    productos_vendidos = list(
+        Producto.objects.annotate(
+            unidades=Sum(
+                "detalleboleta__cantidad",
+                filter=Q(detalleboleta__boleta__fecha__year=anio),
+                default=0,
+            )
+        )
+        .filter(unidades__gt=0)
+        .order_by("-unidades", "codigo")[:5]
+    )
     mayor_cantidad = productos_vendidos[0].unidades if productos_vendidos else 0
     for producto in productos_vendidos:
         producto.porcentaje = round(producto.unidades * 100 / mayor_cantidad, 2)
@@ -202,12 +298,27 @@ def gestion(request):
     stock_bajo = Producto.objects.filter(activo=True, stock__lt=5).order_by("stock", "codigo")
     anios = {fecha.year for fecha in Boleta.objects.dates("fecha", "year")}
     anios.update([date.today().year, anio])
-    return render(request, "core/gestion.html", {"titulo": "Panel de administración",
-        "total_productos": Producto.objects.count(),
-        "total_clientes": Cliente.objects.count(), "total_ventas": ventas.count(), "ingresos": ingresos,
-        "anio": anio, "anios": sorted(anios, reverse=True), "meses": meses, "mayor_monto": mayor_monto,
-        "productos_vendidos": productos_vendidos, "cantidad_stock_bajo": stock_bajo.count(),
-        "categorias": Categoria.objects.order_by("nombre")})
+    return render(
+        request,
+        "core/gestion.html",
+        {
+            "titulo": "Panel de administración",
+            "total_productos": Producto.objects.count(),
+            "total_clientes": Cliente.objects.count(),
+            "total_ventas": ventas.count(),
+            "ingresos": ingresos,
+            "anio": anio,
+            "anios": sorted(anios, reverse=True),
+            "meses": meses,
+            "mayor_monto": mayor_monto,
+            "productos_vendidos": productos_vendidos,
+            "cantidad_stock_bajo": stock_bajo.count(),
+            "categorias": Categoria.objects.order_by("nombre"),
+        },
+    )
+
+
+# CRUD de productos
 
 
 @login_required
@@ -235,10 +346,20 @@ def gestion_productos(request):
     else:
         stock = ""
     pagina = Paginator(productos, 25).get_page(request.GET.get("page"))
-    return render(request, "core/e3/productos.html", {"titulo": "Productos", "pagina": pagina,
-        "categorias": Categoria.objects.order_by("nombre"), "busqueda": busqueda, "categoria_actual": categoria_id,
-        "estado_actual": estado, "stock_actual": stock,
-        "hay_filtros": bool(busqueda or categoria_id.isdigit() or estado or stock)})
+    return render(
+        request,
+        "core/e3/productos.html",
+        {
+            "titulo": "Productos",
+            "pagina": pagina,
+            "categorias": Categoria.objects.order_by("nombre"),
+            "busqueda": busqueda,
+            "categoria_actual": categoria_id,
+            "estado_actual": estado,
+            "stock_actual": stock,
+            "hay_filtros": bool(busqueda or categoria_id.isdigit() or estado or stock),
+        },
+    )
 
 
 @login_required
@@ -262,10 +383,19 @@ def producto_formulario(request, producto_id=None):
             producto.save()
             messages.success(request, "Producto guardado.")
             return redirect("core:gestion_productos")
-    return render(request, "core/e3/producto_form.html", {"titulo": "Editar producto" if producto_id else "Nuevo producto",
-        "producto": producto, "datos": request.POST if request.method == "POST" else {}, "errores": errores,
-        "categorias": Categoria.objects.order_by("nombre"), "marcas": Marca.objects.order_by("nombre"),
-        "proveedores": Proveedor.objects.order_by("nombre")})
+    return render(
+        request,
+        "core/e3/producto_form.html",
+        {
+            "titulo": "Editar producto" if producto_id else "Nuevo producto",
+            "producto": producto,
+            "datos": request.POST if request.method == "POST" else {},
+            "errores": errores,
+            "categorias": Categoria.objects.order_by("nombre"),
+            "marcas": Marca.objects.order_by("nombre"),
+            "proveedores": Proveedor.objects.order_by("nombre"),
+        },
+    )
 
 
 @login_required
@@ -277,10 +407,24 @@ def producto_eliminar(request, producto_id):
             producto.delete()
             messages.success(request, "Producto eliminado.")
         except ProtectedError:
-            messages.error(request, "El producto está utilizado en ventas o compras. Puede desactivarlo en lugar de borrarlo.")
+            messages.error(
+                request,
+                "El producto está utilizado en ventas o compras. Puede desactivarlo en lugar de borrarlo.",
+            )
         return redirect("core:gestion_productos")
-    return render(request, "core/e3/confirmar_eliminacion.html", {"titulo": "Eliminar producto", "objeto": producto,
-        "volver": "core:gestion_productos", "tipo_objeto": "producto"})
+    return render(
+        request,
+        "core/e3/confirmar_eliminacion.html",
+        {
+            "titulo": "Eliminar producto",
+            "objeto": producto,
+            "volver": "core:gestion_productos",
+            "tipo_objeto": "producto",
+        },
+    )
+
+
+# Gestión de cuentas de acceso
 
 
 @login_required
@@ -290,8 +434,15 @@ def gestion_usuarios(request):
     busqueda = request.GET.get("q", "").strip()
     if busqueda:
         usuarios = usuarios.filter(username__icontains=busqueda)
-    return render(request, "core/e3/usuarios.html", {"titulo": "Usuarios", "busqueda": busqueda,
-        "pagina": Paginator(usuarios, 25).get_page(request.GET.get("page"))})
+    return render(
+        request,
+        "core/e3/usuarios.html",
+        {
+            "titulo": "Usuarios",
+            "busqueda": busqueda,
+            "pagina": Paginator(usuarios, 25).get_page(request.GET.get("page")),
+        },
+    )
 
 
 @login_required
@@ -317,7 +468,9 @@ def usuario_formulario(request, usuario_id=None):
                 errores["password"] = error.messages
             usuario.set_password(clave)
         if usuario_id == request.user.pk and not usuario.is_active:
-            errores["is_active"] = ["No puede desactivar su propia cuenta mientras administra la tienda."]
+            errores["is_active"] = [
+                "No puede desactivar su propia cuenta mientras administra la tienda."
+            ]
         errores.update(errores_modelo(usuario))
         if not errores:
             usuario.save()
@@ -326,10 +479,21 @@ def usuario_formulario(request, usuario_id=None):
                 usuario.groups.add(grupo)
             if usuario.pk == request.user.pk and clave:
                 update_session_auth_hash(request, usuario)
-            messages.success(request, "Cuenta guardada. Las contraseñas se almacenan mediante el sistema de Django.")
+            messages.success(
+                request,
+                "Cuenta guardada. Las contraseñas se almacenan mediante el sistema de Django.",
+            )
             return redirect("core:gestion_usuarios")
-    return render(request, "core/e3/usuario_form.html", {"titulo": "Editar usuario" if usuario_id else "Nuevo usuario",
-        "usuario": usuario, "errores": errores, "nuevo": usuario_id is None})
+    return render(
+        request,
+        "core/e3/usuario_form.html",
+        {
+            "titulo": "Editar usuario" if usuario_id else "Nuevo usuario",
+            "usuario": usuario,
+            "errores": errores,
+            "nuevo": usuario_id is None,
+        },
+    )
 
 
 @login_required
@@ -344,8 +508,17 @@ def usuario_desactivar(request, usuario_id):
             usuario.save(update_fields=["is_active"])
             messages.success(request, "Cuenta desactivada; ya no puede iniciar sesión.")
         return redirect("core:gestion_usuarios")
-    return render(request, "core/e3/confirmar_eliminacion.html", {"titulo": "Desactivar usuario", "objeto": usuario,
-        "volver": "core:gestion_usuarios", "desactivar": True, "tipo_objeto": "usuario"})
+    return render(
+        request,
+        "core/e3/confirmar_eliminacion.html",
+        {
+            "titulo": "Desactivar usuario",
+            "objeto": usuario,
+            "volver": "core:gestion_usuarios",
+            "desactivar": True,
+            "tipo_objeto": "usuario",
+        },
+    )
 
 
 @login_required
@@ -358,16 +531,34 @@ def usuario_eliminar(request, usuario_id):
     if request.method == "POST":
         nombre = usuario.username
         usuario.delete()
-        messages.success(request, f"Cuenta {nombre} eliminada. Los datos comerciales de la tienda se conservaron.")
+        messages.success(
+            request,
+            f"Cuenta {nombre} eliminada. Los datos comerciales de la tienda se conservaron.",
+        )
         return redirect("core:gestion_usuarios")
-    return render(request, "core/e3/confirmar_eliminacion.html", {"titulo": "Eliminar usuario", "objeto": usuario,
-        "volver": "core:gestion_usuarios", "tipo_objeto": "usuario"})
+    return render(
+        request,
+        "core/e3/confirmar_eliminacion.html",
+        {
+            "titulo": "Eliminar usuario",
+            "objeto": usuario,
+            "volver": "core:gestion_usuarios",
+            "tipo_objeto": "usuario",
+        },
+    )
+
+
+# CRUD de categorías
 
 
 @login_required
 @grupos_permitidos("Administrador", "Operador")
 def gestion_categorias(request):
-    return render(request, "core/e3/categorias.html", {"titulo": "Categorías", "categorias": Categoria.objects.order_by("nombre")})
+    return render(
+        request,
+        "core/e3/categorias.html",
+        {"titulo": "Categorías", "categorias": Categoria.objects.order_by("nombre")},
+    )
 
 
 @login_required
@@ -384,8 +575,15 @@ def categoria_formulario(request, categoria_id=None):
             categoria.save()
             messages.success(request, "Categoría guardada.")
             return redirect("core:gestion_categorias")
-    return render(request, "core/e3/categoria_form.html", {"titulo": "Editar categoría" if categoria_id else "Nueva categoría",
-        "categoria": categoria, "errores": errores})
+    return render(
+        request,
+        "core/e3/categoria_form.html",
+        {
+            "titulo": "Editar categoría" if categoria_id else "Nueva categoría",
+            "categoria": categoria,
+            "errores": errores,
+        },
+    )
 
 
 @login_required
@@ -399,8 +597,19 @@ def categoria_eliminar(request, categoria_id):
         except ProtectedError:
             messages.error(request, "La categoría tiene productos asociados y no puede eliminarse.")
         return redirect("core:gestion_categorias")
-    return render(request, "core/e3/confirmar_eliminacion.html", {"titulo": "Eliminar categoría", "objeto": categoria,
-        "volver": "core:gestion_categorias", "tipo_objeto": "categoria"})
+    return render(
+        request,
+        "core/e3/confirmar_eliminacion.html",
+        {
+            "titulo": "Eliminar categoría",
+            "objeto": categoria,
+            "volver": "core:gestion_categorias",
+            "tipo_objeto": "categoria",
+        },
+    )
+
+
+# CRUD de clientes
 
 
 @login_required
@@ -410,8 +619,15 @@ def gestion_clientes(request):
     busqueda = request.GET.get("q", "").strip()
     if busqueda:
         clientes = clientes.filter(nombre__icontains=busqueda)
-    return render(request, "core/e3/clientes.html", {"titulo": "Clientes", "busqueda": busqueda,
-        "pagina": Paginator(clientes, 25).get_page(request.GET.get("page"))})
+    return render(
+        request,
+        "core/e3/clientes.html",
+        {
+            "titulo": "Clientes",
+            "busqueda": busqueda,
+            "pagina": Paginator(clientes, 25).get_page(request.GET.get("page")),
+        },
+    )
 
 
 @login_required
@@ -429,8 +645,15 @@ def cliente_formulario(request, cliente_id=None):
             persona.save()
             messages.success(request, "Cliente guardado.")
             return redirect("core:gestion_clientes")
-    return render(request, "core/e3/cliente_form.html", {"titulo": "Editar cliente" if cliente_id else "Nuevo cliente",
-        "persona": persona, "errores": errores})
+    return render(
+        request,
+        "core/e3/cliente_form.html",
+        {
+            "titulo": "Editar cliente" if cliente_id else "Nuevo cliente",
+            "persona": persona,
+            "errores": errores,
+        },
+    )
 
 
 @login_required
@@ -442,20 +665,41 @@ def cliente_eliminar(request, cliente_id):
             persona.delete()
             messages.success(request, "Cliente eliminado.")
         except ProtectedError:
-            messages.error(request, "El cliente tiene ventas asociadas. Puede desactivarlo sin borrar su historial.")
+            messages.error(
+                request,
+                "El cliente tiene ventas asociadas. Puede desactivarlo sin borrar su historial.",
+            )
         return redirect("core:gestion_clientes")
-    return render(request, "core/e3/confirmar_eliminacion.html", {"titulo": "Eliminar cliente", "objeto": persona,
-        "volver": "core:gestion_clientes", "tipo_objeto": "cliente"})
+    return render(
+        request,
+        "core/e3/confirmar_eliminacion.html",
+        {
+            "titulo": "Eliminar cliente",
+            "objeto": persona,
+            "volver": "core:gestion_clientes",
+            "tipo_objeto": "cliente",
+        },
+    )
+
+
+# Ventas y sus detalles
 
 
 @login_required
 @grupos_permitidos("Administrador", "Operador")
 def gestion_ventas(request):
-    ventas = Boleta.objects.select_related("cliente", "sucursal").annotate(
-        total=Sum(F("detalleboleta__cantidad") * F("detalleboleta__precio_unitario"), default=0)
-    ).order_by("-fecha", "-numero")
-    return render(request, "core/e3/ventas.html", {"titulo": "Ventas",
-        "pagina": Paginator(ventas, 25).get_page(request.GET.get("page"))})
+    ventas = (
+        Boleta.objects.select_related("cliente", "sucursal")
+        .annotate(
+            total=Sum(F("detalleboleta__cantidad") * F("detalleboleta__precio_unitario"), default=0)
+        )
+        .order_by("-fecha", "-numero")
+    )
+    return render(
+        request,
+        "core/e3/ventas.html",
+        {"titulo": "Ventas", "pagina": Paginator(ventas, 25).get_page(request.GET.get("page"))},
+    )
 
 
 @login_required
@@ -471,11 +715,26 @@ def venta_formulario(request, venta_id=None):
         errores = errores_modelo(venta)
         if not errores:
             venta.save()
-            messages.success(request, "Venta guardada. Puede incorporar sus productos en el detalle.")
+            messages.success(
+                request, "Venta guardada. Puede incorporar sus productos en el detalle."
+            )
             return redirect("core:venta_detalle", venta_id=venta.pk)
-    return render(request, "core/e3/venta_form.html", {"titulo": "Editar venta" if venta_id else "Nueva venta", "venta": venta,
-        "errores": errores, "fecha_formulario": request.POST.get("fecha", "") if request.method == "POST" else venta.fecha.isoformat(),
-        "clientes": Cliente.objects.order_by("nombre"), "sucursales": Sucursal.objects.order_by("nombre")})
+    return render(
+        request,
+        "core/e3/venta_form.html",
+        {
+            "titulo": "Editar venta" if venta_id else "Nueva venta",
+            "venta": venta,
+            "errores": errores,
+            "fecha_formulario": (
+                request.POST.get("fecha", "")
+                if request.method == "POST"
+                else venta.fecha.isoformat()
+            ),
+            "clientes": Cliente.objects.order_by("nombre"),
+            "sucursales": Sucursal.objects.order_by("nombre"),
+        },
+    )
 
 
 @login_required
@@ -484,15 +743,22 @@ def venta_detalle(request, venta_id):
     venta = get_object_or_404(Boleta.objects.select_related("cliente", "sucursal"), pk=venta_id)
     detalles = DetalleBoleta.objects.filter(boleta=venta).select_related("producto").order_by("id")
     total = detalles.aggregate(total=Sum(F("cantidad") * F("precio_unitario"), default=0))["total"]
-    return render(request, "core/e3/venta_detalle.html", {"titulo": f"Venta {venta.numero}", "venta": venta,
-        "detalles": detalles, "total": total})
+    return render(
+        request,
+        "core/e3/venta_detalle.html",
+        {"titulo": f"Venta {venta.numero}", "venta": venta, "detalles": detalles, "total": total},
+    )
 
 
 @login_required
 @grupos_permitidos("Administrador", "Operador")
 def detalle_formulario(request, venta_id, detalle_id=None):
     venta = get_object_or_404(Boleta, pk=venta_id)
-    detalle = get_object_or_404(DetalleBoleta, pk=detalle_id, boleta=venta) if detalle_id else DetalleBoleta(boleta=venta)
+    detalle = (
+        get_object_or_404(DetalleBoleta, pk=detalle_id, boleta=venta)
+        if detalle_id
+        else DetalleBoleta(boleta=venta)
+    )
     errores = {}
     if request.method == "POST":
         detalle.producto_id = request.POST.get("producto") or None
@@ -503,8 +769,17 @@ def detalle_formulario(request, venta_id, detalle_id=None):
             detalle.save()
             messages.success(request, "Detalle guardado con el precio histórico indicado.")
             return redirect("core:venta_detalle", venta_id=venta.pk)
-    return render(request, "core/e3/detalle_form.html", {"titulo": "Editar detalle" if detalle_id else "Agregar producto a la venta",
-        "venta": venta, "detalle": detalle, "errores": errores, "productos": Producto.objects.order_by("nombre")})
+    return render(
+        request,
+        "core/e3/detalle_form.html",
+        {
+            "titulo": "Editar detalle" if detalle_id else "Agregar producto a la venta",
+            "venta": venta,
+            "detalle": detalle,
+            "errores": errores,
+            "productos": Producto.objects.order_by("nombre"),
+        },
+    )
 
 
 @login_required
@@ -515,8 +790,16 @@ def detalle_eliminar(request, venta_id, detalle_id):
         detalle.delete()
         messages.success(request, "Detalle eliminado.")
         return redirect("core:venta_detalle", venta_id=venta_id)
-    return render(request, "core/e3/confirmar_eliminacion.html", {"titulo": "Eliminar detalle", "objeto": detalle,
-        "venta_id": venta_id, "tipo_objeto": "detalle"})
+    return render(
+        request,
+        "core/e3/confirmar_eliminacion.html",
+        {
+            "titulo": "Eliminar detalle",
+            "objeto": detalle,
+            "venta_id": venta_id,
+            "tipo_objeto": "detalle",
+        },
+    )
 
 
 @login_required
@@ -525,7 +808,17 @@ def venta_eliminar(request, venta_id):
     venta = get_object_or_404(Boleta, pk=venta_id)
     if request.method == "POST":
         venta.delete()
-        messages.success(request, "Venta y detalles eliminados. El cliente y los productos se conservaron.")
+        messages.success(
+            request, "Venta y detalles eliminados. El cliente y los productos se conservaron."
+        )
         return redirect("core:gestion_ventas")
-    return render(request, "core/e3/confirmar_eliminacion.html", {"titulo": "Eliminar venta y sus detalles", "objeto": venta,
-        "volver": "core:gestion_ventas", "tipo_objeto": "venta"})
+    return render(
+        request,
+        "core/e3/confirmar_eliminacion.html",
+        {
+            "titulo": "Eliminar venta y sus detalles",
+            "objeto": venta,
+            "volver": "core:gestion_ventas",
+            "tipo_objeto": "venta",
+        },
+    )

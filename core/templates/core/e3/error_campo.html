@@ -1,1 +1,7 @@
-{% if mensajes %}<div class="gestion-error-campo" id="error-{{ campo }}">{% for mensaje in mensajes %}<p>{{ mensaje }}</p>{% endfor %}</div>{% endif %}
+{% if mensajes %}
+    <div class="gestion-error-campo" id="error-{{ campo }}">
+        {% for mensaje in mensajes %}
+            <p>{{ mensaje }}</p>
+        {% endfor %}
+    </div>
+{% endif %}

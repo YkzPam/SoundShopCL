@@ -1,3 +1,77 @@
-{% extends 'core/e3/base_gestion.html' %}{% block gestion %}<header class="gestion-cabecera-listado"><div class="cabecera"><p class="eyebrow">Personas de la tienda</p><h1>Clientes</h1><p>Datos de contacto e historial comercial de los clientes.</p><span class="gestion-conteo">{{ pagina.paginator.count }} {% if busqueda %}resultado{{ pagina.paginator.count|pluralize }} de la búsqueda{% else %}cliente{{ pagina.paginator.count|pluralize }} registrado{{ pagina.paginator.count|pluralize }}{% endif %}</span></div><a class="btn btn-primary" href="{% url 'core:cliente_nuevo' %}">+ Nuevo cliente</a></header>
-<p>Los clientes son registros comerciales, no cuentas de acceso al panel.</p><form method="get" class="d-flex flex-wrap gap-2 mb-3 gestion-buscador"><label class="visually-hidden" for="q">Buscar cliente por nombre</label><input class="form-control" id="q" name="q" value="{{ busqueda }}" placeholder="Buscar por nombre"><button class="btn btn-outline-primary">Buscar</button>{% if busqueda %}<a class="btn btn-outline-primary" href="{% url 'core:gestion_clientes' %}">Limpiar búsqueda</a>{% endif %}</form>
-<div class="table-responsive{% if not pagina %} gestion-listado-vacio{% endif %}"><table class="table"><thead><tr><th>Nombre</th><th>Correo</th><th>Teléfono</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>{% for c in pagina %}<tr><td>{{ c.nombre }}</td><td>{{ c.correo }}</td><td>{{ c.telefono }}</td><td>{{ c.activo|yesno:'Activo,Inactivo' }}</td><td><a class="accion-crud" href="{% url 'core:cliente_editar' c.pk %}">{% include 'core/e3/icono.html' with nombre='editar' %}Editar</a> {% if es_administrador %}<a class="accion-crud accion-peligro" href="{% url 'core:cliente_eliminar' c.pk %}">{% include 'core/e3/icono.html' with nombre='eliminar' %}Eliminar</a>{% endif %}</td></tr>{% empty %}<tr><td colspan="5"><div class="gestion-vacio gestion-vacio-listado"><span aria-hidden="true">○</span>{% if busqueda %}<h2>No hay clientes para esta búsqueda</h2><p>Se puede probar otro nombre o volver al listado completo.</p><a class="btn btn-outline-primary" href="{% url 'core:gestion_clientes' %}">Limpiar búsqueda</a>{% else %}<h2>Todavía no hay clientes</h2><p>El primer registro permitirá asociar una venta a su cliente.</p><a class="btn btn-primary" href="{% url 'core:cliente_nuevo' %}">Crear el primer cliente</a>{% endif %}</div></td></tr>{% endfor %}</tbody></table></div>{% include 'core/e3/paginacion.html' %}{% endblock %}
+{% extends "core/e3/base_gestion.html" %}
+{% block gestion %}
+    <header class="gestion-cabecera-listado">
+        <div class="cabecera">
+            <p class="eyebrow">Personas de la tienda</p>
+            <h1>Clientes</h1>
+            <p>Datos de contacto e historial comercial de los clientes.</p>
+            <span class="gestion-conteo">{{ pagina.paginator.count }} {% if busqueda %}resultado{{ pagina.paginator.count|pluralize }} de la búsqueda{% else %}cliente{{ pagina.paginator.count|pluralize }} registrado{{ pagina.paginator.count|pluralize }}{% endif %}</span>
+        </div>
+        <a class="btn btn-primary" href="{% url 'core:cliente_nuevo' %}">+ Nuevo cliente</a>
+    </header>
+    <p>Los clientes son registros comerciales, no cuentas de acceso al panel.</p>
+    <form method="get" class="d-flex flex-wrap gap-2 mb-3 gestion-buscador">
+        <label class="visually-hidden" for="q">Buscar cliente por nombre</label>
+        <input class="form-control"
+               id="q"
+               name="q"
+               value="{{ busqueda }}"
+               placeholder="Buscar por nombre">
+        <button class="btn btn-outline-primary">Buscar</button>
+        {% if busqueda %}
+            <a class="btn btn-outline-primary"
+               href="{% url 'core:gestion_clientes' %}">Limpiar búsqueda</a>
+        {% endif %}
+    </form>
+    <div class="table-responsive{% if not pagina %} gestion-listado-vacio{% endif %}">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Correo</th>
+                    <th>Teléfono</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in pagina %}
+                    <tr>
+                        <td>{{ c.nombre }}</td>
+                        <td>{{ c.correo }}</td>
+                        <td>{{ c.telefono }}</td>
+                        <td>{{ c.activo|yesno:'Activo,Inactivo' }}</td>
+                        <td>
+                            <a class="accion-crud"
+                               href="{% url 'core:cliente_editar' c.pk %}">{% include "core/e3/icono.html" with nombre="editar" %}Editar</a>
+                            {% if es_administrador %}
+                                <a class="accion-crud accion-peligro"
+                                   href="{% url 'core:cliente_eliminar' c.pk %}">{% include "core/e3/icono.html" with nombre="eliminar" %}Eliminar</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5">
+                            <div class="gestion-vacio gestion-vacio-listado">
+                                <span aria-hidden="true">○</span>
+                                {% if busqueda %}
+                                    <h2>No hay clientes para esta búsqueda</h2>
+                                    <p>Se puede probar otro nombre o volver al listado completo.</p>
+                                    <a class="btn btn-outline-primary"
+                                       href="{% url 'core:gestion_clientes' %}">Limpiar búsqueda</a>
+                                {% else %}
+                                    <h2>Todavía no hay clientes</h2>
+                                    <p>El primer registro permitirá asociar una venta a su cliente.</p>
+                                    <a class="btn btn-primary"
+                                       href="{% url 'core:cliente_nuevo' %}">Crear el primer cliente</a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% include "core/e3/paginacion.html" %}
+{% endblock %}

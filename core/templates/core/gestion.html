@@ -1,43 +1,145 @@
-{% extends 'core/e3/base_gestion.html' %}
+{% extends "core/e3/base_gestion.html" %}
 {% load moneda l10n %}
 {% block gestion %}
-<div class="gestion-entrada"><div><p class="eyebrow">SoundShop CL / Administración</p><h1>Todo en su lugar.</h1><p>Un vistazo al movimiento de la tienda, antes de seguir con el día.</p></div><span class="gestion-sello" aria-hidden="true">s.</span></div>
-
-<div class="gestion-herramientas">
-  <form method="get" class="gestion-periodo"><label for="anio">Año de ventas</label><div><select class="form-select" name="anio" id="anio">{% for opcion in anios %}<option value="{{ opcion|unlocalize }}" {% if opcion == anio %}selected{% endif %}>{{ opcion|unlocalize }}</option>{% endfor %}</select><button class="btn btn-outline-primary" type="submit">Ver resumen</button></div></form>
-  <div class="gestion-accesos">{% if es_administrador %}<a class="btn btn-outline-primary" href="{% url 'core:producto_nuevo' %}">+ Nuevo producto</a>{% endif %}<a class="btn btn-primary" href="{% url 'core:venta_nueva' %}">+ Nueva venta</a></div>
-</div>
-
-<div class="gestion-metricas gestion-metricas-cuatro">
-  <section class="gestion-metrica"><span>Productos en catálogo</span><strong>{{ total_productos }}</strong><a href="{% url 'core:gestion_productos' %}">Ver productos ↗</a></section>
-  <section class="gestion-metrica"><span>Clientes registrados</span><strong>{{ total_clientes }}</strong><a href="{% url 'core:gestion_clientes' %}">Ver clientes ↗</a></section>
-  <section class="gestion-metrica"><span>Ventas de {{ anio|unlocalize }}</span><strong>{{ total_ventas }}</strong><a href="{% url 'core:gestion_ventas' %}">Ver ventas ↗</a></section>
-  <section class="gestion-metrica gestion-metrica-ingreso"><span>Ingresos de {{ anio|unlocalize }}</span><strong>${{ ingresos|pesos }}</strong><a href="{% url 'core:reportes' %}?reporte=19&amp;anio={{ anio|unlocalize }}">Ver montos por mes ↗</a></section>
-</div>
-
-<section class="gestion-colecciones"><div class="gestion-widget-titulo"><div><p class="eyebrow">Cada equipo tiene su lugar</p><h2>Catálogo musical</h2></div></div>{% include 'core/e3/accesos_categorias.html' %}</section>
-
-<div class="gestion-graficos">
-  <section class="gestion-widget">
-    <div class="gestion-widget-titulo"><div><p class="eyebrow">El ritmo de las ventas</p><h2>Ingresos por mes</h2></div><span class="gestion-anio">{{ anio|unlocalize }}</span></div>
-    {% if ingresos %}
-    <p class="gestion-escala">Mayor monto mensual: <strong>${{ mayor_monto|pesos }}</strong></p>
-    <div class="gestion-grafico-scroll"><ol class="gestion-columnas" aria-label="Ingresos mensuales en pesos">
-      {% for mes in meses %}<li><div class="gestion-columna-pista"><span class="gestion-columna" style="height:{{ mes.altura|unlocalize }}%" title="{{ mes.nombre }}: ${{ mes.monto|pesos }}"><span class="visually-hidden">{{ mes.nombre }}: ${{ mes.monto|pesos }}</span></span></div><span class="gestion-mes">{{ mes.nombre }}</span></li>{% endfor %}
-    </ol></div>
-    {% else %}<div class="gestion-vacio"><span aria-hidden="true">▥</span><p>Todavía no hay ingresos en {{ anio|unlocalize }}.</p><small>El gráfico se completará con los detalles de las ventas registradas.</small></div>{% endif %}
-    <p class="gestion-escala">Cada barra muestra el monto de su mes al mantener el cursor encima.</p>
-  </section>
-
-  <section class="gestion-widget">
-    <div class="gestion-widget-titulo"><div><p class="eyebrow">Los favoritos</p><h2>Productos más vendidos</h2></div></div><p class="gestion-escala">Hasta cinco productos · Unidades en {{ anio|unlocalize }}</p>
-    <ol class="gestion-ranking">{% for producto in productos_vendidos %}<li><div class="gestion-ranking-titulo">{% if es_administrador %}<a href="{% url 'core:producto_editar' producto.pk %}">{{ producto.nombre }}</a>{% elif producto.activo %}<a href="{% url 'core:detalle_producto' producto.pk %}">{{ producto.nombre }}</a>{% else %}<span>{{ producto.nombre }}</span>{% endif %}<span>{{ producto.unidades }} <small>unid.</small></span></div><div class="gestion-barra-pista"><span style="width:{{ producto.porcentaje|unlocalize }}%"></span></div></li>{% empty %}<li class="gestion-vacio"><span aria-hidden="true">♫</span><p>Aún no hay productos vendidos en este año.</p><small>Se mostrarán al agregar productos a una venta.</small></li>{% endfor %}</ol>
-    <a class="gestion-enlace-widget" href="{% url 'core:reportes' %}">Explorar los veinte reportes ↗</a>
-  </section>
-</div>
-
-<section class="gestion-widget gestion-aviso-stock">
-  <div><p class="eyebrow">Un ojo en el catálogo</p><h2>{{ cantidad_stock_bajo }} productos con stock bajo</h2><p>Productos activos con menos de cinco unidades, incluyendo los agotados.</p></div>
-  <a class="btn btn-outline-primary" href="{% url 'core:gestion_productos' %}">Revisar catálogo ↗</a>
-</section>
+    <div class="gestion-entrada">
+        <div>
+            <p class="eyebrow">SoundShop CL / Administración</p>
+            <h1>Todo en su lugar.</h1>
+            <p>Un vistazo al movimiento de la tienda, antes de seguir con el día.</p>
+        </div>
+        <span class="gestion-sello" aria-hidden="true">s.</span>
+    </div>
+    <div class="gestion-herramientas">
+        <form method="get" class="gestion-periodo">
+            <label for="anio">Año de ventas</label>
+            <div>
+                <select class="form-select" name="anio" id="anio">
+                    {% for opcion in anios %}
+                        <option value="{{ opcion|unlocalize }}"
+                                {% if opcion == anio %}selected{% endif %}>{{ opcion|unlocalize }}</option>
+                    {% endfor %}
+                </select>
+                <button class="btn btn-outline-primary" type="submit">Ver resumen</button>
+            </div>
+        </form>
+        <div class="gestion-accesos">
+            {% if es_administrador %}
+                <a class="btn btn-outline-primary"
+                   href="{% url 'core:producto_nuevo' %}">+ Nuevo producto</a>
+            {% endif %}
+            <a class="btn btn-primary" href="{% url 'core:venta_nueva' %}">+ Nueva venta</a>
+        </div>
+    </div>
+    <div class="gestion-metricas gestion-metricas-cuatro">
+        <section class="gestion-metrica">
+            <span>Productos en catálogo</span>
+            <strong>{{ total_productos }}</strong>
+            <a href="{% url 'core:gestion_productos' %}">Ver productos ↗</a>
+        </section>
+        <section class="gestion-metrica">
+            <span>Clientes registrados</span>
+            <strong>{{ total_clientes }}</strong>
+            <a href="{% url 'core:gestion_clientes' %}">Ver clientes ↗</a>
+        </section>
+        <section class="gestion-metrica">
+            <span>Ventas de {{ anio|unlocalize }}</span>
+            <strong>{{ total_ventas }}</strong>
+            <a href="{% url 'core:gestion_ventas' %}">Ver ventas ↗</a>
+        </section>
+        <section class="gestion-metrica gestion-metrica-ingreso">
+            <span>Ingresos de {{ anio|unlocalize }}</span>
+            <strong>${{ ingresos|pesos }}</strong>
+            <a href="{% url 'core:reportes' %}?reporte=19&amp;anio={{ anio|unlocalize }}">Ver montos por mes ↗</a>
+        </section>
+    </div>
+    <section class="gestion-colecciones">
+        <div class="gestion-widget-titulo">
+            <div>
+                <p class="eyebrow">Cada equipo tiene su lugar</p>
+                <h2>Catálogo musical</h2>
+            </div>
+        </div>
+        {% include "core/e3/accesos_categorias.html" %}
+    </section>
+    <div class="gestion-graficos">
+        <section class="gestion-widget">
+            <div class="gestion-widget-titulo">
+                <div>
+                    <p class="eyebrow">El ritmo de las ventas</p>
+                    <h2>Ingresos por mes</h2>
+                </div>
+                <span class="gestion-anio">{{ anio|unlocalize }}</span>
+            </div>
+            {% if ingresos %}
+                <p class="gestion-escala">Mayor monto mensual: <strong>${{ mayor_monto|pesos }}</strong></p>
+                <div class="gestion-grafico-scroll">
+                    <ol class="gestion-columnas" aria-label="Ingresos mensuales en pesos">
+                        {% for mes in meses %}
+                            <li>
+                                <div class="gestion-columna-pista">
+                                    <span class="gestion-columna"
+                                          style="height:{{ mes.altura|unlocalize }}%"
+                                          title="{{ mes.nombre }}: ${{ mes.monto|pesos }}"><span class="visually-hidden">{{ mes.nombre }}: ${{ mes.monto|pesos }}</span>
+                                    </span>
+                                </div>
+                                <span class="gestion-mes">{{ mes.nombre }}</span>
+                            </li>
+                        {% endfor %}
+                    </ol>
+                </div>
+            {% else %}
+                <div class="gestion-vacio">
+                    <span aria-hidden="true">▥</span>
+                    <p>Todavía no hay ingresos en {{ anio|unlocalize }}.</p>
+                    <small>El gráfico se completará con los detalles de las ventas registradas.</small>
+                </div>
+            {% endif %}
+            <p class="gestion-escala">Cada barra muestra el monto de su mes al mantener el cursor encima.</p>
+        </section>
+        <section class="gestion-widget">
+            <div class="gestion-widget-titulo">
+                <div>
+                    <p class="eyebrow">Los favoritos</p>
+                    <h2>Productos más vendidos</h2>
+                </div>
+            </div>
+            <p class="gestion-escala">Hasta cinco productos · Unidades en {{ anio|unlocalize }}</p>
+            <ol class="gestion-ranking">
+                {% for producto in productos_vendidos %}
+                    <li>
+                        <div class="gestion-ranking-titulo">
+                            {% if es_administrador %}
+                                <a href="{% url 'core:producto_editar' producto.pk %}">{{ producto.nombre }}</a>
+                            {% elif producto.activo %}
+                                <a href="{% url 'core:detalle_producto' producto.pk %}">{{ producto.nombre }}</a>
+                            {% else %}
+                                <span>{{ producto.nombre }}</span>
+                            {% endif %}
+                            <span>{{ producto.unidades }} <small>unid.</small></span>
+                        </div>
+                        <div class="gestion-barra-pista">
+                            <span style="width:{{ producto.porcentaje|unlocalize }}%"></span>
+                        </div>
+                    </li>
+                {% empty %}
+                    <li class="gestion-vacio">
+                        <span aria-hidden="true">♫</span>
+                        <p>Aún no hay productos vendidos en este año.</p>
+                        <small>Se mostrarán al agregar productos a una venta.</small>
+                    </li>
+                {% endfor %}
+            </ol>
+            <a class="gestion-enlace-widget"
+               href="{% url 'core:reportes' %}">Explorar los veinte reportes ↗</a>
+        </section>
+    </div>
+    <section class="gestion-widget gestion-aviso-stock">
+        <div>
+            <p class="eyebrow">Un ojo en el catálogo</p>
+            <h2>{{ cantidad_stock_bajo }} productos con stock bajo</h2>
+            <p>Productos activos con menos de cinco unidades, incluyendo los agotados.</p>
+        </div>
+        <a class="btn btn-outline-primary"
+           href="{% url 'core:gestion_productos' %}">Revisar catálogo ↗</a>
+    </section>
 {% endblock %}
