@@ -1,1 +1,1 @@
-{% if errores %}<div class="alert alert-danger" role="alert"><p>Revisar los datos antes de guardar:</p><ul class="mb-0">{% for campo, mensajes in errores.items %}{% for mensaje in mensajes %}<li>{{ campo }}: {{ mensaje }}</li>{% endfor %}{% endfor %}</ul></div>{% endif %}
+{% if errores %}<div class="alert alert-danger" role="alert"><p>Revisar los campos indicados antes de guardar:</p><ul class="mb-0">{% for campo, mensajes in errores.items %}{% for mensaje in mensajes %}<li>{{ mensaje }}</li>{% endfor %}{% endfor %}</ul></div>{% endif %}

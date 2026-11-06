@@ -205,3 +205,37 @@
 @media(max-width:1100px) { .gestion-edicion-producto { grid-template-columns:1fr; } .gestion-vista-producto { position:static; } }
 @media(max-width:767px) { .gestion-accesos-categorias { gap:.5rem; } .acceso-categoria { padding:.65rem .75rem; font-size:.66rem; } .acceso-categoria .icono-crud { width:20px; height:20px; } .gestion-form-producto { padding:1.2rem; } .gestion-vista-producto { padding:1.2rem; } }
 @media(prefers-reduced-motion:reduce) { .acceso-categoria:hover { transform:none; } }
+
+/* Listados, filtros y validación del CRUD. */
+.gestion-cabecera-listado { display:flex; align-items:center; justify-content:space-between; gap:1.5rem; margin-bottom:1.8rem; }
+.gestion-contenido .gestion-cabecera-listado .cabecera { margin-bottom:0; }
+.gestion-cabecera-listado .cabecera h1 { margin-bottom:.5rem; }
+.gestion-cabecera-listado .cabecera > p:last-of-type { margin-bottom:.7rem; }
+.gestion-cabecera-listado > .btn { flex-shrink:0; }
+.gestion-conteo { display:inline-block; font-size:.7rem; color:var(--detalle); background:color-mix(in srgb,var(--oro) 13%,var(--superficie)); border:1px solid var(--linea); border-radius:20px; padding:.3rem .7rem; }
+.gestion-filtros-acciones { display:flex; align-items:end; gap:.5rem; flex-wrap:wrap; }
+.gestion-buscador .form-control { flex:1 1 230px; width:auto; min-width:0; }
+.gestion-vacio-listado { padding:2.2rem 1rem; }
+.gestion-listado-vacio .table thead { display:none; }
+.gestion-listado-vacio .table { width:100%; min-width:0; table-layout:fixed; }
+.gestion-listado-vacio .table td { white-space:normal; }
+.gestion-vacio-listado h2 { font-size:1.1rem; font-weight:500; margin:.6rem 0; }
+.gestion-vacio-listado p { max-width:480px; margin:.4rem auto 1rem; color:var(--bs-secondary-color); font-weight:400; }
+.gestion-contenido .table td .gestion-vacio-listado .btn { padding:.65rem 1rem; border-radius:7px; }
+.gestion-contenido [aria-invalid="true"] { border-color:#a23838; box-shadow:0 0 0 1px #a2383820; }
+.gestion-error-campo { color:#a23838; font-size:.75rem; line-height:1.5; margin:.35rem 0 .5rem; }
+.gestion-error-campo p { margin:0; }
+.gestion-resumen-registro { display:grid; grid-template-columns:minmax(100px,150px) minmax(0,1fr); gap:.7rem 1rem; background:var(--papel); border:1px solid var(--linea); border-radius:9px; padding:1rem; margin:1.2rem 0; font-size:.85rem; }
+.gestion-resumen-registro dt { font-weight:500; color:var(--bs-secondary-color); }
+.gestion-resumen-registro dd { margin:0; overflow-wrap:anywhere; }
+.gestion-aviso-eliminacion { font-size:.85rem; line-height:1.6; border-left:3px solid #a23838; padding:.4rem 0 .4rem .9rem; }
+.gestion-confirmacion form { display:flex; flex-wrap:wrap; gap:.6rem; margin-top:1.2rem; }
+.gestion-cabecera-listado { animation:gestion-aparecer .35s ease-out backwards; }
+[data-bs-theme="dark"] .gestion-error-campo { color:#ffb5b5; }
+[data-bs-theme="dark"] .gestion-contenido [aria-invalid="true"] { border-color:#ffb5b5; }
+@media(max-width:767px) {
+  .gestion-cabecera-listado { align-items:flex-start; flex-direction:column; gap:1rem; }
+  .gestion-filtros-acciones { align-items:center; }
+}
+@media(max-width:420px) { .gestion-resumen-registro { grid-template-columns:1fr; gap:.2rem; } .gestion-resumen-registro dd { margin-bottom:.6rem; } }
+@media(prefers-reduced-motion:reduce) { .gestion-cabecera-listado { animation:none; } }

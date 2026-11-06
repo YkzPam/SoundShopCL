@@ -216,13 +216,29 @@ def gestion_productos(request):
     productos = Producto.objects.select_related("categoria", "marca").order_by("codigo")
     busqueda = request.GET.get("q", "").strip()
     categoria_id = request.GET.get("categoria", "")
+    estado = request.GET.get("estado", "")
+    stock = request.GET.get("stock", "")
     if busqueda:
         productos = productos.filter(nombre__icontains=busqueda)
     if categoria_id.isdigit():
         productos = productos.filter(categoria_id=categoria_id)
+    if estado in ("activo", "inactivo"):
+        productos = productos.filter(activo=estado == "activo")
+    else:
+        estado = ""
+    if stock == "agotado":
+        productos = productos.filter(stock=0)
+    elif stock == "bajo":
+        productos = productos.filter(stock__gt=0, stock__lt=5)
+    elif stock == "disponible":
+        productos = productos.filter(stock__gt=0)
+    else:
+        stock = ""
     pagina = Paginator(productos, 25).get_page(request.GET.get("page"))
     return render(request, "core/e3/productos.html", {"titulo": "Productos", "pagina": pagina,
-        "categorias": Categoria.objects.order_by("nombre"), "busqueda": busqueda, "categoria_actual": categoria_id})
+        "categorias": Categoria.objects.order_by("nombre"), "busqueda": busqueda, "categoria_actual": categoria_id,
+        "estado_actual": estado, "stock_actual": stock,
+        "hay_filtros": bool(busqueda or categoria_id.isdigit() or estado or stock)})
 
 
 @login_required
@@ -264,7 +280,7 @@ def producto_eliminar(request, producto_id):
             messages.error(request, "El producto está utilizado en ventas o compras. Puede desactivarlo en lugar de borrarlo.")
         return redirect("core:gestion_productos")
     return render(request, "core/e3/confirmar_eliminacion.html", {"titulo": "Eliminar producto", "objeto": producto,
-        "volver": "core:gestion_productos"})
+        "volver": "core:gestion_productos", "tipo_objeto": "producto"})
 
 
 @login_required
@@ -329,7 +345,7 @@ def usuario_desactivar(request, usuario_id):
             messages.success(request, "Cuenta desactivada; ya no puede iniciar sesión.")
         return redirect("core:gestion_usuarios")
     return render(request, "core/e3/confirmar_eliminacion.html", {"titulo": "Desactivar usuario", "objeto": usuario,
-        "volver": "core:gestion_usuarios", "desactivar": True})
+        "volver": "core:gestion_usuarios", "desactivar": True, "tipo_objeto": "usuario"})
 
 
 @login_required
@@ -368,7 +384,7 @@ def categoria_eliminar(request, categoria_id):
             messages.error(request, "La categoría tiene productos asociados y no puede eliminarse.")
         return redirect("core:gestion_categorias")
     return render(request, "core/e3/confirmar_eliminacion.html", {"titulo": "Eliminar categoría", "objeto": categoria,
-        "volver": "core:gestion_categorias"})
+        "volver": "core:gestion_categorias", "tipo_objeto": "categoria"})
 
 
 @login_required
@@ -413,7 +429,7 @@ def cliente_eliminar(request, cliente_id):
             messages.error(request, "El cliente tiene ventas asociadas. Puede desactivarlo sin borrar su historial.")
         return redirect("core:gestion_clientes")
     return render(request, "core/e3/confirmar_eliminacion.html", {"titulo": "Eliminar cliente", "objeto": persona,
-        "volver": "core:gestion_clientes"})
+        "volver": "core:gestion_clientes", "tipo_objeto": "cliente"})
 
 
 @login_required
@@ -484,7 +500,7 @@ def detalle_eliminar(request, venta_id, detalle_id):
         messages.success(request, "Detalle eliminado.")
         return redirect("core:venta_detalle", venta_id=venta_id)
     return render(request, "core/e3/confirmar_eliminacion.html", {"titulo": "Eliminar detalle", "objeto": detalle,
-        "venta_id": venta_id})
+        "venta_id": venta_id, "tipo_objeto": "detalle"})
 
 
 @login_required
@@ -496,4 +512,4 @@ def venta_eliminar(request, venta_id):
         messages.success(request, "Venta y detalles eliminados. El cliente y los productos se conservaron.")
         return redirect("core:gestion_ventas")
     return render(request, "core/e3/confirmar_eliminacion.html", {"titulo": "Eliminar venta y sus detalles", "objeto": venta,
-        "volver": "core:gestion_ventas"})
+        "volver": "core:gestion_ventas", "tipo_objeto": "venta"})

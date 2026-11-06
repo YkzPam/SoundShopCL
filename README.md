@@ -72,6 +72,8 @@ El resumen del panel presenta gráficos de ingresos mensuales y de los cinco pro
 
 Las pantallas del CRUD comparten animaciones breves en formularios, listados, indicadores, avisos y gráficos, junto con respuestas visuales de botones y campos. Se realizan con CSS y se desactivan cuando el sistema tiene activada la preferencia de reducir movimiento.
 
+Los listados muestran el número de registros y distinguen entre una lista vacía y una búsqueda sin resultados. Productos permite combinar nombre, categoría, estado y existencias; el stock bajo comprende de una a cuatro unidades y los agotados tienen cero. Los filtros se pueden limpiar y se conservan al cambiar de página o categoría. Los formularios señalan los errores junto a cada campo, y la confirmación de eliminación muestra el registro y las consecuencias antes de enviar el POST.
+
 El catálogo administrativo incluye accesos por categoría musical, botones de acción con iconos y avisos para productos sin foto, con stock bajo, agotados o desactivados. El formulario de producto está organizado por secciones y cuenta con una vista previa de fotografía, nombre, marca, categoría, código, precio y estado. La vista previa utiliza JavaScript del proyecto y solo refleja los campos que se están editando; los cambios se guardan al enviar el formulario.
 
 ```text

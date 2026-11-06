@@ -442,3 +442,70 @@ class Evaluacion3Tests(TestCase):
         for ruta, args in [('producto_nuevo', []), ('producto_editar', [self.guitarra.pk]), ('producto_eliminar', [self.guitarra.pk]), ('cliente_nuevo', []), ('venta_nueva', []), ('usuario_nuevo', []), ('salir', [])]:
             with self.subTest(ruta=ruta):
                 self.assertEqual(navegador.post(reverse('core:' + ruta, args=args), self.datos_producto()).status_code, 403)
+
+    def test_filtros_de_productos_combinados_y_stock(self):
+        casos = [({'estado': 'activo'}, ['P1', 'P2', 'P4']),
+                 ({'estado': 'inactivo'}, ['P3']),
+                 ({'stock': 'agotado'}, ['P3']),
+                 ({'stock': 'bajo'}, ['P2', 'P4']),
+                 ({'stock': 'disponible'}, ['P1', 'P2', 'P4']),
+                 ({'q': 'Guitarra', 'categoria': self.categoria.pk, 'estado': 'activo', 'stock': 'disponible'}, ['P1'])]
+        for filtros, esperados in casos:
+            with self.subTest(filtros=filtros):
+                respuesta = self.client.get(reverse('core:gestion_productos'), filtros)
+                self.assertEqual([p.codigo for p in respuesta.context['pagina']], esperados)
+                self.assertTrue(respuesta.context['hay_filtros'])
+        respuesta = self.client.get(reverse('core:gestion_productos'), {'estado': 'incorrecto', 'stock': 'incorrecto'})
+        self.assertEqual(respuesta.context['pagina'].paginator.count, 4)
+        self.assertFalse(respuesta.context['hay_filtros'])
+
+    def test_filtros_se_conservan_en_paginacion_y_categorias(self):
+        Producto.objects.bulk_create([Producto(codigo=f'F{i:02}', nombre='Filtro paginado', descripcion='Equipo', precio=10, stock=2, categoria=self.categoria, marca=self.marca, proveedor=self.proveedor) for i in range(27)])
+        filtros = {'q': 'Filtro', 'categoria': self.categoria.pk, 'estado': 'activo', 'stock': 'bajo'}
+        respuesta = self.client.get(reverse('core:gestion_productos'), filtros)
+        self.assertEqual(respuesta.context['pagina'].paginator.count, 27)
+        self.assertContains(respuesta, 'estado=activo&amp;stock=bajo&amp;page=2')
+        filtros['page'] = 2
+        respuesta = self.client.get(reverse('core:gestion_productos'), filtros)
+        self.assertEqual(len(respuesta.context['pagina']), 2)
+        self.assertContains(respuesta, 'estado=activo&amp;stock=bajo')
+
+    def test_vacios_distinguen_filtros_y_respetan_perfil(self):
+        respuesta = self.client.get(reverse('core:gestion_productos'), {'q': 'No existe este equipo'})
+        self.assertContains(respuesta, 'No hay productos para estos filtros')
+        self.assertContains(respuesta, 'Limpiar filtros')
+        respuesta = self.client.get(reverse('core:gestion_clientes'), {'q': 'No existe esta persona'})
+        self.assertContains(respuesta, 'No hay clientes para esta búsqueda')
+        Boleta.objects.all().delete()
+        Producto.objects.all().delete()
+        respuesta = self.client.get(reverse('core:gestion_productos'))
+        self.assertContains(respuesta, 'Todavía no hay productos')
+        self.assertContains(respuesta, 'Crear el primer producto')
+        self.client.force_login(self.operador)
+        respuesta = self.client.get(reverse('core:gestion_productos'))
+        self.assertContains(respuesta, 'Todavía no hay productos')
+        self.assertNotContains(respuesta, reverse('core:producto_nuevo'))
+
+    def test_errores_en_campos_y_datos_conservados(self):
+        datos = self.datos_producto()
+        datos.update(codigo='P1', stock='-1', precio='0')
+        respuesta = self.client.post(reverse('core:producto_nuevo'), datos)
+        self.assertContains(respuesta, 'id="error-codigo"')
+        self.assertContains(respuesta, 'id="error-stock"')
+        self.assertContains(respuesta, 'id="error-precio"')
+        self.assertContains(respuesta, 'aria-describedby="ayuda-precio error-precio"')
+        self.assertContains(respuesta, 'value="Bajo nuevo"')
+        self.assertEqual(Producto.objects.count(), 4)
+        respuesta = self.client.post(reverse('core:cliente_nuevo'), {'nombre': 'Nombre conservado', 'correo': 'incorrecto', 'activo': 'on'})
+        self.assertContains(respuesta, 'id="error-correo"')
+        self.assertContains(respuesta, 'value="Nombre conservado"')
+
+    def test_confirmacion_identifica_registro_y_consecuencias(self):
+        respuesta = self.client.get(reverse('core:producto_eliminar', args=[self.guitarra.pk]))
+        self.assertContains(respuesta, self.guitarra.codigo)
+        self.assertContains(respuesta, self.guitarra.nombre)
+        respuesta = self.client.get(reverse('core:venta_eliminar', args=[self.venta.pk]))
+        self.assertContains(respuesta, self.ana.nombre)
+        self.assertContains(respuesta, 'Se eliminarán esta venta y todos sus detalles')
+        self.assertContains(respuesta, 'Detalles incluidos')
+        self.assertTrue(Boleta.objects.filter(pk=self.venta.pk).exists())
