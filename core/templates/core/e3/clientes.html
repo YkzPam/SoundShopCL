@@ -7,7 +7,9 @@
             <p>Datos de contacto e historial comercial de los clientes.</p>
             <span class="gestion-conteo">{{ pagina.paginator.count }} {% if busqueda %}resultado{{ pagina.paginator.count|pluralize }} de la búsqueda{% else %}cliente{{ pagina.paginator.count|pluralize }} registrado{{ pagina.paginator.count|pluralize }}{% endif %}</span>
         </div>
-        <a class="btn btn-primary" href="{% url 'core:cliente_nuevo' %}">+ Nuevo cliente</a>
+        {% if perms.core.add_cliente %}
+            <a class="btn btn-primary" href="{% url 'core:cliente_nuevo' %}">+ Nuevo cliente</a>
+        {% endif %}
     </header>
     <p>Los clientes son registros comerciales, no cuentas de acceso al panel.</p>
     <form method="get" class="d-flex flex-wrap gap-2 mb-3 gestion-buscador">
@@ -44,9 +46,11 @@
                         <td>{{ c.telefono }}</td>
                         <td>{{ c.activo|yesno:'Activo,Inactivo' }}</td>
                         <td>
-                            <a class="accion-crud"
-                               href="{% url 'core:cliente_editar' c.pk %}">{% include "core/e3/icono.html" with nombre="editar" %}Editar</a>
-                            {% if es_administrador %}
+                            {% if perms.core.change_cliente %}
+                                <a class="accion-crud"
+                                   href="{% url 'core:cliente_editar' c.pk %}">{% include "core/e3/icono.html" with nombre="editar" %}Editar</a>
+                            {% endif %}
+                            {% if es_administrador and perms.core.delete_cliente %}
                                 <a class="accion-crud accion-peligro"
                                    href="{% url 'core:cliente_eliminar' c.pk %}">{% include "core/e3/icono.html" with nombre="eliminar" %}Eliminar</a>
                             {% endif %}
@@ -65,8 +69,10 @@
                                 {% else %}
                                     <h2>Todavía no hay clientes</h2>
                                     <p>El primer registro permitirá asociar una venta a su cliente.</p>
-                                    <a class="btn btn-primary"
-                                       href="{% url 'core:cliente_nuevo' %}">Crear el primer cliente</a>
+                                    {% if perms.core.add_cliente %}
+                                        <a class="btn btn-primary"
+                                           href="{% url 'core:cliente_nuevo' %}">Crear el primer cliente</a>
+                                    {% endif %}
                                 {% endif %}
                             </div>
                         </td>

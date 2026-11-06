@@ -7,7 +7,9 @@
             <p>Cuentas, perfiles y estado de acceso al espacio de gestión.</p>
             <span class="gestion-conteo">{{ pagina.paginator.count }} {% if busqueda %}resultado{{ pagina.paginator.count|pluralize }} de la búsqueda{% else %}cuenta{{ pagina.paginator.count|pluralize }} registrada{{ pagina.paginator.count|pluralize }}{% endif %}</span>
         </div>
-        <a class="btn btn-primary" href="{% url 'core:usuario_nuevo' %}">+ Nuevo usuario</a>
+        {% if perms.auth.add_user %}
+            <a class="btn btn-primary" href="{% url 'core:usuario_nuevo' %}">+ Nuevo usuario</a>
+        {% endif %}
     </header>
     <form method="get" class="d-flex flex-wrap gap-2 mb-3 gestion-buscador">
         <label class="visually-hidden" for="q">Buscar usuario</label>
@@ -43,14 +45,20 @@
                         <td>{% if u.is_superuser %}Administrador{% else %}{% for grupo in u.groups.all %}{{ grupo.name }}{% if not forloop.last %}, {% endif %}{% empty %}Sin perfil{% endfor %}{% endif %}</td>
                         <td>{{ u.is_active|yesno:'Activo,Inactivo' }}</td>
                         <td>
-                            <a class="accion-crud"
-                               href="{% url 'core:usuario_editar' u.pk %}">{% include "core/e3/icono.html" with nombre="editar" %}Editar</a>
+                            {% if perms.auth.change_user %}
+                                <a class="accion-crud"
+                                   href="{% url 'core:usuario_editar' u.pk %}">{% include "core/e3/icono.html" with nombre="editar" %}Editar</a>
+                            {% endif %}
                             {% if u.pk != request.user.pk %}
-                                <a class="accion-crud accion-advertencia"
-                                   href="{% url 'core:usuario_desactivar' u.pk %}">{% include "core/e3/icono.html" with nombre="desactivar" %}Desactivar</a>
-                                <a class="accion-crud accion-peligro"
-                                   href="{% url 'core:usuario_eliminar' u.pk %}"
-                                   aria-label="Eliminar usuario {{ u.username }}">{% include "core/e3/icono.html" with nombre="eliminar" %}Eliminar</a>
+                                {% if perms.auth.change_user %}
+                                    <a class="accion-crud accion-advertencia"
+                                       href="{% url 'core:usuario_desactivar' u.pk %}">{% include "core/e3/icono.html" with nombre="desactivar" %}Desactivar</a>
+                                {% endif %}
+                                {% if perms.auth.delete_user %}
+                                    <a class="accion-crud accion-peligro"
+                                       href="{% url 'core:usuario_eliminar' u.pk %}"
+                                       aria-label="Eliminar usuario {{ u.username }}">{% include "core/e3/icono.html" with nombre="eliminar" %}Eliminar</a>
+                                {% endif %}
                             {% endif %}
                         </td>
                     </tr>
@@ -67,8 +75,10 @@
                                 {% else %}
                                     <h2>Todavía no hay usuarios en el listado</h2>
                                     <p>Las cuentas nuevas reciben el perfil Operador.</p>
-                                    <a class="btn btn-primary"
-                                       href="{% url 'core:usuario_nuevo' %}">Crear usuario</a>
+                                    {% if perms.auth.add_user %}
+                                        <a class="btn btn-primary"
+                                           href="{% url 'core:usuario_nuevo' %}">Crear usuario</a>
+                                    {% endif %}
                                 {% endif %}
                             </div>
                         </td>

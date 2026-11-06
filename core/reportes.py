@@ -7,7 +7,7 @@ Boleta representa la venta de la tienda y DetalleBoleta conserva sus productos.
 from datetime import date, timedelta
 from decimal import Decimal, InvalidOperation
 
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.core.paginator import Paginator
 from django.db.models import Avg, Count, F, Q, Sum
 from django.db.models.functions import ExtractMonth, TruncDate
@@ -49,6 +49,16 @@ def identificador(valor, nombre):
 
 @login_required
 @grupos_permitidos("Administrador", "Operador")
+@permission_required(
+    (
+        "core.view_producto",
+        "core.view_categoria",
+        "core.view_cliente",
+        "core.view_boleta",
+        "core.view_detalleboleta",
+    ),
+    raise_exception=True,
+)
 def reportes(request):
     numero = request.GET.get("reporte", "1")
     if not numero.isdigit() or not 1 <= int(numero) <= 20:

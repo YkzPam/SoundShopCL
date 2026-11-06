@@ -23,11 +23,13 @@
             </div>
         </form>
         <div class="gestion-accesos">
-            {% if es_administrador %}
+            {% if es_administrador and perms.core.add_producto %}
                 <a class="btn btn-outline-primary"
                    href="{% url 'core:producto_nuevo' %}">+ Nuevo producto</a>
             {% endif %}
-            <a class="btn btn-primary" href="{% url 'core:venta_nueva' %}">+ Nueva venta</a>
+            {% if perms.core.add_boleta %}
+                <a class="btn btn-primary" href="{% url 'core:venta_nueva' %}">+ Nueva venta</a>
+            {% endif %}
         </div>
     </div>
     <div class="gestion-metricas gestion-metricas-cuatro">

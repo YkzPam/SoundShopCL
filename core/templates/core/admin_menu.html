@@ -20,7 +20,7 @@
            {% if 'venta' in request.resolver_match.url_name or 'detalle' in request.resolver_match.url_name %}aria-current="page"{% endif %}>{% include "core/e3/icono.html" with nombre="ventas" %}Ventas</a>
         <a href="{% url 'core:reportes' %}"
            {% if request.resolver_match.url_name == 'reportes' %}aria-current="page"{% endif %}>{% include "core/e3/icono.html" with nombre="reportes" %}Reportes</a>
-        {% if es_administrador %}
+        {% if es_administrador and perms.auth.view_user %}
             <a href="{% url 'core:gestion_usuarios' %}"
                {% if 'usuario' in request.resolver_match.url_name %}aria-current="page"{% endif %}>{% include "core/e3/icono.html" with nombre="usuarios" %}Usuarios</a>
         {% endif %}

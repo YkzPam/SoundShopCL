@@ -5,10 +5,14 @@
         <p class="eyebrow">Ventas</p>
         <h1>Venta {{ venta.numero }}</h1>
         <p>{{ venta.fecha|date:'d/m/Y H:i' }} · {{ venta.cliente.nombre }} · {{ venta.sucursal.nombre }} · {{ venta.get_estado_display }}</p>
-        <a class="btn btn-primary"
-           href="{% url 'core:detalle_nuevo' venta.id %}">Agregar producto</a>
-        <a class="btn btn-outline-secondary"
-           href="{% url 'core:venta_editar' venta.id %}">Editar venta</a>
+        {% if perms.core.add_detalleboleta %}
+            <a class="btn btn-primary"
+               href="{% url 'core:detalle_nuevo' venta.id %}">Agregar producto</a>
+        {% endif %}
+        {% if perms.core.change_boleta %}
+            <a class="btn btn-outline-secondary"
+               href="{% url 'core:venta_editar' venta.id %}">Editar venta</a>
+        {% endif %}
     </div>
     <div class="table-responsive">
         <table class="table align-middle">
@@ -29,9 +33,11 @@
                         <td class="gestion-numero">${{ detalle.precio_unitario|pesos }}</td>
                         <td class="gestion-numero">${{ detalle.subtotal|pesos }}</td>
                         <td>
-                            <a class="accion-crud"
-                               href="{% url 'core:detalle_editar' venta.id detalle.id %}">{% include "core/e3/icono.html" with nombre="editar" %}Editar</a>
-                            {% if es_administrador %}
+                            {% if perms.core.change_detalleboleta %}
+                                <a class="accion-crud"
+                                   href="{% url 'core:detalle_editar' venta.id detalle.id %}">{% include "core/e3/icono.html" with nombre="editar" %}Editar</a>
+                            {% endif %}
+                            {% if es_administrador and perms.core.delete_detalleboleta %}
                                 <a class="accion-crud accion-peligro"
                                    href="{% url 'core:detalle_eliminar' venta.id detalle.id %}">{% include "core/e3/icono.html" with nombre="eliminar" %}Eliminar</a>
                             {% endif %}

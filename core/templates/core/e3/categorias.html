@@ -7,7 +7,7 @@
             <p>Familias de equipos para organizar el catálogo de la tienda.</p>
             <span class="gestion-conteo">{{ categorias.count }} categoría{{ categorias.count|pluralize }} registrada{{ categorias.count|pluralize }}</span>
         </div>
-        {% if es_administrador %}
+        {% if es_administrador and perms.core.add_categoria %}
             <a class="btn btn-primary" href="{% url 'core:categoria_nueva' %}">+ Nueva categoría</a>
         {% endif %}
     </header>
@@ -31,10 +31,14 @@
                         <td>{{ c.descripcion }}</td>
                         {% if es_administrador %}
                             <td>
-                                <a class="accion-crud"
-                                   href="{% url 'core:categoria_editar' c.pk %}">{% include "core/e3/icono.html" with nombre="editar" %}Editar</a>
-                                <a class="accion-crud accion-peligro"
-                                   href="{% url 'core:categoria_eliminar' c.pk %}">{% include "core/e3/icono.html" with nombre="eliminar" %}Eliminar</a>
+                                {% if perms.core.change_categoria %}
+                                    <a class="accion-crud"
+                                       href="{% url 'core:categoria_editar' c.pk %}">{% include "core/e3/icono.html" with nombre="editar" %}Editar</a>
+                                {% endif %}
+                                {% if perms.core.delete_categoria %}
+                                    <a class="accion-crud accion-peligro"
+                                       href="{% url 'core:categoria_eliminar' c.pk %}">{% include "core/e3/icono.html" with nombre="eliminar" %}Eliminar</a>
+                                {% endif %}
                             </td>
                         {% endif %}
                     </tr>
@@ -45,7 +49,7 @@
                                 <span aria-hidden="true">♫</span>
                                 <h2>Todavía no hay categorías</h2>
                                 <p>Una categoría permite reunir los productos de una misma familia.</p>
-                                {% if es_administrador %}
+                                {% if es_administrador and perms.core.add_categoria %}
                                     <a class="btn btn-primary"
                                        href="{% url 'core:categoria_nueva' %}">Crear la primera categoría</a>
                                 {% endif %}

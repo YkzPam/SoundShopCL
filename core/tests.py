@@ -2,7 +2,7 @@
 
 from datetime import date, datetime, time, timedelta
 from decimal import Decimal
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import Group, Permission, User
 from django.core.management import call_command
 from io import StringIO
 from django.db import connection
@@ -23,6 +23,7 @@ class Evaluacion3Tests(TestCase):
         operador, _ = Group.objects.get_or_create(name="Operador")
         cls.admin.groups.add(administrador)
         cls.operador.groups.add(operador)
+        call_command("configurar_grupos", stdout=StringIO())
         cls.categoria = Categoria.objects.create(nombre="Instrumentos", slug="instrumentos")
         cls.otra_categoria = Categoria.objects.create(nombre="Audio", slug="audio")
         cls.marca = Marca.objects.create(nombre="Marca musical")
@@ -776,6 +777,87 @@ class Evaluacion3Tests(TestCase):
         self.assertTrue(self.admin.groups.filter(name="Administrador").exists())
         self.assertTrue(sin_perfil.groups.filter(name="Operador").exists())
         self.assertFalse(self.operador.groups.filter(name="Administrador").exists())
+
+    def test_permisos_nativos_de_cada_grupo(self):
+        administrador = Group.objects.get(name="Administrador")
+        operador = Group.objects.get(name="Operador")
+        self.assertEqual(administrador.permissions.count(), 24)
+        self.assertEqual(operador.permissions.count(), 11)
+        self.assertTrue(self.operador.has_perm("core.view_producto"))
+        self.assertTrue(self.operador.has_perm("core.add_cliente"))
+        self.assertTrue(self.operador.has_perm("core.change_boleta"))
+        self.assertFalse(self.operador.has_perm("core.add_producto"))
+        self.assertFalse(self.operador.has_perm("core.delete_boleta"))
+        self.assertFalse(self.operador.has_perm("auth.view_user"))
+        operador.permissions.clear()
+        call_command("configurar_grupos", stdout=StringIO())
+        self.assertEqual(operador.permissions.count(), 11)
+
+    def test_permiso_nativo_bloquea_aunque_pertenezca_al_grupo(self):
+        cuenta = User.objects.create_user("admin_permisos", password="Cedro!Sonido9f2026")
+        grupo = Group.objects.get(name="Administrador")
+        cuenta.groups.add(grupo)
+        grupo.permissions.remove(
+            Permission.objects.get(content_type__app_label="core", codename="delete_producto")
+        )
+        self.client.force_login(cuenta)
+        url = reverse("core:producto_eliminar", args=[self.sin_venta.pk])
+        self.assertContains(self.client.get(url), "Acceso restringido", status_code=403)
+        self.assertEqual(self.client.post(url).status_code, 403)
+        self.assertTrue(Producto.objects.filter(pk=self.sin_venta.pk).exists())
+        listado = self.client.get(reverse("core:gestion_productos"))
+        self.assertNotContains(listado, url)
+        grupo.permissions.remove(
+            Permission.objects.get(content_type__app_label="core", codename="view_producto")
+        )
+        self.assertEqual(self.client.get(reverse("core:gestion_productos")).status_code, 403)
+
+    def test_crear_y_editar_exigen_permisos_distintos(self):
+        cuenta = User.objects.create_user("admin_edicion", password="Cedro!Sonido9f2026")
+        grupo = Group.objects.get(name="Administrador")
+        cuenta.groups.add(grupo)
+        permiso_crear = Permission.objects.get(
+            content_type__app_label="core", codename="add_producto"
+        )
+        permiso_editar = Permission.objects.get(
+            content_type__app_label="core", codename="change_producto"
+        )
+        grupo.permissions.remove(permiso_crear)
+        self.client.force_login(cuenta)
+        crear = reverse("core:producto_nuevo")
+        editar = reverse("core:producto_editar", args=[self.sin_venta.pk])
+        self.assertEqual(self.client.get(crear).status_code, 403)
+        self.assertEqual(self.client.post(crear, self.datos_producto()).status_code, 403)
+        self.assertEqual(self.client.get(editar).status_code, 200)
+        datos = self.datos_producto()
+        datos["codigo"] = self.sin_venta.codigo
+        self.assertEqual(self.client.post(editar, datos).status_code, 302)
+        self.sin_venta.refresh_from_db()
+        self.assertEqual(self.sin_venta.nombre, datos["nombre"])
+        grupo.permissions.add(permiso_crear)
+        grupo.permissions.remove(permiso_editar)
+        self.assertEqual(self.client.get(crear).status_code, 200)
+        self.assertEqual(self.client.get(editar).status_code, 403)
+        self.assertEqual(self.client.post(editar, datos).status_code, 403)
+
+    def test_operador_sin_permiso_de_edicion_no_modifica_clientes(self):
+        grupo = Group.objects.get(name="Operador")
+        grupo.permissions.remove(
+            Permission.objects.get(content_type__app_label="core", codename="change_cliente")
+        )
+        self.client.force_login(self.operador)
+        url = reverse("core:cliente_editar", args=[self.ana.pk])
+        self.assertEqual(self.client.get(url).status_code, 403)
+        self.assertEqual(
+            self.client.post(
+                url, {"nombre": "Cambio bloqueado", "correo": self.ana.correo}
+            ).status_code,
+            403,
+        )
+        self.ana.refresh_from_db()
+        self.assertEqual(self.ana.nombre, "Ana")
+        self.assertEqual(self.client.get(reverse("core:cliente_nuevo")).status_code, 200)
+        self.assertNotContains(self.client.get(reverse("core:gestion_clientes")), url)
 
     def test_get_no_modifica_registros(self):
         modelos = [Producto, Categoria, Cliente, Boleta, DetalleBoleta, User]

@@ -38,7 +38,9 @@ python manage.py runserver
 
 El grupo **Administrador** tiene acceso completo a productos, categorías, clientes, ventas, detalles y cuentas de usuario. El grupo **Operador** puede consultar el catálogo, categorías, clientes, ventas y reportes; también puede crear y editar clientes, ventas y sus detalles. Los cambios del catálogo, las eliminaciones y la gestión de usuarios quedan reservados al Administrador. Las cuentas nuevas creadas desde el panel reciben el grupo Operador. Las contraseñas se guardan con el sistema de Django, nunca como texto legible.
 
-`configurar_grupos` crea los dos grupos y asigna Administrador a los superusuarios activos. Las cuentas activas sin grupo reciben Operador. El comando puede ejecutarse nuevamente en una base ya preparada y conserva las contraseñas. La primera cuenta creada con `createsuperuser` puede acceder al panel para preparar el proyecto.
+`configurar_grupos` crea los dos grupos y asigna sus permisos nativos de Django: consultar, crear, modificar y eliminar. Administrador recibe esos permisos para las cinco entidades principales de Tienda y las cuentas de usuario. Operador recibe consulta para las cinco entidades y creación y modificación para clientes, ventas y detalles. Los permisos de la aplicación se identifican con `core`, por ejemplo, `core.add_producto`; los de cuentas utilizan `auth`, por ejemplo, `auth.change_user`.
+
+El comando asigna Administrador a los superusuarios activos y Operador a las cuentas activas sin grupo. Puede ejecutarse nuevamente en una base ya preparada y conserva las contraseñas. Al actualizar una copia existente se ejecuta `python manage.py configurar_grupos` para preparar los permisos. La primera cuenta creada con `createsuperuser` puede acceder al panel para preparar el proyecto.
 
 Desde Usuarios, el Administrador puede editar, desactivar o eliminar otras cuentas. Desactivar conserva la cuenta sin permitir su acceso; eliminar la borra después de confirmar mediante POST. El usuario no puede desactivar ni eliminar su propia cuenta durante la gestión. Los clientes y las ventas son registros comerciales independientes y se conservan al borrar una cuenta de acceso.
 
@@ -84,7 +86,7 @@ core/tests.py                   Pruebas funcionales de E3
 .vscode/tasks.json              Ejecución de tareas desde VS Code
 ```
 
-Las páginas administrativas y las operaciones están protegidas con `login_required` y el decorador propio `grupos_permitidos`. Una cuenta autenticada sin perfil autorizado recibe una respuesta HTTP 403, igual que un Operador que intenta acceder a una acción reservada. La comprobación se ejecuta en las vistas para peticiones GET y POST; también se adapta la interfaz al perfil. Cerrar sesión invalida el acceso y los formularios utilizan protección CSRF. El formulario de usuarios no permite otorgar privilegios administrativos a una cuenta nueva.
+Las páginas administrativas y las operaciones están protegidas con `login_required`, el decorador propio `grupos_permitidos` y los permisos nativos de Django. Los listados y borrados utilizan `permission_required`; los formularios comprueban `has_perm` para distinguir entre crear y modificar. Una cuenta autenticada sin perfil o sin el permiso requerido recibe HTTP 403. Las plantillas consultan `perms` para mostrar las acciones autorizadas, y la vista vuelve a comprobarlas para peticiones GET y POST. Cerrar sesión invalida el acceso y los formularios utilizan protección CSRF. El formulario de usuarios no permite otorgar privilegios administrativos a una cuenta nueva.
 
 ## 5. Comprobación y conservación de las entregas
 

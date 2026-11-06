@@ -8,7 +8,9 @@
             <p>Compras de los clientes y detalle de los productos adquiridos.</p>
             <span class="gestion-conteo">{{ pagina.paginator.count }} venta{{ pagina.paginator.count|pluralize }} registrada{{ pagina.paginator.count|pluralize }}</span>
         </div>
-        <a class="btn btn-primary" href="{% url 'core:venta_nueva' %}">+ Nueva venta</a>
+        {% if perms.core.add_boleta %}
+            <a class="btn btn-primary" href="{% url 'core:venta_nueva' %}">+ Nueva venta</a>
+        {% endif %}
     </header>
     <div class="table-responsive{% if not pagina %} gestion-listado-vacio{% endif %}">
         <table class="table align-middle">
@@ -33,11 +35,15 @@
                         <td>{{ venta.sucursal.nombre }}</td>
                         <td class="gestion-numero">${{ venta.total|pesos }}</td>
                         <td>
-                            <a class="accion-crud accion-consultar"
-                               href="{% url 'core:venta_detalle' venta.id %}">{% include "core/e3/icono.html" with nombre="ver" %}Ver detalle</a>
-                            <a class="accion-crud"
-                               href="{% url 'core:venta_editar' venta.id %}">{% include "core/e3/icono.html" with nombre="editar" %}Editar</a>
-                            {% if es_administrador %}
+                            {% if perms.core.view_detalleboleta %}
+                                <a class="accion-crud accion-consultar"
+                                   href="{% url 'core:venta_detalle' venta.id %}">{% include "core/e3/icono.html" with nombre="ver" %}Ver detalle</a>
+                            {% endif %}
+                            {% if perms.core.change_boleta %}
+                                <a class="accion-crud"
+                                   href="{% url 'core:venta_editar' venta.id %}">{% include "core/e3/icono.html" with nombre="editar" %}Editar</a>
+                            {% endif %}
+                            {% if es_administrador and perms.core.delete_boleta %}
                                 <a class="accion-crud accion-peligro"
                                    href="{% url 'core:venta_eliminar' venta.id %}">{% include "core/e3/icono.html" with nombre="eliminar" %}Eliminar</a>
                             {% endif %}
@@ -50,8 +56,10 @@
                                 <span aria-hidden="true">↗</span>
                                 <h2>Todavía no hay ventas</h2>
                                 <p>Se puede registrar una venta y después incorporar sus productos.</p>
-                                <a class="btn btn-primary"
-                                   href="{% url 'core:venta_nueva' %}">Crear la primera venta</a>
+                                {% if perms.core.add_boleta %}
+                                    <a class="btn btn-primary"
+                                       href="{% url 'core:venta_nueva' %}">Crear la primera venta</a>
+                                {% endif %}
                             </div>
                         </td>
                     </tr>

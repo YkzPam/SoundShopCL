@@ -10,10 +10,10 @@ from django.contrib.auth import (
     logout,
     update_session_auth_hash,
 )
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.models import Group, User
 from django.contrib.auth.password_validation import validate_password
-from django.core.exceptions import ValidationError
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import Paginator
 from django.db.models import F, Q, Sum
 from django.db.models.functions import ExtractMonth
@@ -240,6 +240,16 @@ def errores_modelo(objeto):
 
 @login_required
 @grupos_permitidos("Administrador", "Operador")
+@permission_required(
+    (
+        "core.view_producto",
+        "core.view_categoria",
+        "core.view_cliente",
+        "core.view_boleta",
+        "core.view_detalleboleta",
+    ),
+    raise_exception=True,
+)
 def gestion(request):
     anio = request.GET.get("anio", str(date.today().year))
     if not anio.isdigit() or not 1 <= int(anio) <= 9999:
@@ -325,6 +335,7 @@ def gestion(request):
 
 @login_required
 @grupos_permitidos("Administrador", "Operador")
+@permission_required("core.view_producto", raise_exception=True)
 def gestion_productos(request):
     productos = Producto.objects.select_related("categoria", "marca").order_by("codigo")
     busqueda = request.GET.get("q", "").strip()
@@ -367,6 +378,9 @@ def gestion_productos(request):
 @login_required
 @grupos_permitidos("Administrador")
 def producto_formulario(request, producto_id=None):
+    permiso = "core.change_producto" if producto_id else "core.add_producto"
+    if not request.user.has_perm(permiso):
+        raise PermissionDenied
     producto = get_object_or_404(Producto, pk=producto_id) if producto_id else Producto()
     errores = {}
     if request.method == "POST":
@@ -402,6 +416,7 @@ def producto_formulario(request, producto_id=None):
 
 @login_required
 @grupos_permitidos("Administrador")
+@permission_required("core.delete_producto", raise_exception=True)
 def producto_eliminar(request, producto_id):
     producto = get_object_or_404(Producto, pk=producto_id)
     if request.method == "POST":
@@ -431,6 +446,7 @@ def producto_eliminar(request, producto_id):
 
 @login_required
 @grupos_permitidos("Administrador")
+@permission_required("auth.view_user", raise_exception=True)
 def gestion_usuarios(request):
     usuarios = User.objects.prefetch_related("groups").order_by("username")
     busqueda = request.GET.get("q", "").strip()
@@ -450,6 +466,9 @@ def gestion_usuarios(request):
 @login_required
 @grupos_permitidos("Administrador")
 def usuario_formulario(request, usuario_id=None):
+    permiso = "auth.change_user" if usuario_id else "auth.add_user"
+    if not request.user.has_perm(permiso):
+        raise PermissionDenied
     usuario = get_object_or_404(User, pk=usuario_id) if usuario_id else User()
     errores = {}
     if request.method == "POST":
@@ -500,6 +519,7 @@ def usuario_formulario(request, usuario_id=None):
 
 @login_required
 @grupos_permitidos("Administrador")
+@permission_required("auth.change_user", raise_exception=True)
 def usuario_desactivar(request, usuario_id):
     usuario = get_object_or_404(User, pk=usuario_id)
     if request.method == "POST":
@@ -525,6 +545,7 @@ def usuario_desactivar(request, usuario_id):
 
 @login_required
 @grupos_permitidos("Administrador")
+@permission_required("auth.delete_user", raise_exception=True)
 def usuario_eliminar(request, usuario_id):
     usuario = get_object_or_404(User, pk=usuario_id)
     if usuario.pk == request.user.pk:
@@ -555,6 +576,7 @@ def usuario_eliminar(request, usuario_id):
 
 @login_required
 @grupos_permitidos("Administrador", "Operador")
+@permission_required("core.view_categoria", raise_exception=True)
 def gestion_categorias(request):
     return render(
         request,
@@ -566,6 +588,9 @@ def gestion_categorias(request):
 @login_required
 @grupos_permitidos("Administrador")
 def categoria_formulario(request, categoria_id=None):
+    permiso = "core.change_categoria" if categoria_id else "core.add_categoria"
+    if not request.user.has_perm(permiso):
+        raise PermissionDenied
     categoria = get_object_or_404(Categoria, pk=categoria_id) if categoria_id else Categoria()
     errores = {}
     if request.method == "POST":
@@ -590,6 +615,7 @@ def categoria_formulario(request, categoria_id=None):
 
 @login_required
 @grupos_permitidos("Administrador")
+@permission_required("core.delete_categoria", raise_exception=True)
 def categoria_eliminar(request, categoria_id):
     categoria = get_object_or_404(Categoria, pk=categoria_id)
     if request.method == "POST":
@@ -616,6 +642,7 @@ def categoria_eliminar(request, categoria_id):
 
 @login_required
 @grupos_permitidos("Administrador", "Operador")
+@permission_required("core.view_cliente", raise_exception=True)
 def gestion_clientes(request):
     clientes = Cliente.objects.order_by("nombre", "id")
     busqueda = request.GET.get("q", "").strip()
@@ -635,6 +662,9 @@ def gestion_clientes(request):
 @login_required
 @grupos_permitidos("Administrador", "Operador")
 def cliente_formulario(request, cliente_id=None):
+    permiso = "core.change_cliente" if cliente_id else "core.add_cliente"
+    if not request.user.has_perm(permiso):
+        raise PermissionDenied
     persona = get_object_or_404(Cliente, pk=cliente_id) if cliente_id else Cliente()
     errores = {}
     if request.method == "POST":
@@ -661,6 +691,7 @@ def cliente_formulario(request, cliente_id=None):
 
 @login_required
 @grupos_permitidos("Administrador")
+@permission_required("core.delete_cliente", raise_exception=True)
 def cliente_eliminar(request, cliente_id):
     persona = get_object_or_404(Cliente, pk=cliente_id)
     if request.method == "POST":
@@ -690,6 +721,7 @@ def cliente_eliminar(request, cliente_id):
 
 @login_required
 @grupos_permitidos("Administrador", "Operador")
+@permission_required("core.view_boleta", raise_exception=True)
 def gestion_ventas(request):
     ventas = Boleta.objects.select_related("cliente", "sucursal").order_by("-fecha", "-numero")
     return render(
@@ -702,6 +734,9 @@ def gestion_ventas(request):
 @login_required
 @grupos_permitidos("Administrador", "Operador")
 def venta_formulario(request, venta_id=None):
+    permiso = "core.change_boleta" if venta_id else "core.add_boleta"
+    if not request.user.has_perm(permiso):
+        raise PermissionDenied
     venta = get_object_or_404(Boleta, pk=venta_id) if venta_id else Boleta()
     errores = {}
     if request.method == "POST":
@@ -740,6 +775,7 @@ def venta_formulario(request, venta_id=None):
 
 @login_required
 @grupos_permitidos("Administrador", "Operador")
+@permission_required(("core.view_boleta", "core.view_detalleboleta"), raise_exception=True)
 def venta_detalle(request, venta_id):
     venta = get_object_or_404(Boleta.objects.select_related("cliente", "sucursal"), pk=venta_id)
     detalles = DetalleBoleta.objects.filter(boleta=venta).select_related("producto").order_by("id")
@@ -758,6 +794,9 @@ def venta_detalle(request, venta_id):
 @login_required
 @grupos_permitidos("Administrador", "Operador")
 def detalle_formulario(request, venta_id, detalle_id=None):
+    permiso = "core.change_detalleboleta" if detalle_id else "core.add_detalleboleta"
+    if not request.user.has_perm(permiso):
+        raise PermissionDenied
     venta = get_object_or_404(Boleta, pk=venta_id)
     detalle = (
         get_object_or_404(DetalleBoleta, pk=detalle_id, boleta=venta)
@@ -798,6 +837,7 @@ def detalle_formulario(request, venta_id, detalle_id=None):
 
 @login_required
 @grupos_permitidos("Administrador")
+@permission_required("core.delete_detalleboleta", raise_exception=True)
 def detalle_eliminar(request, venta_id, detalle_id):
     detalle = get_object_or_404(DetalleBoleta, pk=detalle_id, boleta_id=venta_id)
     if request.method == "POST":
@@ -818,6 +858,7 @@ def detalle_eliminar(request, venta_id, detalle_id):
 
 @login_required
 @grupos_permitidos("Administrador")
+@permission_required("core.delete_boleta", raise_exception=True)
 def venta_eliminar(request, venta_id):
     venta = get_object_or_404(Boleta, pk=venta_id)
     if request.method == "POST":
