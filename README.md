@@ -58,6 +58,8 @@ El grupo **Administrador** tiene acceso completo a productos, categorías, clien
 
 `configurar_grupos` crea los dos grupos y asigna Administrador a los superusuarios activos. Las cuentas activas sin grupo reciben Operador. El comando puede ejecutarse nuevamente en una base ya preparada y conserva las contraseñas. La primera cuenta creada con `createsuperuser` puede acceder al panel para preparar el proyecto.
 
+Desde Usuarios, el Administrador puede editar, desactivar o eliminar otras cuentas. Desactivar conserva la cuenta sin permitir su acceso; eliminar la borra después de confirmar mediante POST. El usuario no puede desactivar ni eliminar su propia cuenta durante la gestión. Los clientes y las ventas son registros comerciales independientes y se conservan al borrar una cuenta de acceso.
+
 ## 3. Continuidad del modelo de la tienda
 
 Las ventas se almacenan en los modelos existentes `Boleta` y `DetalleBoleta`: corresponden a `Venta` y `DetalleVenta` del caso de la guía. No se crean otras tablas para duplicar esa información. El detalle relaciona cada producto con su venta y conserva la cantidad y el precio unitario histórico. El total se calcula con esos valores, por lo que cambiar el precio del catálogo no modifica ventas anteriores.

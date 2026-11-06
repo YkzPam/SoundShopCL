@@ -12,6 +12,7 @@
 {% endif %}
 </dl>
 {% if desactivar %}<p class="gestion-aviso-eliminacion">La cuenta y sus datos se conservarán, pero no podrá iniciar sesión.</p>
+{% elif tipo_objeto == 'usuario' %}<p class="gestion-aviso-eliminacion">Se eliminará esta cuenta de acceso y no podrá iniciar sesión. Los clientes, productos y ventas de la tienda se conservarán. Esta operación no se puede deshacer desde el panel.</p>
 {% elif tipo_objeto == 'venta' %}<p class="gestion-aviso-eliminacion">Se eliminarán esta venta y todos sus detalles. El cliente y los productos del catálogo se conservarán. Esta operación no se puede deshacer desde el panel.</p>
 {% elif tipo_objeto == 'detalle' %}<p class="gestion-aviso-eliminacion">Se quitará esta línea de la venta y se actualizará su total. El producto del catálogo se conservará. Esta operación no se puede deshacer desde el panel.</p>
 {% else %}<p class="gestion-aviso-eliminacion">Esta operación no se puede deshacer desde el panel. Si el registro tiene relaciones protegidas, el sistema impedirá su eliminación.</p>{% endif %}

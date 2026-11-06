@@ -349,6 +349,22 @@ def usuario_desactivar(request, usuario_id):
 
 
 @login_required
+@grupos_permitidos("Administrador")
+def usuario_eliminar(request, usuario_id):
+    usuario = get_object_or_404(User, pk=usuario_id)
+    if usuario.pk == request.user.pk:
+        messages.error(request, "No puede eliminar su propia cuenta mientras administra la tienda.")
+        return redirect("core:gestion_usuarios")
+    if request.method == "POST":
+        nombre = usuario.username
+        usuario.delete()
+        messages.success(request, f"Cuenta {nombre} eliminada. Los datos comerciales de la tienda se conservaron.")
+        return redirect("core:gestion_usuarios")
+    return render(request, "core/e3/confirmar_eliminacion.html", {"titulo": "Eliminar usuario", "objeto": usuario,
+        "volver": "core:gestion_usuarios", "tipo_objeto": "usuario"})
+
+
+@login_required
 @grupos_permitidos("Administrador", "Operador")
 def gestion_categorias(request):
     return render(request, "core/e3/categorias.html", {"titulo": "Categorías", "categorias": Categoria.objects.order_by("nombre")})

@@ -26,6 +26,7 @@ urlpatterns = [
     path("gestion/usuarios/nuevo/", views.usuario_formulario, name="usuario_nuevo"),
     path("gestion/usuarios/<int:usuario_id>/editar/", views.usuario_formulario, name="usuario_editar"),
     path("gestion/usuarios/<int:usuario_id>/desactivar/", views.usuario_desactivar, name="usuario_desactivar"),
+    path("gestion/usuarios/<int:usuario_id>/eliminar/", views.usuario_eliminar, name="usuario_eliminar"),
     path("gestion/categorias/", views.gestion_categorias, name="gestion_categorias"),
     path("gestion/categorias/nueva/", views.categoria_formulario, name="categoria_nueva"),
     path("gestion/categorias/<int:categoria_id>/editar/", views.categoria_formulario, name="categoria_editar"),

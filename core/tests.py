@@ -58,7 +58,7 @@ class Evaluacion3Tests(TestCase):
 
     def test_todas_las_rutas_de_gestion_exigen_sesion(self):
         self.client.logout()
-        rutas = [('gestion', []), ('gestion_productos', []), ('producto_nuevo', []), ('producto_editar', [self.guitarra.pk]), ('producto_eliminar', [self.guitarra.pk]), ('gestion_categorias', []), ('categoria_nueva', []), ('categoria_editar', [self.categoria.pk]), ('categoria_eliminar', [self.categoria.pk]), ('gestion_clientes', []), ('cliente_nuevo', []), ('cliente_editar', [self.ana.pk]), ('cliente_eliminar', [self.ana.pk]), ('gestion_ventas', []), ('venta_nueva', []), ('venta_editar', [self.venta.pk]), ('venta_detalle', [self.venta.pk]), ('venta_eliminar', [self.venta.pk]), ('detalle_nuevo', [self.venta.pk]), ('detalle_editar', [self.venta.pk, self.detalle.pk]), ('detalle_eliminar', [self.venta.pk, self.detalle.pk]), ('gestion_usuarios', []), ('usuario_nuevo', []), ('usuario_editar', [self.operador.pk]), ('usuario_desactivar', [self.operador.pk]), ('reportes', [])]
+        rutas = [('gestion', []), ('gestion_productos', []), ('producto_nuevo', []), ('producto_editar', [self.guitarra.pk]), ('producto_eliminar', [self.guitarra.pk]), ('gestion_categorias', []), ('categoria_nueva', []), ('categoria_editar', [self.categoria.pk]), ('categoria_eliminar', [self.categoria.pk]), ('gestion_clientes', []), ('cliente_nuevo', []), ('cliente_editar', [self.ana.pk]), ('cliente_eliminar', [self.ana.pk]), ('gestion_ventas', []), ('venta_nueva', []), ('venta_editar', [self.venta.pk]), ('venta_detalle', [self.venta.pk]), ('venta_eliminar', [self.venta.pk]), ('detalle_nuevo', [self.venta.pk]), ('detalle_editar', [self.venta.pk, self.detalle.pk]), ('detalle_eliminar', [self.venta.pk, self.detalle.pk]), ('gestion_usuarios', []), ('usuario_nuevo', []), ('usuario_editar', [self.operador.pk]), ('usuario_desactivar', [self.operador.pk]), ('usuario_eliminar', [self.operador.pk]), ('reportes', [])]
         for nombre, args in rutas:
             for metodo in ('get', 'post'):
                 with self.subTest(ruta=nombre, metodo=metodo):
@@ -94,7 +94,7 @@ class Evaluacion3Tests(TestCase):
         self.assertFalse(Producto.objects.filter(codigo='NUEVO').exists())
 
     def test_pantallas_de_gestion_renderizan(self):
-        rutas = [('gestion', []), ('gestion_productos', []), ('producto_nuevo', []), ('producto_editar', [self.guitarra.pk]), ('producto_eliminar', [self.guitarra.pk]), ('gestion_categorias', []), ('categoria_nueva', []), ('categoria_editar', [self.categoria.pk]), ('gestion_clientes', []), ('cliente_nuevo', []), ('cliente_editar', [self.ana.pk]), ('gestion_ventas', []), ('venta_nueva', []), ('venta_editar', [self.venta.pk]), ('venta_detalle', [self.venta.pk]), ('venta_eliminar', [self.venta.pk]), ('detalle_nuevo', [self.venta.pk]), ('detalle_editar', [self.venta.pk, self.detalle.pk]), ('detalle_eliminar', [self.venta.pk, self.detalle.pk]), ('gestion_usuarios', []), ('usuario_nuevo', []), ('usuario_editar', [self.operador.pk]), ('usuario_desactivar', [self.operador.pk])]
+        rutas = [('gestion', []), ('gestion_productos', []), ('producto_nuevo', []), ('producto_editar', [self.guitarra.pk]), ('producto_eliminar', [self.guitarra.pk]), ('gestion_categorias', []), ('categoria_nueva', []), ('categoria_editar', [self.categoria.pk]), ('gestion_clientes', []), ('cliente_nuevo', []), ('cliente_editar', [self.ana.pk]), ('gestion_ventas', []), ('venta_nueva', []), ('venta_editar', [self.venta.pk]), ('venta_detalle', [self.venta.pk]), ('venta_eliminar', [self.venta.pk]), ('detalle_nuevo', [self.venta.pk]), ('detalle_editar', [self.venta.pk, self.detalle.pk]), ('detalle_eliminar', [self.venta.pk, self.detalle.pk]), ('gestion_usuarios', []), ('usuario_nuevo', []), ('usuario_editar', [self.operador.pk]), ('usuario_desactivar', [self.operador.pk]), ('usuario_eliminar', [self.operador.pk])]
         for nombre, args in rutas:
             with self.subTest(ruta=nombre):
                 self.assertEqual(self.client.get(reverse('core:' + nombre, args=args)).status_code, 200)
@@ -217,7 +217,7 @@ class Evaluacion3Tests(TestCase):
 
     def test_operador_no_administra_usuarios(self):
         self.client.force_login(self.operador)
-        for nombre, args in [('gestion_usuarios', []), ('usuario_nuevo', []), ('usuario_editar', [self.admin.pk]), ('usuario_desactivar', [self.admin.pk])]:
+        for nombre, args in [('gestion_usuarios', []), ('usuario_nuevo', []), ('usuario_editar', [self.admin.pk]), ('usuario_desactivar', [self.admin.pk]), ('usuario_eliminar', [self.admin.pk])]:
             for metodo in ('get', 'post'):
                 self.assertEqual(getattr(self.client, metodo)(reverse('core:' + nombre, args=args)).status_code, 403)
 
@@ -388,7 +388,7 @@ class Evaluacion3Tests(TestCase):
 
     def test_operador_bloqueado_por_url_y_post_en_operaciones_reservadas(self):
         self.client.force_login(self.operador)
-        rutas = [('producto_nuevo', []), ('producto_editar', [self.guitarra.pk]), ('producto_eliminar', [self.guitarra.pk]), ('categoria_nueva', []), ('categoria_editar', [self.categoria.pk]), ('categoria_eliminar', [self.categoria.pk]), ('cliente_eliminar', [self.ana.pk]), ('venta_eliminar', [self.venta.pk]), ('detalle_eliminar', [self.venta.pk, self.detalle.pk]), ('gestion_usuarios', []), ('usuario_nuevo', []), ('usuario_editar', [self.admin.pk]), ('usuario_desactivar', [self.admin.pk])]
+        rutas = [('producto_nuevo', []), ('producto_editar', [self.guitarra.pk]), ('producto_eliminar', [self.guitarra.pk]), ('categoria_nueva', []), ('categoria_editar', [self.categoria.pk]), ('categoria_eliminar', [self.categoria.pk]), ('cliente_eliminar', [self.ana.pk]), ('venta_eliminar', [self.venta.pk]), ('detalle_eliminar', [self.venta.pk, self.detalle.pk]), ('gestion_usuarios', []), ('usuario_nuevo', []), ('usuario_editar', [self.admin.pk]), ('usuario_desactivar', [self.admin.pk]), ('usuario_eliminar', [self.admin.pk])]
         for nombre, args in rutas:
             for metodo in ('get', 'post'):
                 with self.subTest(ruta=nombre, metodo=metodo):
@@ -427,7 +427,7 @@ class Evaluacion3Tests(TestCase):
     def test_get_no_modifica_registros(self):
         modelos = [Producto, Categoria, Cliente, Boleta, DetalleBoleta, User]
         antes = [modelo.objects.count() for modelo in modelos]
-        rutas = [('producto_nuevo', []), ('producto_editar', [self.guitarra.pk]), ('producto_eliminar', [self.guitarra.pk]), ('categoria_nueva', []), ('categoria_eliminar', [self.categoria.pk]), ('cliente_nuevo', []), ('cliente_eliminar', [self.ana.pk]), ('venta_nueva', []), ('venta_eliminar', [self.venta.pk]), ('detalle_nuevo', [self.venta.pk]), ('detalle_eliminar', [self.venta.pk, self.detalle.pk]), ('usuario_nuevo', []), ('usuario_desactivar', [self.operador.pk])]
+        rutas = [('producto_nuevo', []), ('producto_editar', [self.guitarra.pk]), ('producto_eliminar', [self.guitarra.pk]), ('categoria_nueva', []), ('categoria_eliminar', [self.categoria.pk]), ('cliente_nuevo', []), ('cliente_eliminar', [self.ana.pk]), ('venta_nueva', []), ('venta_eliminar', [self.venta.pk]), ('detalle_nuevo', [self.venta.pk]), ('detalle_eliminar', [self.venta.pk, self.detalle.pk]), ('usuario_nuevo', []), ('usuario_desactivar', [self.operador.pk]), ('usuario_eliminar', [self.operador.pk])]
         for nombre, args in rutas:
             self.assertEqual(self.client.get(reverse('core:' + nombre, args=args), {'precio': '1', 'nombre': 'No guardar por GET'}).status_code, 200)
         self.assertEqual([modelo.objects.count() for modelo in modelos], antes)
@@ -439,7 +439,7 @@ class Evaluacion3Tests(TestCase):
     def test_csrf_bloquea_post_sin_token_en_cada_operacion(self):
         navegador = Client(enforce_csrf_checks=True)
         navegador.force_login(self.admin)
-        for ruta, args in [('producto_nuevo', []), ('producto_editar', [self.guitarra.pk]), ('producto_eliminar', [self.guitarra.pk]), ('cliente_nuevo', []), ('venta_nueva', []), ('usuario_nuevo', []), ('salir', [])]:
+        for ruta, args in [('producto_nuevo', []), ('producto_editar', [self.guitarra.pk]), ('producto_eliminar', [self.guitarra.pk]), ('cliente_nuevo', []), ('venta_nueva', []), ('usuario_nuevo', []), ('usuario_eliminar', [self.operador.pk]), ('salir', [])]:
             with self.subTest(ruta=ruta):
                 self.assertEqual(navegador.post(reverse('core:' + ruta, args=args), self.datos_producto()).status_code, 403)
 
@@ -521,3 +521,34 @@ class Evaluacion3Tests(TestCase):
         producto.refresh_from_db()
         self.assertEqual(producto.precio, Decimal('777'))
         self.assertEqual((Producto.objects.count(), Cliente.objects.count(), Boleta.objects.count()), cantidades)
+
+    def test_usuario_eliminacion_confirmada_conserva_datos_comerciales(self):
+        cuenta = User.objects.create_user('cuenta_temporal', password='Pino!Temporal9f2026')
+        cuenta.groups.add(Group.objects.get(name='Operador'))
+        sesion_usuario = Client()
+        sesion_usuario.force_login(cuenta)
+        navegador = Client(enforce_csrf_checks=True)
+        navegador.force_login(self.admin)
+        url = reverse('core:usuario_eliminar', args=[cuenta.pk])
+        antes = (Producto.objects.count(), Cliente.objects.count(), Boleta.objects.count(), DetalleBoleta.objects.count())
+        respuesta = navegador.get(url)
+        self.assertContains(respuesta, cuenta.username)
+        self.assertContains(respuesta, 'Los clientes, productos y ventas de la tienda se conservarán')
+        self.assertTrue(User.objects.filter(pk=cuenta.pk).exists())
+        token = navegador.cookies['csrftoken'].value
+        respuesta = navegador.post(url, {'csrfmiddlewaretoken': token})
+        self.assertRedirects(respuesta, reverse('core:gestion_usuarios'))
+        self.assertFalse(User.objects.filter(pk=cuenta.pk).exists())
+        self.assertEqual((Producto.objects.count(), Cliente.objects.count(), Boleta.objects.count(), DetalleBoleta.objects.count()), antes)
+        self.assertTrue(Group.objects.filter(name='Operador').exists())
+        self.assertEqual(sesion_usuario.get(reverse('core:gestion')).status_code, 302)
+        self.assertEqual(navegador.get(url).status_code, 404)
+
+    def test_usuario_no_puede_eliminar_su_propia_cuenta(self):
+        url = reverse('core:usuario_eliminar', args=[self.admin.pk])
+        for metodo in ('get', 'post'):
+            self.assertRedirects(getattr(self.client, metodo)(url), reverse('core:gestion_usuarios'))
+            self.assertTrue(User.objects.filter(pk=self.admin.pk, is_active=True).exists())
+        listado = self.client.get(reverse('core:gestion_usuarios'))
+        self.assertNotContains(listado, url)
+        self.assertContains(listado, reverse('core:usuario_eliminar', args=[self.operador.pk]))
