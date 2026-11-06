@@ -4,7 +4,6 @@ from decimal import Decimal
 from pathlib import Path
 from django.core.management.base import BaseCommand
 from django.db import transaction
-from faker import Faker
 from core.models import (
     Categoria, Marca, Proveedor, Sucursal, Cliente, Producto,
     Boleta, DetalleBoleta, CompraProveedor, DetalleCompra,
@@ -19,8 +18,6 @@ class Command(BaseCommand):
         ruta = Path(__file__).resolve().parents[2] / "data" / "catalogo.json"
         with ruta.open(encoding="utf-8") as archivo:
             datos = json.load(archivo)
-        fake = Faker("es_CL")
-        fake.seed_instance(42)
 
         for categoria in datos["categorias"]:
             Categoria.objects.get_or_create(
@@ -54,7 +51,7 @@ class Command(BaseCommand):
         for numero in range(1, 4):
             cliente, _ = Cliente.objects.get_or_create(
                 correo=f"cliente-{numero}@example.test",
-                defaults={"nombre": fake.name()[:100], "telefono": fake.phone_number()[:20]},
+                defaults={"nombre": f"Cliente de muestra {numero}", "telefono": ""},
             )
             clientes.append(cliente)
         boleta, _ = Boleta.objects.get_or_create(

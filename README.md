@@ -6,6 +6,8 @@ La Evaluación 3 continúa la misma tienda de E2. Conserva el catálogo, las im�
 
 Abrir en Visual Studio Code la carpeta que contiene `manage.py`. Se requiere Python y un servidor MySQL local activo. La conexión se verificó con MySQL Community Server 8.4 y `mysqlclient` 2.2.8. La descarga del proyecto no incluye el servidor de base de datos, el entorno virtual ni contraseñas.
 
+La carga inicial utiliza datos de muestra definidos directamente, sin bibliotecas para generar personas ficticias. El resumen y los reportes calculan sus cifras desde los registros de MySQL; las ventas de demostración son datos locales y no forman parte de la descarga del repositorio.
+
 En la terminal integrada seleccionar **Command Prompt / Símbolo del sistema (CMD)**. Los siguientes comandos corresponden a CMD; se ejecutan uno por uno:
 
 ```bat

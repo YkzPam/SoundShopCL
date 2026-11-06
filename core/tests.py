@@ -509,3 +509,15 @@ class Evaluacion3Tests(TestCase):
         self.assertContains(respuesta, 'Se eliminarán esta venta y todos sus detalles')
         self.assertContains(respuesta, 'Detalles incluidos')
         self.assertTrue(Boleta.objects.filter(pk=self.venta.pk).exists())
+
+    def test_catalogo_de_muestra_se_carga_sin_sobrescribir_ediciones(self):
+        call_command('cargar_catalogo', stdout=StringIO())
+        self.assertEqual(Cliente.objects.get(correo='cliente-1@example.test').nombre, 'Cliente de muestra 1')
+        producto = Producto.objects.get(codigo='SS-0001')
+        producto.precio = Decimal('777')
+        producto.save()
+        cantidades = (Producto.objects.count(), Cliente.objects.count(), Boleta.objects.count())
+        call_command('cargar_catalogo', stdout=StringIO())
+        producto.refresh_from_db()
+        self.assertEqual(producto.precio, Decimal('777'))
+        self.assertEqual((Producto.objects.count(), Cliente.objects.count(), Boleta.objects.count()), cantidades)
