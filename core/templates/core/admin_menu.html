@@ -8,9 +8,9 @@
 <a href="{% url 'core:gestion_clientes' %}" {% if 'cliente' in request.resolver_match.url_name %}aria-current="page"{% endif %}><span aria-hidden="true">○</span>Clientes</a>
 <a href="{% url 'core:gestion_ventas' %}" {% if 'venta' in request.resolver_match.url_name or 'detalle' in request.resolver_match.url_name %}aria-current="page"{% endif %}><span aria-hidden="true">↗</span>Ventas</a>
 <a href="{% url 'core:reportes' %}" {% if request.resolver_match.url_name == 'reportes' %}aria-current="page"{% endif %}><span aria-hidden="true">▥</span>Reportes</a>
-{% if request.user.is_staff %}<a href="{% url 'core:gestion_usuarios' %}" {% if 'usuario' in request.resolver_match.url_name %}aria-current="page"{% endif %}><span aria-hidden="true">◇</span>Usuarios</a>{% endif %}
+{% if es_administrador %}<a href="{% url 'core:gestion_usuarios' %}" {% if 'usuario' in request.resolver_match.url_name %}aria-current="page"{% endif %}><span aria-hidden="true">◇</span>Usuarios</a>{% endif %}
 </nav>
-<div class="gestion-sesion"><span class="gestion-avatar" aria-hidden="true">{{ request.user.username|first|upper }}</span><div><strong>{{ request.user.username }}</strong><small>{% if request.user.is_staff %}Administración{% else %}Gestión de tienda{% endif %}</small></div></div>
+<div class="gestion-sesion"><span class="gestion-avatar" aria-hidden="true">{{ request.user.username|first|upper }}</span><div><strong>{{ request.user.username }}</strong><small>{{ perfil_actual }}</small></div></div>
 <a class="gestion-tienda" href="{% url 'core:inicio' %}">Volver a la tienda ↗</a>
 <form method="post" action="{% url 'core:salir' %}">{% csrf_token %}<button class="gestion-salir">Cerrar sesión</button></form>
 </aside>

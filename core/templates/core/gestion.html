@@ -5,7 +5,7 @@
 
 <div class="gestion-herramientas">
   <form method="get" class="gestion-periodo"><label for="anio">Año de ventas</label><div><select class="form-select" name="anio" id="anio">{% for opcion in anios %}<option value="{{ opcion|unlocalize }}" {% if opcion == anio %}selected{% endif %}>{{ opcion|unlocalize }}</option>{% endfor %}</select><button class="btn btn-outline-primary" type="submit">Ver resumen</button></div></form>
-  <div class="gestion-accesos"><a class="btn btn-outline-primary" href="{% url 'core:producto_nuevo' %}">+ Nuevo producto</a><a class="btn btn-primary" href="{% url 'core:venta_nueva' %}">+ Nueva venta</a></div>
+  <div class="gestion-accesos">{% if es_administrador %}<a class="btn btn-outline-primary" href="{% url 'core:producto_nuevo' %}">+ Nuevo producto</a>{% endif %}<a class="btn btn-primary" href="{% url 'core:venta_nueva' %}">+ Nueva venta</a></div>
 </div>
 
 <div class="gestion-metricas gestion-metricas-cuatro">
@@ -31,7 +31,7 @@
 
   <section class="gestion-widget">
     <div class="gestion-widget-titulo"><div><p class="eyebrow">Los favoritos</p><h2>Productos más vendidos</h2></div></div><p class="gestion-escala">Hasta cinco productos · Unidades en {{ anio|unlocalize }}</p>
-    <ol class="gestion-ranking">{% for producto in productos_vendidos %}<li><div class="gestion-ranking-titulo"><a href="{% url 'core:producto_editar' producto.pk %}">{{ producto.nombre }}</a><span>{{ producto.unidades }} <small>unid.</small></span></div><div class="gestion-barra-pista"><span style="width:{{ producto.porcentaje|unlocalize }}%"></span></div></li>{% empty %}<li class="gestion-vacio"><span aria-hidden="true">♫</span><p>Aún no hay productos vendidos en este año.</p><small>Se mostrarán al agregar productos a una venta.</small></li>{% endfor %}</ol>
+    <ol class="gestion-ranking">{% for producto in productos_vendidos %}<li><div class="gestion-ranking-titulo">{% if es_administrador %}<a href="{% url 'core:producto_editar' producto.pk %}">{{ producto.nombre }}</a>{% elif producto.activo %}<a href="{% url 'core:detalle_producto' producto.pk %}">{{ producto.nombre }}</a>{% else %}<span>{{ producto.nombre }}</span>{% endif %}<span>{{ producto.unidades }} <small>unid.</small></span></div><div class="gestion-barra-pista"><span style="width:{{ producto.porcentaje|unlocalize }}%"></span></div></li>{% empty %}<li class="gestion-vacio"><span aria-hidden="true">♫</span><p>Aún no hay productos vendidos en este año.</p><small>Se mostrarán al agregar productos a una venta.</small></li>{% endfor %}</ol>
     <a class="gestion-enlace-widget" href="{% url 'core:reportes' %}">Explorar los veinte reportes ↗</a>
   </section>
 </div>

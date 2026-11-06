@@ -3,18 +3,19 @@ from datetime import date
 from django.contrib import messages
 from django.contrib.auth import authenticate, login as iniciar_login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Group, User
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 from django.db.models import F, Q, Sum
 from django.db.models.functions import ExtractMonth
 from django.db.models.deletion import ProtectedError
-from django.http import HttpResponseForbidden, HttpResponseNotAllowed
+from django.http import HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.text import slugify
 from .models import Categoria, Marca, Proveedor, Sucursal, Cliente, Producto, Boleta, DetalleBoleta
+from .decorators import grupos_permitidos
 
 
 def producto_datos(producto):
@@ -166,6 +167,7 @@ def errores_modelo(objeto):
 
 
 @login_required
+@grupos_permitidos("Administrador", "Operador")
 def gestion(request):
     anio = request.GET.get("anio", str(date.today().year))
     if not anio.isdigit() or not 1 <= int(anio) <= 9999:
@@ -209,6 +211,7 @@ def gestion(request):
 
 
 @login_required
+@grupos_permitidos("Administrador", "Operador")
 def gestion_productos(request):
     productos = Producto.objects.select_related("categoria", "marca").order_by("codigo")
     busqueda = request.GET.get("q", "").strip()
@@ -223,6 +226,7 @@ def gestion_productos(request):
 
 
 @login_required
+@grupos_permitidos("Administrador")
 def producto_formulario(request, producto_id=None):
     producto = get_object_or_404(Producto, pk=producto_id) if producto_id else Producto()
     errores = {}
@@ -249,6 +253,7 @@ def producto_formulario(request, producto_id=None):
 
 
 @login_required
+@grupos_permitidos("Administrador")
 def producto_eliminar(request, producto_id):
     producto = get_object_or_404(Producto, pk=producto_id)
     if request.method == "POST":
@@ -263,10 +268,9 @@ def producto_eliminar(request, producto_id):
 
 
 @login_required
+@grupos_permitidos("Administrador")
 def gestion_usuarios(request):
-    if not request.user.is_staff:
-        return HttpResponseForbidden("Solo el administrador puede gestionar cuentas de acceso.")
-    usuarios = User.objects.order_by("username")
+    usuarios = User.objects.prefetch_related("groups").order_by("username")
     busqueda = request.GET.get("q", "").strip()
     if busqueda:
         usuarios = usuarios.filter(username__icontains=busqueda)
@@ -275,9 +279,8 @@ def gestion_usuarios(request):
 
 
 @login_required
+@grupos_permitidos("Administrador")
 def usuario_formulario(request, usuario_id=None):
-    if not request.user.is_staff:
-        return HttpResponseForbidden("Solo el administrador puede gestionar cuentas de acceso.")
     usuario = get_object_or_404(User, pk=usuario_id) if usuario_id else User()
     errores = {}
     if request.method == "POST":
@@ -302,6 +305,9 @@ def usuario_formulario(request, usuario_id=None):
         errores.update(errores_modelo(usuario))
         if not errores:
             usuario.save()
+            if usuario_id is None:
+                grupo, _ = Group.objects.get_or_create(name="Operador")
+                usuario.groups.add(grupo)
             if usuario.pk == request.user.pk and clave:
                 update_session_auth_hash(request, usuario)
             messages.success(request, "Cuenta guardada. Las contraseñas se almacenan mediante el sistema de Django.")
@@ -311,9 +317,8 @@ def usuario_formulario(request, usuario_id=None):
 
 
 @login_required
+@grupos_permitidos("Administrador")
 def usuario_desactivar(request, usuario_id):
-    if not request.user.is_staff:
-        return HttpResponseForbidden("Solo el administrador puede gestionar cuentas de acceso.")
     usuario = get_object_or_404(User, pk=usuario_id)
     if request.method == "POST":
         if usuario.pk == request.user.pk:
@@ -328,11 +333,13 @@ def usuario_desactivar(request, usuario_id):
 
 
 @login_required
+@grupos_permitidos("Administrador", "Operador")
 def gestion_categorias(request):
     return render(request, "core/e3/categorias.html", {"titulo": "Categorías", "categorias": Categoria.objects.order_by("nombre")})
 
 
 @login_required
+@grupos_permitidos("Administrador")
 def categoria_formulario(request, categoria_id=None):
     categoria = get_object_or_404(Categoria, pk=categoria_id) if categoria_id else Categoria()
     errores = {}
@@ -350,6 +357,7 @@ def categoria_formulario(request, categoria_id=None):
 
 
 @login_required
+@grupos_permitidos("Administrador")
 def categoria_eliminar(request, categoria_id):
     categoria = get_object_or_404(Categoria, pk=categoria_id)
     if request.method == "POST":
@@ -364,6 +372,7 @@ def categoria_eliminar(request, categoria_id):
 
 
 @login_required
+@grupos_permitidos("Administrador", "Operador")
 def gestion_clientes(request):
     clientes = Cliente.objects.order_by("nombre", "id")
     busqueda = request.GET.get("q", "").strip()
@@ -374,6 +383,7 @@ def gestion_clientes(request):
 
 
 @login_required
+@grupos_permitidos("Administrador", "Operador")
 def cliente_formulario(request, cliente_id=None):
     persona = get_object_or_404(Cliente, pk=cliente_id) if cliente_id else Cliente()
     errores = {}
@@ -392,6 +402,7 @@ def cliente_formulario(request, cliente_id=None):
 
 
 @login_required
+@grupos_permitidos("Administrador")
 def cliente_eliminar(request, cliente_id):
     persona = get_object_or_404(Cliente, pk=cliente_id)
     if request.method == "POST":
@@ -406,6 +417,7 @@ def cliente_eliminar(request, cliente_id):
 
 
 @login_required
+@grupos_permitidos("Administrador", "Operador")
 def gestion_ventas(request):
     ventas = Boleta.objects.select_related("cliente", "sucursal").annotate(
         total=Sum(F("detalleboleta__cantidad") * F("detalleboleta__precio_unitario"), default=0)
@@ -415,6 +427,7 @@ def gestion_ventas(request):
 
 
 @login_required
+@grupos_permitidos("Administrador", "Operador")
 def venta_formulario(request, venta_id=None):
     venta = get_object_or_404(Boleta, pk=venta_id) if venta_id else Boleta(fecha=date.today())
     errores = {}
@@ -434,6 +447,7 @@ def venta_formulario(request, venta_id=None):
 
 
 @login_required
+@grupos_permitidos("Administrador", "Operador")
 def venta_detalle(request, venta_id):
     venta = get_object_or_404(Boleta.objects.select_related("cliente", "sucursal"), pk=venta_id)
     detalles = DetalleBoleta.objects.filter(boleta=venta).select_related("producto").order_by("id")
@@ -443,6 +457,7 @@ def venta_detalle(request, venta_id):
 
 
 @login_required
+@grupos_permitidos("Administrador", "Operador")
 def detalle_formulario(request, venta_id, detalle_id=None):
     venta = get_object_or_404(Boleta, pk=venta_id)
     detalle = get_object_or_404(DetalleBoleta, pk=detalle_id, boleta=venta) if detalle_id else DetalleBoleta(boleta=venta)
@@ -461,6 +476,7 @@ def detalle_formulario(request, venta_id, detalle_id=None):
 
 
 @login_required
+@grupos_permitidos("Administrador")
 def detalle_eliminar(request, venta_id, detalle_id):
     detalle = get_object_or_404(DetalleBoleta, pk=detalle_id, boleta_id=venta_id)
     if request.method == "POST":
@@ -472,6 +488,7 @@ def detalle_eliminar(request, venta_id, detalle_id):
 
 
 @login_required
+@grupos_permitidos("Administrador")
 def venta_eliminar(request, venta_id):
     venta = get_object_or_404(Boleta, pk=venta_id)
     if request.method == "POST":

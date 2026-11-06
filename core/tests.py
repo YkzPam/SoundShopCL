@@ -1,7 +1,9 @@
 """Pruebas funcionales de E3 sobre la base MySQL de pruebas de Django."""
 from datetime import date, timedelta
 from decimal import Decimal
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Group, User
+from django.core.management import call_command
+from io import StringIO
 from django.db import connection
 from django.test import Client, TestCase
 from django.urls import reverse
@@ -13,6 +15,10 @@ class Evaluacion3Tests(TestCase):
     def setUpTestData(cls):
         cls.admin = User.objects.create_superuser('administracion', 'admin@example.test', 'Madera!Sonido9f2026')
         cls.operador = User.objects.create_user('operador', password='Madera!Sonido9f2026')
+        administrador, _ = Group.objects.get_or_create(name='Administrador')
+        operador, _ = Group.objects.get_or_create(name='Operador')
+        cls.admin.groups.add(administrador)
+        cls.operador.groups.add(operador)
         cls.categoria = Categoria.objects.create(nombre='Instrumentos', slug='instrumentos')
         cls.otra_categoria = Categoria.objects.create(nombre='Audio', slug='audio')
         cls.marca = Marca.objects.create(nombre='Marca musical')
@@ -224,6 +230,7 @@ class Evaluacion3Tests(TestCase):
         self.assertNotEqual(cuenta.password, datos['password'])
         self.assertFalse(cuenta.is_staff)
         self.assertFalse(cuenta.is_superuser)
+        self.assertEqual(list(cuenta.groups.values_list('name', flat=True)), ['Operador'])
         datos.update(first_name='Camila editada', password='', confirmar='')
         self.client.post(reverse('core:usuario_editar', args=[cuenta.pk]), datos)
         cuenta.refresh_from_db()
@@ -357,3 +364,81 @@ class Evaluacion3Tests(TestCase):
         self.assertEqual(respuesta.status_code, 302)
         despues = self.client.get(reverse('core:gestion')).context['ingresos']
         self.assertEqual(despues, antes + Decimal('80'))
+
+    def test_operador_consulta_y_registra_ventas_y_clientes(self):
+        self.client.force_login(self.operador)
+        for ruta in ('gestion', 'gestion_productos', 'gestion_categorias', 'gestion_clientes', 'gestion_ventas', 'reportes'):
+            self.assertEqual(self.client.get(reverse('core:' + ruta)).status_code, 200)
+        respuesta = self.client.post(reverse('core:cliente_nuevo'), {'nombre': 'Cliente del operador', 'correo': 'operador-cliente@example.test', 'activo': 'on'})
+        self.assertEqual(respuesta.status_code, 302)
+        persona = Cliente.objects.get(correo='operador-cliente@example.test')
+        respuesta = self.client.post(reverse('core:venta_nueva'), {'numero': 55, 'fecha': self.hoy.isoformat(), 'cliente': persona.pk, 'sucursal': self.sucursal.pk})
+        self.assertEqual(respuesta.status_code, 302)
+        venta = Boleta.objects.get(numero=55)
+        respuesta = self.client.post(reverse('core:detalle_nuevo', args=[venta.pk]), {'producto': self.guitarra.pk, 'cantidad': 2, 'precio_unitario': 90})
+        self.assertEqual(respuesta.status_code, 302)
+        detalle = DetalleBoleta.objects.get(boleta=venta)
+        self.assertEqual(detalle.subtotal, Decimal('180'))
+        self.client.post(reverse('core:detalle_editar', args=[venta.pk, detalle.pk]), {'producto': self.guitarra.pk, 'cantidad': 3, 'precio_unitario': 90})
+        detalle.refresh_from_db()
+        self.assertEqual(detalle.cantidad, 3)
+        listado = self.client.get(reverse('core:gestion_productos'))
+        self.assertNotContains(listado, reverse('core:producto_nuevo'))
+        self.assertNotContains(listado, reverse('core:producto_editar', args=[self.guitarra.pk]))
+
+    def test_operador_bloqueado_por_url_y_post_en_operaciones_reservadas(self):
+        self.client.force_login(self.operador)
+        rutas = [('producto_nuevo', []), ('producto_editar', [self.guitarra.pk]), ('producto_eliminar', [self.guitarra.pk]), ('categoria_nueva', []), ('categoria_editar', [self.categoria.pk]), ('categoria_eliminar', [self.categoria.pk]), ('cliente_eliminar', [self.ana.pk]), ('venta_eliminar', [self.venta.pk]), ('detalle_eliminar', [self.venta.pk, self.detalle.pk]), ('gestion_usuarios', []), ('usuario_nuevo', []), ('usuario_editar', [self.admin.pk]), ('usuario_desactivar', [self.admin.pk])]
+        for nombre, args in rutas:
+            for metodo in ('get', 'post'):
+                with self.subTest(ruta=nombre, metodo=metodo):
+                    respuesta = getattr(self.client, metodo)(reverse('core:' + nombre, args=args), self.datos_producto())
+                    self.assertEqual(respuesta.status_code, 403)
+        self.assertEqual(Producto.objects.count(), 4)
+        self.assertEqual(Cliente.objects.count(), 3)
+        self.assertEqual(Boleta.objects.count(), 4)
+        self.assertEqual(DetalleBoleta.objects.count(), 5)
+
+    def test_cuenta_sin_grupo_bloqueada_aunque_tenga_is_staff(self):
+        cuenta = User.objects.create_user('sin_perfil', password='Pino!Sonido9f2026', is_staff=True)
+        self.client.force_login(cuenta)
+        for ruta in ('gestion', 'gestion_productos', 'gestion_clientes', 'gestion_ventas', 'reportes', 'gestion_usuarios'):
+            self.assertEqual(self.client.get(reverse('core:' + ruta)).status_code, 403)
+
+    def test_grupo_administrador_autoriza_sin_superusuario(self):
+        cuenta = User.objects.create_user('administrador_grupo', password='Cedro!Sonido9f2026')
+        cuenta.groups.add(Group.objects.get(name='Administrador'))
+        self.client.force_login(cuenta)
+        respuesta = self.client.get(reverse('core:gestion_usuarios'))
+        self.assertEqual(respuesta.status_code, 200)
+        self.assertTrue(respuesta.context['es_administrador'])
+        self.assertEqual(self.client.post(reverse('core:producto_nuevo'), self.datos_producto()).status_code, 302)
+        self.assertTrue(Producto.objects.filter(codigo='NUEVO').exists())
+
+    def test_configurar_grupos_es_repetible_y_no_promueve_operadores(self):
+        sin_perfil = User.objects.create_user('cuenta_existente')
+        for _ in range(2):
+            call_command('configurar_grupos', stdout=StringIO())
+        self.assertEqual(Group.objects.filter(name__in=['Administrador', 'Operador']).count(), 2)
+        self.assertTrue(self.admin.groups.filter(name='Administrador').exists())
+        self.assertTrue(sin_perfil.groups.filter(name='Operador').exists())
+        self.assertFalse(self.operador.groups.filter(name='Administrador').exists())
+
+    def test_get_no_modifica_registros(self):
+        modelos = [Producto, Categoria, Cliente, Boleta, DetalleBoleta, User]
+        antes = [modelo.objects.count() for modelo in modelos]
+        rutas = [('producto_nuevo', []), ('producto_editar', [self.guitarra.pk]), ('producto_eliminar', [self.guitarra.pk]), ('categoria_nueva', []), ('categoria_eliminar', [self.categoria.pk]), ('cliente_nuevo', []), ('cliente_eliminar', [self.ana.pk]), ('venta_nueva', []), ('venta_eliminar', [self.venta.pk]), ('detalle_nuevo', [self.venta.pk]), ('detalle_eliminar', [self.venta.pk, self.detalle.pk]), ('usuario_nuevo', []), ('usuario_desactivar', [self.operador.pk])]
+        for nombre, args in rutas:
+            self.assertEqual(self.client.get(reverse('core:' + nombre, args=args), {'precio': '1', 'nombre': 'No guardar por GET'}).status_code, 200)
+        self.assertEqual([modelo.objects.count() for modelo in modelos], antes)
+        self.guitarra.refresh_from_db()
+        self.assertEqual(self.guitarra.precio, Decimal('100'))
+        self.operador.refresh_from_db()
+        self.assertTrue(self.operador.is_active)
+
+    def test_csrf_bloquea_post_sin_token_en_cada_operacion(self):
+        navegador = Client(enforce_csrf_checks=True)
+        navegador.force_login(self.admin)
+        for ruta, args in [('producto_nuevo', []), ('producto_editar', [self.guitarra.pk]), ('producto_eliminar', [self.guitarra.pk]), ('cliente_nuevo', []), ('venta_nueva', []), ('usuario_nuevo', []), ('salir', [])]:
+            with self.subTest(ruta=ruta):
+                self.assertEqual(navegador.post(reverse('core:' + ruta, args=args), self.datos_producto()).status_code, 403)

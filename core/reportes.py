@@ -12,6 +12,7 @@ from django.db.models.functions import ExtractMonth
 from django.http import HttpResponseBadRequest
 from django.shortcuts import render
 from .models import Categoria, Cliente, Producto, Boleta, DetalleBoleta
+from .decorators import grupos_permitidos
 
 
 PREGUNTAS = [
@@ -45,6 +46,7 @@ def identificador(valor, nombre):
 
 
 @login_required
+@grupos_permitidos("Administrador", "Operador")
 def reportes(request):
     numero = request.GET.get("reporte", "1")
     if not numero.isdigit() or not 1 <= int(numero) <= 20:

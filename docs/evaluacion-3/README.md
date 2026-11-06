@@ -4,11 +4,13 @@ SoundShop CL conserva el caso Tienda de la etapa anterior. La interfaz de gesti�
 
 ## 1. Gestión de información y acceso
 
-El panel de `/gestion/` permite mantener productos, categorías, clientes, ventas y detalles. Los usuarios con sesión pueden operar estos registros; las cuentas administrativas con `is_staff` gestionan también los usuarios de acceso. Se utiliza el modelo `User` de Django, con contraseñas verificadas mediante `authenticate`, sesiones iniciadas con `login` y cierre mediante `logout`. Un cliente comercial es un registro del modelo `Cliente`, distinto de una cuenta de acceso.
+El panel de `/gestion/` permite mantener productos, categorías, clientes, ventas y detalles. El grupo Administrador tiene el control completo. El grupo Operador consulta el catálogo y los reportes, y crea o edita clientes, ventas y detalles; no cambia el catálogo, elimina registros ni gestiona cuentas. Se utiliza el modelo `User` de Django, con contraseñas verificadas mediante `authenticate`, sesiones iniciadas con `login` y cierre mediante `logout`. Un cliente comercial es un registro del modelo `Cliente`, distinto de una cuenta de acceso.
+
+Los grupos nativos de Django se preparan con `python manage.py configurar_grupos`. El decorador reutilizable `grupos_permitidos`, definido en `core/decorators.py`, comprueba el perfil antes de ejecutar cada vista. Se utiliza junto a `login_required`: una visita anónima se redirige al inicio de sesión y una cuenta sin autorización recibe HTTP 403. El bloqueo se aplica también al escribir directamente una URL o enviar una petición POST; ocultar un botón no reemplaza esta comprobación.
 
 Cada formulario envía una petición POST con CSRF. La vista lee los campos, aplica `full_clean()` al modelo y guarda mediante el ORM cuando los datos son válidos. Los errores vuelven al formulario. Los borrados requieren confirmación con POST y respetan las relaciones protegidas. Las cuentas se desactivan en lugar de borrarse y no se permite desactivar la cuenta propia durante la gestión.
 
-La primera cuenta se prepara con `createsuperuser`, pero la gestión se realiza en las páginas propias del proyecto. La ruta `/admin/` no está habilitada y `django.contrib.admin` no está instalado en esta rama. El historial anterior permanece en las ramas de E1 y E2.
+La primera cuenta se prepara con `createsuperuser`, pero la gestión se realiza en las páginas propias del proyecto. La ruta `/admin/` no está habilitada y `django.contrib.admin` no está instalado en esta rama, de acuerdo con la indicación del PDF de E3 de utilizar un administrador propio. El registro de los modelos en Django Admin corresponde a la etapa E2 conservada en su rama. Las actividades de aplicación adjuntas se incorporan a E3 en lo relativo al CRUD, las peticiones POST, CSRF, los grupos, el decorador propio y el control de acceso.
 
 ## 2. Correspondencia de las veinte consultas ORM
 

@@ -40,6 +40,7 @@ Con MySQL activo y las variables anteriores configuradas, ejecutar:
 python manage.py migrate
 python manage.py cargar_catalogo
 python manage.py createsuperuser
+python manage.py configurar_grupos
 python manage.py runserver
 ```
 
@@ -51,7 +52,9 @@ python manage.py runserver
 - Panel propio: <http://127.0.0.1:8000/gestion/>.
 - Inicio de sesión: <http://127.0.0.1:8000/login/>.
 
-El panel permite crear, listar, editar y eliminar productos, categorías, clientes, ventas y sus detalles. Las cuentas de acceso se crean, consultan, editan y desactivan desde **Usuarios**, disponible para la cuenta administradora. Las nuevas cuentas pueden operar la tienda, pero no administrar usuarios. Las contraseñas se guardan con el sistema de Django, nunca como texto legible.
+El grupo **Administrador** tiene acceso completo a productos, categorías, clientes, ventas, detalles y cuentas de usuario. El grupo **Operador** puede consultar el catálogo, categorías, clientes, ventas y reportes; también puede crear y editar clientes, ventas y sus detalles. Los cambios del catálogo, las eliminaciones y la gestión de usuarios quedan reservados al Administrador. Las cuentas nuevas creadas desde el panel reciben el grupo Operador. Las contraseñas se guardan con el sistema de Django, nunca como texto legible.
+
+`configurar_grupos` crea los dos grupos y asigna Administrador a los superusuarios activos. Las cuentas activas sin grupo reciben Operador. El comando puede ejecutarse nuevamente en una base ya preparada y conserva las contraseñas. La primera cuenta creada con `createsuperuser` puede acceder al panel para preparar el proyecto.
 
 ## 3. Continuidad del modelo de la tienda
 
@@ -77,6 +80,8 @@ soundshop/urls.py                Rutas del proyecto sin Django Admin
 core/models.py                  Modelo de datos conservado de E2
 core/migrations/                Historial conservado de E2
 core/views.py                   Login, logout y CRUD con request.POST
+core/decorators.py              Autorización reutilizable por grupos
+core/context_processors.py      Perfil y acciones disponibles en la interfaz
 core/reportes.py                Las veinte consultas ORM de Tienda
 core/urls.py                    Rutas propias de la tienda y el panel
 core/templates/core/e3/          Formularios y páginas del panel
@@ -85,7 +90,7 @@ core/tests.py                   Pruebas funcionales de E3
 .vscode/tasks.json              Ejecución de tareas desde VS Code
 ```
 
-Las páginas administrativas y las operaciones están protegidas con `login_required`. Cerrar sesión invalida el acceso y los formularios utilizan protección CSRF. La gestión de cuentas requiere también `is_staff`; el formulario no permite otorgar privilegios administrativos a una cuenta nueva.
+Las páginas administrativas y las operaciones están protegidas con `login_required` y el decorador propio `grupos_permitidos`. Una cuenta autenticada sin perfil autorizado recibe una respuesta HTTP 403, igual que un Operador que intenta acceder a una acción reservada. La comprobación se ejecuta en las vistas para peticiones GET y POST; también se adapta la interfaz al perfil. Cerrar sesión invalida el acceso y los formularios utilizan protección CSRF. El formulario de usuarios no permite otorgar privilegios administrativos a una cuenta nueva.
 
 ## 5. Comprobación y conservación de las entregas
 
