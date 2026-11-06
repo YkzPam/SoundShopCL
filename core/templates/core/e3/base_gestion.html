@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block estilos %}<link rel="stylesheet" href="{% static 'css/gestion.css' %}?v=4"><script src="{% static 'js/gestion.js' %}" defer></script>{% endblock %}
+{% block estilos %}<link rel="stylesheet" href="{% static 'css/gestion.css' %}?v=6"><script src="{% static 'js/gestion.js' %}" defer></script>{% endblock %}
 {% block clase_body %}panel-administrativo{% endblock %}
 {% block contenido %}
 <div class="gestion-layout">
   {% include 'core/admin_menu.html' %}
-  <div class="gestion-contenido">{% block gestion %}{% endblock %}</div>
+  <div class="gestion-contenido">{% include 'core/e3/migas.html' %}{% block gestion %}{% endblock %}</div>
 </div>
 {% endblock %}

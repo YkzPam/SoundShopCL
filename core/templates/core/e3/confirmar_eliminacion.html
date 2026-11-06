@@ -1,7 +1,7 @@
 {% extends 'core/e3/base_gestion.html' %}
-{% load moneda %}
+{% load moneda static %}
 {% block gestion %}
-<section class="acceso gestion-confirmacion"><p class="eyebrow">Revisar antes de confirmar</p><h1>{{ titulo }}</h1>
+<section class="acceso gestion-confirmacion"><div class="gestion-confirmacion-identidad">{% if tipo_objeto == 'producto' and objeto.imagen %}<img class="gestion-confirmacion-foto" src="{% static objeto.imagen %}" alt="">{% else %}<span class="gestion-confirmacion-icono">{% if desactivar %}{% include 'core/e3/icono.html' with nombre='desactivar' %}{% else %}{% include 'core/e3/icono.html' with nombre='advertencia' %}{% endif %}</span>{% endif %}<div><p class="eyebrow">Revisar antes de confirmar</p><h1>{{ titulo }}</h1></div></div>
 <dl class="gestion-resumen-registro">
 {% if tipo_objeto == 'producto' %}<dt>Producto</dt><dd>{{ objeto.nombre }}</dd><dt>Código</dt><dd>{{ objeto.codigo }}</dd><dt>Precio</dt><dd>${{ objeto.precio|pesos }}</dd><dt>Stock</dt><dd>{{ objeto.stock }} unidades</dd>
 {% elif tipo_objeto == 'venta' %}<dt>Número de venta</dt><dd>{{ objeto.numero }}</dd><dt>Cliente</dt><dd>{{ objeto.cliente.nombre }}</dd><dt>Fecha</dt><dd>{{ objeto.fecha|date:'d/m/Y' }}</dd><dt>Detalles incluidos</dt><dd>{{ objeto.detalleboleta_set.count }}</dd>

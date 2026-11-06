@@ -2,13 +2,13 @@
 <div class="gestion-marca"><span aria-hidden="true">◎</span><div>soundshop<small>ESPACIO DE GESTIÓN</small></div></div>
 <p class="gestion-grupo">La tienda</p>
 <nav class="gestion-nav" aria-label="Administración">
-<a href="{% url 'core:gestion' %}" {% if request.resolver_match.url_name == 'gestion' %}aria-current="page"{% endif %}><span aria-hidden="true">◈</span>Resumen</a>
-<a href="{% url 'core:gestion_productos' %}" {% if 'producto' in request.resolver_match.url_name %}aria-current="page"{% endif %}><span aria-hidden="true">▤</span>Productos</a>
-<a href="{% url 'core:gestion_categorias' %}" {% if 'categoria' in request.resolver_match.url_name %}aria-current="page"{% endif %}><span aria-hidden="true">▦</span>Categorías</a>
-<a href="{% url 'core:gestion_clientes' %}" {% if 'cliente' in request.resolver_match.url_name %}aria-current="page"{% endif %}><span aria-hidden="true">○</span>Clientes</a>
-<a href="{% url 'core:gestion_ventas' %}" {% if 'venta' in request.resolver_match.url_name or 'detalle' in request.resolver_match.url_name %}aria-current="page"{% endif %}><span aria-hidden="true">↗</span>Ventas</a>
-<a href="{% url 'core:reportes' %}" {% if request.resolver_match.url_name == 'reportes' %}aria-current="page"{% endif %}><span aria-hidden="true">▥</span>Reportes</a>
-{% if es_administrador %}<a href="{% url 'core:gestion_usuarios' %}" {% if 'usuario' in request.resolver_match.url_name %}aria-current="page"{% endif %}><span aria-hidden="true">◇</span>Usuarios</a>{% endif %}
+<a href="{% url 'core:gestion' %}" {% if request.resolver_match.url_name == 'gestion' %}aria-current="page"{% endif %}>{% include 'core/e3/icono.html' with nombre='resumen' %}Resumen</a>
+<a href="{% url 'core:gestion_productos' %}" {% if 'producto' in request.resolver_match.url_name %}aria-current="page"{% endif %}>{% include 'core/e3/icono.html' with nombre='productos' %}Productos</a>
+<a href="{% url 'core:gestion_categorias' %}" {% if 'categoria' in request.resolver_match.url_name %}aria-current="page"{% endif %}>{% include 'core/e3/icono.html' with nombre='categorias' %}Categorías</a>
+<a href="{% url 'core:gestion_clientes' %}" {% if 'cliente' in request.resolver_match.url_name %}aria-current="page"{% endif %}>{% include 'core/e3/icono.html' with nombre='clientes' %}Clientes</a>
+<a href="{% url 'core:gestion_ventas' %}" {% if 'venta' in request.resolver_match.url_name or 'detalle' in request.resolver_match.url_name %}aria-current="page"{% endif %}>{% include 'core/e3/icono.html' with nombre='ventas' %}Ventas</a>
+<a href="{% url 'core:reportes' %}" {% if request.resolver_match.url_name == 'reportes' %}aria-current="page"{% endif %}>{% include 'core/e3/icono.html' with nombre='reportes' %}Reportes</a>
+{% if es_administrador %}<a href="{% url 'core:gestion_usuarios' %}" {% if 'usuario' in request.resolver_match.url_name %}aria-current="page"{% endif %}>{% include 'core/e3/icono.html' with nombre='usuarios' %}Usuarios</a>{% endif %}
 </nav>
 <div class="gestion-sesion"><span class="gestion-avatar" aria-hidden="true">{{ request.user.username|first|upper }}</span><div><strong>{{ request.user.username }}</strong><small>{{ perfil_actual }}</small></div></div>
 <a class="gestion-tienda" href="{% url 'core:inicio' %}">Volver a la tienda ↗</a>

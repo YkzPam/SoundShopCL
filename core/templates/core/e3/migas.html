@@ -1,0 +1,16 @@
+{% with ruta=request.resolver_match.url_name %}
+<nav class="gestion-migas" aria-label="Ruta de navegación"><ol>
+{% if ruta == 'gestion' %}<li aria-current="page">Resumen</li>{% else %}
+<li><a href="{% url 'core:gestion' %}">Gestión</a></li>
+{% if 'producto' in ruta and ruta != 'gestion_productos' %}<li><a href="{% url 'core:gestion_productos' %}">Productos</a></li>
+{% elif 'categoria' in ruta and ruta != 'gestion_categorias' %}<li><a href="{% url 'core:gestion_categorias' %}">Categorías</a></li>
+{% elif 'cliente' in ruta and ruta != 'gestion_clientes' %}<li><a href="{% url 'core:gestion_clientes' %}">Clientes</a></li>
+{% elif 'usuario' in ruta and ruta != 'gestion_usuarios' %}<li><a href="{% url 'core:gestion_usuarios' %}">Usuarios</a></li>
+{% elif 'venta' in ruta or 'detalle' in ruta %}
+  {% if ruta != 'gestion_ventas' %}<li><a href="{% url 'core:gestion_ventas' %}">Ventas</a></li>{% endif %}
+  {% if venta.pk and ruta != 'venta_detalle' %}<li><a href="{% url 'core:venta_detalle' venta.pk %}">Venta {{ venta.numero }}</a></li>{% elif venta_id %}<li><a href="{% url 'core:venta_detalle' venta_id %}">Venta {{ objeto.boleta.numero }}</a></li>{% endif %}
+{% endif %}
+<li aria-current="page">{{ titulo }}</li>
+{% endif %}
+</ol></nav>
+{% endwith %}

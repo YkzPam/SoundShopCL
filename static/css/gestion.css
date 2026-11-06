@@ -239,3 +239,34 @@
 }
 @media(max-width:420px) { .gestion-resumen-registro { grid-template-columns:1fr; gap:.2rem; } .gestion-resumen-registro dd { margin-bottom:.6rem; } }
 @media(prefers-reduced-motion:reduce) { .gestion-cabecera-listado { animation:none; } }
+
+/* Detalles visuales compartidos por las pantallas de gestión. */
+.gestion-nav .icono-crud { width:18px; height:18px; flex-shrink:0; color:#c3a76d; }
+.gestion-migas { margin:0 0 1.4rem; font-size:.7rem; line-height:1.6; }
+.gestion-migas ol { display:flex; flex-wrap:wrap; gap:.35rem .5rem; padding:0; margin:0; list-style:none; }
+.gestion-migas li { display:inline-flex; align-items:baseline; gap:.5rem; color:var(--tinta); overflow-wrap:anywhere; }
+.gestion-migas li + li::before { content:"/"; color:var(--bs-secondary-color); }
+.gestion-migas a { color:var(--bs-secondary-color); text-decoration:none; text-underline-offset:3px; }
+.gestion-migas a:hover { color:var(--detalle); text-decoration:underline; }
+.gestion-contenido .table tbody tr:nth-child(even) > td { background:color-mix(in srgb,var(--papel) 35%,var(--superficie)); }
+.gestion-contenido .table tbody tr:hover > td { background:color-mix(in srgb,var(--oro) 8%,var(--superficie)); }
+.gestion-contenido .table .gestion-numero { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.gestion-contenido .table tfoot th,.gestion-contenido .table tfoot td { padding:1rem; background:var(--papel); border-top:1px solid var(--linea); }
+.gestion-producto img,.gestion-miniatura-vacia { width:48px; height:48px; flex-shrink:0; border:1px solid var(--linea); background:var(--papel); }
+.gestion-producto img { padding:3px; }
+.gestion-formulario fieldset { min-width:0; margin:0 0 1.6rem; padding:0 0 1.6rem; border:0; border-bottom:1px solid var(--linea); }
+.gestion-formulario fieldset:last-of-type { margin-bottom:0; padding-bottom:0; border-bottom:0; }
+.gestion-formulario legend { float:none; font-size:1rem; font-weight:600; letter-spacing:-.025em; margin-bottom:1.1rem; }
+.gestion-formulario .form-check-input:checked { background-color:var(--detalle); border-color:var(--detalle); }
+.gestion-form-acciones { margin-top:1.5rem; padding:1rem; border:1px solid var(--linea); border-radius:9px; background:var(--papel); }
+.gestion-form-acciones .btn { display:inline-flex; align-items:center; justify-content:center; gap:.4rem; }
+.gestion-form-acciones .icono-crud { width:16px; height:16px; }
+.gestion-confirmacion-identidad { display:flex; align-items:center; gap:1rem; margin-bottom:1.3rem; }
+.gestion-confirmacion-identidad .eyebrow { margin:0 0 .4rem; }
+.gestion-confirmacion-identidad h1 { font-size:clamp(1.35rem,2.4vw,2rem); margin:0; }
+.gestion-confirmacion-icono { display:grid; place-items:center; width:62px; height:62px; flex-shrink:0; border-radius:50%; background:#fbefec; color:#91392e; }
+.gestion-confirmacion-icono .icono-crud { width:27px; height:27px; }
+.gestion-confirmacion-foto { width:78px; height:78px; object-fit:contain; flex-shrink:0; background:var(--papel); border:1px solid var(--linea); border-radius:12px; padding:5px; }
+[data-bs-theme="dark"] .gestion-confirmacion-icono { background:#3b2724; color:#ffc2b7; }
+@media(max-width:767px) { .gestion-nav .icono-crud { width:16px; height:16px; } .gestion-form-acciones { padding:.8rem; } .gestion-migas { margin-bottom:1rem; } }
+@media(max-width:420px) { .gestion-confirmacion-identidad { gap:.7rem; } .gestion-confirmacion-icono { width:44px; height:44px; } .gestion-confirmacion-foto { width:58px; height:58px; } }
