@@ -920,6 +920,7 @@ class Evaluacion3Tests(TestCase):
             ({"stock": "agotado"}, ["P3"]),
             ({"stock": "bajo"}, ["P2", "P4"]),
             ({"stock": "disponible"}, ["P1", "P2", "P4"]),
+            ({"q": "p2", "stock": "bajo"}, ["P2"]),
             (
                 {
                     "q": "Guitarra",
@@ -940,6 +941,39 @@ class Evaluacion3Tests(TestCase):
         )
         self.assertEqual(respuesta.context["pagina"].paginator.count, 4)
         self.assertFalse(respuesta.context["hay_filtros"])
+
+    def test_buscar_cliente_por_rut_o_correo_y_ver_compras_como_operador(self):
+        self.ana.rut = "12.345.678-5"
+        self.ana.save(update_fields=["rut"])
+        self.client.force_login(self.operador)
+        ruta_clientes = reverse("core:gestion_clientes")
+        ruta_reporte = reverse("core:reportes")
+        for busqueda in ("12.345.678-5", "ANA@EXAMPLE.TEST"):
+            with self.subTest(busqueda=busqueda):
+                respuesta = self.client.get(ruta_clientes, {"q": busqueda})
+                self.assertEqual(list(respuesta.context["pagina"]), [self.ana])
+                self.assertContains(respuesta, f'{ruta_reporte}?reporte=6&amp;cliente={self.ana.pk}')
+
+        respuesta = self.client.get(ruta_reporte, {"reporte": 6, "cliente": self.ana.pk})
+        self.assertEqual(respuesta.status_code, 200)
+        self.assertFalse(respuesta.context["error"])
+        self.assertEqual([fila[0] for fila in respuesta.context["filas"]], [2, 1])
+
+    def test_busqueda_y_estado_de_ventas_se_pueden_combinar(self):
+        self.venta.estado = "pendiente"
+        self.venta.save(update_fields=["estado"])
+        ruta = reverse("core:gestion_ventas")
+        casos = [
+            ({"q": "2"}, [2]),
+            ({"q": "ana", "estado": "pendiente"}, [1]),
+            ({"q": "ana", "estado": "registrada"}, [2]),
+            ({"q": "Beto", "estado": "pendiente"}, []),
+        ]
+        for filtros, esperados in casos:
+            with self.subTest(filtros=filtros):
+                respuesta = self.client.get(ruta, filtros)
+                self.assertEqual([venta.numero for venta in respuesta.context["pagina"]], esperados)
+        self.assertContains(respuesta, "No hay ventas para estos filtros")
 
     def test_filtros_se_conservan_en_paginacion_y_categorias(self):
         Producto.objects.bulk_create(

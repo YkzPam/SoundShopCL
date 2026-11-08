@@ -1,18 +1,21 @@
 {% extends "core/e3/base_gestion.html" %}
 {% load moneda %}
+{% block clase_body %}{{ block.super }} venta-detalle{% endblock %}
 {% block gestion %}
     <div class="cabecera">
-        <p class="eyebrow">Ventas</p>
+        <p class="eyebrow d-print-none">Ventas</p>
+        <p class="d-none d-print-block">SoundShop CL · Comprobante interno</p>
         <h1>Venta {{ venta.numero }}</h1>
         <p>{{ venta.fecha|date:'d/m/Y H:i' }} · {{ venta.cliente.nombre }} · {{ venta.sucursal.nombre }} · {{ venta.get_estado_display }}</p>
         {% if perms.core.add_detalleboleta %}
-            <a class="btn btn-primary"
+            <a class="btn btn-primary d-print-none"
                href="{% url 'core:detalle_nuevo' venta.id %}">Agregar producto</a>
         {% endif %}
         {% if perms.core.change_boleta %}
-            <a class="btn btn-outline-secondary"
+            <a class="btn btn-outline-secondary d-print-none"
                href="{% url 'core:venta_editar' venta.id %}">Editar venta</a>
         {% endif %}
+        <button type="button" class="btn btn-outline-secondary d-print-none" id="imprimir-venta">Imprimir</button>
     </div>
     <div class="table-responsive">
         <table class="table align-middle">
@@ -22,7 +25,7 @@
                     <th class="gestion-numero">Cantidad</th>
                     <th class="gestion-numero">Precio unitario</th>
                     <th class="gestion-numero">Subtotal</th>
-                    <th>Acciones</th>
+                    <th class="d-print-none">Acciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -32,7 +35,7 @@
                         <td class="gestion-numero">{{ detalle.cantidad }}</td>
                         <td class="gestion-numero">${{ detalle.precio_unitario|pesos }}</td>
                         <td class="gestion-numero">${{ detalle.subtotal|pesos }}</td>
-                        <td>
+                        <td class="d-print-none">
                             {% if perms.core.change_detalleboleta %}
                                 <a class="accion-crud"
                                    href="{% url 'core:detalle_editar' venta.id detalle.id %}">{% include "core/e3/icono.html" with nombre="editar" %}Editar</a>
@@ -53,12 +56,12 @@
                 <tr>
                     <th colspan="3">Total de la venta</th>
                     <th class="gestion-numero">${{ total|pesos }}</th>
-                    <td></td>
+                    <td class="d-print-none"></td>
                 </tr>
             </tfoot>
         </table>
     </div>
-    <p>El precio unitario queda guardado en la venta. Cambiar el precio del catálogo conserva este importe histórico.</p>
-    <a class="btn btn-outline-secondary"
+    <p class="d-print-none">El precio unitario queda guardado en la venta. Cambiar el precio del catálogo conserva este importe histórico.</p>
+    <a class="btn btn-outline-secondary d-print-none"
        href="{% url 'core:gestion_ventas' %}">Volver a ventas</a>
 {% endblock %}

@@ -15,12 +15,12 @@
     {% include "core/e3/accesos_categorias.html" with mostrar_todos=True %}
     <form method="get" class="row g-3 gestion-filtros">
         <div class="col-md-6">
-            <label class="form-label" for="q">Buscar por nombre</label>
+            <label class="form-label" for="q">Buscar por nombre o código (SKU)</label>
             <input class="form-control"
                    id="q"
                    name="q"
                    value="{{ busqueda }}"
-                   placeholder="Nombre del equipo">
+                   placeholder="Nombre del equipo o código">
         </div>
         <div class="col-md-6">
             <label for="categoria" class="form-label">Categoría</label>

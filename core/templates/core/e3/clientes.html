@@ -13,12 +13,12 @@
     </header>
     <p>Los clientes son registros comerciales, no cuentas de acceso al panel.</p>
     <form method="get" class="d-flex flex-wrap gap-2 mb-3 gestion-buscador">
-        <label class="visually-hidden" for="q">Buscar cliente por nombre</label>
+        <label class="visually-hidden" for="q">Buscar cliente por nombre, RUT o correo</label>
         <input class="form-control"
                id="q"
                name="q"
                value="{{ busqueda }}"
-               placeholder="Buscar por nombre">
+               placeholder="Buscar por nombre, RUT o correo">
         <button class="btn btn-outline-primary">Buscar</button>
         {% if busqueda %}
             <a class="btn btn-outline-primary"
@@ -46,6 +46,10 @@
                         <td>{{ c.telefono }}</td>
                         <td>{{ c.activo|yesno:'Activo,Inactivo' }}</td>
                         <td>
+                            {% if perms.core.view_producto and perms.core.view_categoria and perms.core.view_boleta and perms.core.view_detalleboleta %}
+                                <a class="accion-crud accion-consultar"
+                                   href="{% url 'core:reportes' %}?reporte=6&amp;cliente={{ c.pk }}">{% include "core/e3/icono.html" with nombre="ver" %}Ver compras</a>
+                            {% endif %}
                             {% if perms.core.change_cliente %}
                                 <a class="accion-crud"
                                    href="{% url 'core:cliente_editar' c.pk %}">{% include "core/e3/icono.html" with nombre="editar" %}Editar</a>
@@ -63,7 +67,7 @@
                                 <span aria-hidden="true">○</span>
                                 {% if busqueda %}
                                     <h2>No hay clientes para esta búsqueda</h2>
-                                    <p>Se puede probar otro nombre o volver al listado completo.</p>
+                                    <p>Se puede probar otro nombre, RUT o correo, o volver al listado completo.</p>
                                     <a class="btn btn-outline-primary"
                                        href="{% url 'core:gestion_clientes' %}">Limpiar búsqueda</a>
                                 {% else %}

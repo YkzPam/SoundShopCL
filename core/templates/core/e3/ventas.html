@@ -6,12 +6,33 @@
             <p class="eyebrow">Movimiento de la tienda</p>
             <h1>Ventas</h1>
             <p>Compras de los clientes y detalle de los productos adquiridos.</p>
-            <span class="gestion-conteo">{{ pagina.paginator.count }} venta{{ pagina.paginator.count|pluralize }} registrada{{ pagina.paginator.count|pluralize }}</span>
+            <span class="gestion-conteo">{{ pagina.paginator.count }} {% if busqueda or estado_actual %}resultado{{ pagina.paginator.count|pluralize }} con los filtros actuales{% else %}venta{{ pagina.paginator.count|pluralize }} registrada{{ pagina.paginator.count|pluralize }}{% endif %}</span>
         </div>
         {% if perms.core.add_boleta %}
             <a class="btn btn-primary" href="{% url 'core:venta_nueva' %}">+ Nueva venta</a>
         {% endif %}
     </header>
+    <form method="get" class="row g-3 gestion-filtros">
+        <div class="col-md-5">
+            <label class="form-label" for="q">Buscar por número de boleta o cliente</label>
+            <input class="form-control" id="q" name="q" value="{{ busqueda }}" placeholder="Número de boleta o nombre">
+        </div>
+        <div class="col-md-3">
+            <label class="form-label" for="estado">Estado</label>
+            <select class="form-select" id="estado" name="estado">
+                <option value="">Todos</option>
+                {% for valor, etiqueta in estados %}
+                    <option value="{{ valor }}"{% if estado_actual == valor %} selected{% endif %}>{{ etiqueta }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-4 gestion-filtros-acciones">
+            <button class="btn btn-primary">Aplicar filtros</button>
+            {% if busqueda or estado_actual %}
+                <a class="btn btn-outline-primary" href="{% url 'core:gestion_ventas' %}">Limpiar filtros</a>
+            {% endif %}
+        </div>
+    </form>
     <div class="table-responsive{% if not pagina %} gestion-listado-vacio{% endif %}">
         <table class="table align-middle">
             <thead>
@@ -54,11 +75,17 @@
                         <td colspan="7">
                             <div class="gestion-vacio gestion-vacio-listado">
                                 <span aria-hidden="true">↗</span>
-                                <h2>Todavía no hay ventas</h2>
-                                <p>Se puede registrar una venta y después incorporar sus productos.</p>
-                                {% if perms.core.add_boleta %}
-                                    <a class="btn btn-primary"
-                                       href="{% url 'core:venta_nueva' %}">Crear la primera venta</a>
+                                {% if busqueda or estado_actual %}
+                                    <h2>No hay ventas para estos filtros</h2>
+                                    <p>Prueba con otro número, cliente o estado.</p>
+                                    <a class="btn btn-outline-primary" href="{% url 'core:gestion_ventas' %}">Limpiar filtros</a>
+                                {% else %}
+                                    <h2>Todavía no hay ventas</h2>
+                                    <p>Se puede registrar una venta y después incorporar sus productos.</p>
+                                    {% if perms.core.add_boleta %}
+                                        <a class="btn btn-primary"
+                                           href="{% url 'core:venta_nueva' %}">Crear la primera venta</a>
+                                    {% endif %}
                                 {% endif %}
                             </div>
                         </td>

@@ -1719,3 +1719,50 @@
         height: 58px;
     }
 }
+
+@media print {
+    .venta-detalle {
+        --papel: #fff;
+        --superficie: #fff;
+        --tinta: #111;
+        --linea: #bbb;
+        --bs-secondary-color: #333;
+        background: #fff;
+        color: #111;
+    }
+
+    .venta-detalle .site-header,
+    .venta-detalle .site-footer,
+    .venta-detalle .gestion-lateral,
+    .venta-detalle .gestion-migas,
+    .venta-detalle main > .alert {
+        display: none;
+    }
+
+    .venta-detalle main.container {
+        width: 100%;
+        max-width: none;
+        padding: 0 !important;
+    }
+
+    .venta-detalle .gestion-layout {
+        display: block;
+    }
+
+    .venta-detalle .cabecera,
+    .venta-detalle .table-responsive {
+        animation: none;
+    }
+
+    .venta-detalle .table-responsive {
+        overflow: visible;
+    }
+
+    .venta-detalle .table {
+        min-width: 0;
+    }
+
+    .venta-detalle tr {
+        break-inside: avoid;
+    }
+}

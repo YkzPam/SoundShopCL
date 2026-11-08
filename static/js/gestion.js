@@ -87,3 +87,8 @@ if (formularioProducto) {
     formularioProducto.addEventListener('change', actualizarVistaProducto);
     actualizarVistaProducto();
 }
+
+const imprimirVenta = document.getElementById('imprimir-venta');
+if (imprimirVenta) {
+    imprimirVenta.addEventListener('click', () => window.print());
+}

@@ -343,7 +343,7 @@ def gestion_productos(request):
     estado = request.GET.get("estado", "")
     stock = request.GET.get("stock", "")
     if busqueda:
-        productos = productos.filter(nombre__icontains=busqueda)
+        productos = productos.filter(Q(nombre__icontains=busqueda) | Q(codigo__icontains=busqueda))
     if categoria_id.isdigit():
         productos = productos.filter(categoria_id=categoria_id)
     if estado in ("activo", "inactivo"):
@@ -647,7 +647,9 @@ def gestion_clientes(request):
     clientes = Cliente.objects.order_by("nombre", "id")
     busqueda = request.GET.get("q", "").strip()
     if busqueda:
-        clientes = clientes.filter(nombre__icontains=busqueda)
+        clientes = clientes.filter(
+            Q(nombre__icontains=busqueda) | Q(rut__icontains=busqueda) | Q(correo__icontains=busqueda)
+        )
     return render(
         request,
         "core/e3/clientes.html",
@@ -724,10 +726,24 @@ def cliente_eliminar(request, cliente_id):
 @permission_required("core.view_boleta", raise_exception=True)
 def gestion_ventas(request):
     ventas = Boleta.objects.select_related("cliente", "sucursal").order_by("-fecha", "-numero")
+    busqueda = request.GET.get("q", "").strip()
+    estado = request.GET.get("estado", "")
+    if busqueda:
+        ventas = ventas.filter(Q(numero__icontains=busqueda) | Q(cliente__nombre__icontains=busqueda))
+    if estado in dict(Boleta.ESTADOS):
+        ventas = ventas.filter(estado=estado)
+    else:
+        estado = ""
     return render(
         request,
         "core/e3/ventas.html",
-        {"titulo": "Ventas", "pagina": Paginator(ventas, 25).get_page(request.GET.get("page"))},
+        {
+            "titulo": "Ventas",
+            "pagina": Paginator(ventas, 25).get_page(request.GET.get("page")),
+            "busqueda": busqueda,
+            "estados": Boleta.ESTADOS,
+            "estado_actual": estado,
+        },
     )
 
 
